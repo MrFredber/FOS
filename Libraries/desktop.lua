@@ -75,12 +75,15 @@ wf = wf+1
 end
 
 if hf+7 > h then
-  gpu.setBackground(0xff0000)
-  gpu.set(w, h-1, "!")
-  gpu.setBackground(0x2b2b2b)
-  stop = 1
+  desktop.error()
 end
 end 
+end
+
+function desktop.error(...)
+gpu.setBackground(0xFF0000)
+gpu.set(w, h-1, "!")
+gpu.setBackground(0x2b2b2b)
 end
 
 return desktop

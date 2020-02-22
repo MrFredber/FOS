@@ -6,6 +6,7 @@ local term = require("term")
 local event = require("event")
 local os = require("os")
 local computer = require("computer")
+local io = require("io")
 
 --Мои Библиотеки
 
@@ -20,11 +21,29 @@ local gpu = com.gpu
 
 local w, h = gpu.getResolution();
 local a = 0
+local lang = {}
+local langsett = {}
+local langpath = "/fos/lang/fos"
+local settpath = "/fos/system/"
+local settname = "lang"
+local fullsettpath = fs.concat(settpath, settname)
+local settfile = io.open(fullsettpath, "r")
 
 ----------
-w, h =gpu.getResolution();
+
+for var in settfile:lines() do
+table.insert(langsett, var)
+end
+
+local fulllangpath = fs.concat(langpath, langsett[1])
+local langfile = io.open(fulllangpath, "r")
+
+for var in langfile:lines() do
+table.insert(lang, var)
+end
+
 if w < 79 or h < 24 then
-print("for launch FOS you need a normal resolution")
+print(lang[4])
 os.exit()
 end
 
@@ -36,11 +55,11 @@ local _,_,x,y = event.pull("touch")
 
 if x == 1 and y == h then
 gpu.setBackground(0x009400)
-gpu.set(1, h-1, "S")
+gpu.set(1, h-1, lang[1])
 gpu.setBackground(0xff0000)
-gpu.set(2, h-1, "O")
+gpu.set(2, h-1, lang[2])
 gpu.setBackground(0xffb400)
-gpu.set(3, h-1, "R")
+gpu.set(3, h-1, lang[3])
 a = 1
 else if x == 1 and y == h-1 and a == 1 then
 gpu.setBackground(0x000000)
@@ -59,4 +78,7 @@ end
 end
 end
 end
+
+
+
 end
