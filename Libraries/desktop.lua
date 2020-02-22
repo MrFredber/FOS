@@ -2,6 +2,7 @@ local desktop = {}
 local fs = require("filesystem")
 local com = require("component")
 local gpu = com.gpu
+local term = require("term")
 
 local icons = require("/fos/icons")
 
@@ -14,6 +15,16 @@ delay = 0
 delaymax = 2
 wi = 0
 hi = 0
+
+gpu.setBackground(0x2b2b2b)
+gpu.fill(1, 1, w, h-1, " ")
+gpu.setBackground(0x0069ff)
+gpu.fill(1, h, w, h, " ")
+gpu.set(1, h, "F")
+
+gpu.setBackground(0x2b2b2b)
+term.setCursor(1, 1)
+
 
 path = "/fos"
 for file in fs.list(path) do
@@ -50,7 +61,7 @@ for file in fs.list(path) do
   wf = 0
   hf = hf+7
   wi = 0
-  hi = hf-4
+  hi = hf-5
 
 end
 end

@@ -1,6 +1,7 @@
 local icons = {}
 local gpu = require("component").gpu
 local color = gpu.setBackground
+local foreground = gpu.setForeground
 local fill = gpu.fill
 local set = gpu.set
 
@@ -30,12 +31,15 @@ end
 
 function icons.lua(x, y)
 
-color(0x292929)
+color(0x171717)
 fill(x, y, 8, 4, " ")
+foreground(0xe2732b)
+set(x, y, "if")
+set(x, y+2, "end")
 
 color(0x727272)
 fill(x, y+3, 8, 1, " ")
-set(x+3, y+3, ".lua")
+set(x+2, y+3, ".lua")
 end
 
 return icons
