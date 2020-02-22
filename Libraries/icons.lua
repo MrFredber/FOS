@@ -33,13 +33,20 @@ function icons.lua(x, y)
 
 color(0x171717)
 fill(x, y, 8, 4, " ")
-foreground(0xe2732b)
+foreground(0xffb400)
 set(x, y, "if")
 set(x, y+2, "end")
-
+foreground(0xad2de7)
+set(x+3, y, "i = 1")
+set(x+6, y+1, "i")
+foreground(0xff0000)
+set(x, y+1, "print(")
+set(x+7, y+1, ")")
 color(0x727272)
+foreground(0xffffff)
 fill(x, y+3, 8, 1, " ")
 set(x+2, y+3, ".lua")
+color(0x2b2b2b)
 end
 
 return icons

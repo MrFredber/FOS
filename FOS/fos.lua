@@ -22,6 +22,11 @@ local w, h = gpu.getResolution();
 local a = 0
 
 ----------
+w, h =gpu.getResolution();
+if w < 79 or h < 24 then
+print("for launch FOS you need a normal resolution")
+os.exit()
+end
 
 desktop.workplace();
 

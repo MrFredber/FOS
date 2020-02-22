@@ -3,6 +3,7 @@ local fs = require("filesystem")
 local com = require("component")
 local gpu = com.gpu
 local term = require("term")
+stop = 0
 
 local icons = require("/fos/icons")
 
@@ -29,6 +30,8 @@ term.setCursor(1, 1)
 path = "/fos"
 for file in fs.list(path) do
 
+--if stop == 0 then
+
   while delay < delaymax+1 do
 
     gpu.set(wf+1, hf, " ")
@@ -50,7 +53,7 @@ for file in fs.list(path) do
 
   if dir ~= false then
   icons.folder(wi, hi)
-  elseif filename == "%.lua%" then
+  elseif string.find(filename,".lua") ~= nil then
   icons.lua(wi, hi)
   else
   icons.unkFile(wi, hi)
@@ -64,13 +67,20 @@ for file in fs.list(path) do
   hi = hf-5
 
 end
-end
+--end
 
 while wf == w do
 gpu.set(wf, hf, " ")
 wf = wf+1
 end
- 
+
+if hf+7 > h then
+  gpu.setBackground(0xff0000)
+  gpu.set(w, h-1, "!")
+  gpu.setBackground(0x2b2b2b)
+  stop = 1
+end
+end 
 end
 
 return desktop
