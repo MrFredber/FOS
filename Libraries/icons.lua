@@ -49,4 +49,16 @@ set(x+2, y+3, ".lua")
 color(0x2b2b2b)
 end
 
+function icons.lang(x, y)
+color(0x0000ff)
+fill(x, y, 8, 4, " ")
+set(x, y, "привет")
+set(x+1, y+1, "howdy?")
+set(x+1, y+2, "名前は?")
+color(0x727272)
+fill(x, y+3, 8, 1, " ")
+set(x+2, y+3, ".lang")
+color(0x2b2b2b)
+end
+
 return icons

@@ -3,6 +3,8 @@ local fs = require("filesystem")
 local com = require("component")
 local gpu = com.gpu
 local term = require("term")
+local io = require("io")
+local filespath = {}
 stop = 0
 
 local icons = require("/fos/icons")
@@ -16,6 +18,7 @@ delay = 0
 delaymax = 2
 wi = 0
 hi = 0
+filespath = {}
 
 gpu.setBackground(0x2b2b2b)
 gpu.fill(1, 1, w, h-1, " ")
@@ -51,10 +54,14 @@ for file in fs.list(path) do
   p = fs.concat(path, file)
   dir = fs.isDirectory(p)
 
+  table.insert(filespath, p)
+
   if dir ~= false then
   icons.folder(wi, hi)
   elseif string.find(filename,".lua") ~= nil then
   icons.lua(wi, hi)
+  else if string.find(filename, ".lang") ~= nil then
+  icons.lang(wi, hi)
   else
   icons.unkFile(wi, hi)
   end
@@ -68,6 +75,19 @@ for file in fs.list(path) do
 
 end
 --end
+
+for i = 1, #filespath do
+print(filespath[i])
+end
+
+
+--filesfile = io.open("/fos/system/tmp/fos/filespath", "w")
+
+--for i = 1, #filespath do
+  --filesfile:write(filespath[i].."\n")
+--end
+
+--filesfile:close()
 
 while wf == w do
 gpu.set(wf, hf, " ")
@@ -84,6 +104,7 @@ function desktop.error(...)
 gpu.setBackground(0xFF0000)
 gpu.set(w, h-1, "!")
 gpu.setBackground(0x2b2b2b)
+end
 end
 
 return desktop
