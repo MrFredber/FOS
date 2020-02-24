@@ -4,6 +4,7 @@ local com = require("component")
 local gpu = com.gpu
 local term = require("term")
 local io = require("io")
+local srl = require("serialization")
 local filespath = {}
 stop = 0
 
@@ -18,7 +19,7 @@ delay = 0
 delaymax = 2
 wi = 0
 hi = 0
-filespath = {}
+--filespath = {}
 
 gpu.setBackground(0x2b2b2b)
 gpu.fill(1, 1, w, h-1, " ")
@@ -54,7 +55,7 @@ for file in fs.list(path) do
   p = fs.concat(path, file)
   dir = fs.isDirectory(p)
 
-  table.insert(filespath, p)
+  --table.insert(filespath, p)
 
   if dir ~= false then
   icons.folder(wi, hi)
@@ -76,28 +77,30 @@ for file in fs.list(path) do
 end
 --end
 
-for i = 1, #filespath do
-print(filespath[i])
-end
-
-
 --filesfile = io.open("/fos/system/tmp/fos/filespath", "w")
+--table = {1, 2, 3, 4, 5, 6, 7}
 
---for i = 1, #filespath do
-  --filesfile:write(filespath[i].."\n")
+--tbl = srl.serialize(table)
+
+--for i = 1,#table do
+--print(table[i])
 --end
 
 --filesfile:close()
 
-while wf == w do
+wsave = wf
+
+while wf ~= w do
 gpu.set(wf, hf, " ")
 wf = wf+1
 end
 
+wf = wsave
+
 if hf+7 > h then
   desktop.error()
 end
-end 
+end
 end
 
 function desktop.error(...)
