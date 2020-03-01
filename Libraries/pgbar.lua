@@ -1,16 +1,18 @@
 local pgbar = {}
 local gpu = require("component").gpu
 local term = require("term")
-local a = 0.25
 
 function pgbar.bar(x, y, w, procent)
 
 w, h = gpu.getResolution();
+ a = 100/w
 
 gpu.setForeground(0x777777)
 wsave = 0
-while wsave ~= w+1 do
-gpu.set(x+wsave, y, "-")
+ d = 0
+while wsave < w+1 do
+gpu.set(x+d, y, "-")
+  d = d+1
 wsave = wsave+1
 end
 gpu.setForeground(0x00bf00)
