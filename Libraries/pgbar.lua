@@ -10,7 +10,7 @@ w, h = gpu.getResolution();
 gpu.setForeground(0x777777)
 wsave = 0
 while wsave ~= w+1 do
-gpu.set(x, y, "-")
+gpu.set(x+wsave, y, "-")
 wsave = wsave+1
 end
 gpu.setForeground(0x00bf00)
