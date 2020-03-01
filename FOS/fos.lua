@@ -73,6 +73,7 @@ else if a == 1 then
 gpu.setBackground(0x2b2b2b)
 gpu.fill(1, h-1, 2, h-2, " ")
 desktop.workplace();
+a = 0
 end
 end
 end
