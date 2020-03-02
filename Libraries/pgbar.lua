@@ -5,16 +5,10 @@ local term = require("term")
 function pgbar.bar(x, y, width, procent)
 
 w, h = gpu.getResolution();
- a = 100/width
+ a = 0.25
 
 gpu.setForeground(0x777777)
-wsave = 0
- d = 0
-while wsave < width do
-gpu.set(x+d, y, "-")
-  d = d+1
-wsave = wsave+1
-end
+gpu.set(x+d, y, "-------------------------")
 gpu.setForeground(0x00bf00)
 
 b = a*procent
@@ -27,7 +21,7 @@ gpu.set(x+d, y, "-")
 d = d+1
 
 end
- 
+ gpu.setForeground(0xffffff)
 end
 
 return pgbar
