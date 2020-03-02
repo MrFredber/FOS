@@ -8,7 +8,7 @@ w, h = gpu.getResolution();
  a = 0.25
 
 gpu.setForeground(0x777777)
-gpu.set(x+d, y, "-------------------------")
+gpu.set(x, y, "-------------------------")
 gpu.setForeground(0x00bf00)
 
 b = a*procent
