@@ -1,0 +1,7 @@
+a1:
+
+-added help in shell
+-added debug lib
+-added System Logo
+-Fixed Visual Bug in pgbar lib
+-Now version showing on right corner

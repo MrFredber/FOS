@@ -26,6 +26,8 @@ gpu.set(x+d, y, "-")
 d = d+1
 
 end
+
+gpu.setForeground(0xffffff)
  
 end
 

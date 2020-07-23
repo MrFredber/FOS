@@ -61,4 +61,12 @@ set(x+2, y+3, ".lang")
 color(0x2b2b2b)
 end
 
+function icons.logo(x, y)
+color(0xffffff)
+fill(x+2, y, 2, 8, " ")
+fill(x+4, y, 4, 2, " ")
+fill(x+4, y+4, 2, 2, " ")
+color(0x000000)
+end
+
 return icons
