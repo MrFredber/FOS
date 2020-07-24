@@ -75,8 +75,9 @@ load(w, h, 100);
 gpu.setForeground(0xffffff)
 
 desktop.workplace();
-gpu.set(w-1, h-1, ver[1])
-gpu.set(w-4, h-1, "V:")
+
+gpu.set(4, 1, ver[1])
+gpu.set(1, 1, "V:")
 
 while true do
 

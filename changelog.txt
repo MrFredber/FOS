@@ -1,7 +1,13 @@
+a1-1:
+
+-added a shortcut on /home
+-Now version showing on left upper corner
+-Pastebin is Glitching, so i moved installer from Pastebin to GitHub
+
 a1:
 
 -added help in shell
 -added debug lib
 -added System Logo
 -Fixed Visual Bug in pgbar lib
--Now version showing on right corner
+-Now version showing on right bottom corner
