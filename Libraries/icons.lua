@@ -1,5 +1,6 @@
 local icons = {}
 local gpu = require("component").gpu
+local term = require("term")
 local color = gpu.setBackground
 local foreground = gpu.setForeground
 local fill = gpu.fill
@@ -9,12 +10,11 @@ function icons.unkFile(x, y)
 
 color(0x000000)
 fill(x, y, 8, 4, " ")
-set(x+2, y, "chto")
-set(x+3, y+1, "za")
-set(x+1, y+2, "hernya")
-color(0x727272)
-fill(x, y+3, 8, 1, " ")
-set(x+2, y+3, ".???")
+fill(x+2, y, 2, 1, "⣿")
+fill(x+4, y+1, 1, 1, "⣿")
+fill(x+3, y+2, 1, 1, "⣿")
+set(x+3, y+3, "■")
+--●
 color(0x2b2b2b)
 
 end
@@ -51,21 +51,19 @@ end
 
 function icons.lang(x, y)
 color(0x0000ff)
-fill(x, y, 8, 4, " ")
-set(x, y, "привет")
-set(x+1, y+1, "howdy?")
-set(x+1, y+2, "名前は?")
-color(0x727272)
-fill(x, y+3, 8, 1, " ")
-set(x+2, y+3, ".lang")
+fill(x+2, y, 4, 4, " ")
+fill(x, y+1, 8, 2, " ")
+color(0x00ff00)
+fill(x+2, y+1,2,2," ")
+fill(x+4,y+2,2,1," ")
 color(0x2b2b2b)
 end
 
 function icons.logo(x, y)
 color(0xffffff)
-fill(x+2, y, 2, 8, " ")
+fill(x+2, y, 2, 9, " ")
 fill(x+4, y, 4, 2, " ")
-fill(x+4, y+4, 2, 2, " ")
+fill(x+4, y+4, 3, 2, " ")
 color(0x000000)
 end
 

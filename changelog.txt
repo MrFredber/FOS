@@ -1,3 +1,22 @@
+a2:
+
+-Now version is a variable, not a file
+-Changed a logo on taskbar
+-Fixed bsod.lua
+-Redesigned logo
+-Redesigned icon of Unknown File
+-Redesigned .lang icon
+-Optimised os
+-Fixed bug with files, located outside the monitor's borders
+-Renamed lang -> settings (not .lang packets)
+-Now help files have own type (.help)
+-Added settings.help
+-Now you can open files in os (Yeah!)
+-Optimised progress bar in pgbar.lua
+-Added new progress bar (fullbar)
+-Renamed fos -> fos.lnk
+-Optimised  and redesigned Installer
+
 a1-1:
 
 -added a shortcut on /home

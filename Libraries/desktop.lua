@@ -5,36 +5,50 @@ local gpu = com.gpu
 local term = require("term")
 local io = require("io")
 local srl = require("serialization")
-local filespath = {}
-stop = 0
-
 local icons = require("/fos/icons")
+local debug = require("/fos/debug")
 
-function desktop.workplace(...)
-
+function desktop.sysBackground( ... )
 w, h = gpu.getResolution();
-wf = 0
-hf = 8
-delay = 0
-delaymax = 2
-wi = 0
-hi = 0
---filespath = {}
-
+gpu.setBackground(0x0069ff)
+gpu.fill(1, h, w, 1, " ")
+gpu.set(1, h, "⡯")
 gpu.setBackground(0x2b2b2b)
 gpu.fill(1, 1, w, h-1, " ")
-gpu.setBackground(0x0069ff)
-gpu.fill(1, h, w, h, " ")
-gpu.set(1, h, "F")
-
-gpu.setBackground(0x2b2b2b)
 term.setCursor(1, 1)
+end
 
+function desktop.files(path)
+  filesname = {}
+  i = 1
+  for file in fs.list(path) do
+  table.insert(filesname, i, file)
+  i = i+1
+  end
+  return filesname
+end
 
-path = "/fos"
-for file in fs.list(path) do
+function desktop.workplace(filesname, path)
+  w, h = gpu.getResolution();
+wf = 0 --начало имени файла
+hf = 8 --начало имени файла
+delay = 0 --оступ от иконки
+delaymax = 2 --оступ от иконки
+wi = 0 --координаты иконок
+hi = 0 --координаты иконок
+i = 0 --счётчик
 
---if stop == 0 then
+while i ~= #filesname do
+  i = i+1
+
+  if wf+12 >= w then
+  
+    wf = 0
+    hf = hf+7
+    wi = 0
+    hi = hf-5
+
+  end
 
   while delay < delaymax+1 do
 
@@ -44,7 +58,7 @@ for file in fs.list(path) do
 
   end  
   
-  filename = fs.name(file)
+  filename = fs.name(filesname[i])
   gpu.set(wf+1, hf, filename)
   delay = 0
   ifx = wf
@@ -52,10 +66,8 @@ for file in fs.list(path) do
   wi = wf-7
   hi = hf-5
 
-  p = fs.concat(path, file)
+  p = fs.concat(path, filesname[i])
   dir = fs.isDirectory(p)
-
-  --table.insert(filespath, p)
 
   if dir ~= false then
   icons.folder(wi, hi)
@@ -67,47 +79,70 @@ for file in fs.list(path) do
   icons.unkFile(wi, hi)
   end
 
-  if wf > w-7 then
-  
-  wf = 0
-  hf = hf+7
-  wi = 0
-  hi = hf-5
+  wsave = wf
 
+  gpu.fill(wf, hf,w,1," ")
+
+  wf = wsave
+  if hf+7 > h and wf >= w-10 then
+    desktop.error()
+  end
 end
---end
-
---filesfile = io.open("/fos/system/tmp/fos/filespath", "w")
---table = {1, 2, 3, 4, 5, 6, 7}
-
---tbl = srl.serialize(table)
-
---for i = 1,#table do
---print(table[i])
---end
-
---filesfile:close()
-
-wsave = wf
-
-while wf ~= w do
-gpu.set(wf, hf, " ")
-wf = wf+1
-end
-
-wf = wsave
-
-if hf+7 > h then
-  desktop.error()
-end
-end
-end
+end --конец функции
 
 function desktop.error(...)
 gpu.setBackground(0xFF0000)
 gpu.set(w, h-1, "!")
 gpu.setBackground(0x2b2b2b)
 end
+end
+
+function desktop.createButtons(filesname, sett, x, y)
+  gpu.setBackground(0x00ff00)
+  cords = {
+    x = {},
+    y = {}
+  }
+  wb = 3
+  hb = 2
+  i = 0 --счётчик местоположения
+  c = 1 --счётчик таблицы
+  while i ~= #filesname do
+    table.insert(cords.x, c, wb)
+    table.insert(cords.x, c+1, wb+9 )
+    table.insert(cords.y, c, hb )
+    table.insert(cords.y, c+1, hb+6 )
+    if sett[2] == "true" then
+      gpu.fill(cords.x[c], cords.y[c], 10, 7, " ")
+    end
+    c = c+2
+    wb = wb+11
+    i = i+1
+    if wb >= w-8 then
+      wb = 3
+      hb = hb+7
+    end
+  end
+gpu.setBackground(0x2b2b2b)
+return cords
+end
+
+function desktop.pressButton(cords, filesname, x, y)
+  i = 1
+  c = 1
+  a = 0 --счётик файла
+  --print(debug.tableprint(cords))
+  while c-1 ~= #cords.x do
+    if x >= cords.x[c] and x <= cords.x[c+1] and y >= cords.y[c] and y <= cords.y[c+1] then
+      gpu.setBackground(0x7a7a7a)
+      gpu.fill(cords.x[c], cords.y[c], 10, 7, " ")
+      gpu.setBackground(0x2b2b2b)
+      a = i
+    end
+    c = c+2
+    i = i+1
+  end
+  return filesname[a]
 end
 
 return desktop

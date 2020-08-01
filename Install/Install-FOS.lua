@@ -7,61 +7,55 @@ local event = require("event")
 local term = require("term")
 local kb = require("keyboard")
 local color = gpu.setForeground
-a = 0
+local w, h = gpu.getResolution();
 
 fs.makeDirectory("/lib/fos")
 os.execute("wget -f https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/pgbar.lua /lib/fos/pgbar.lua")
 local pgbar = require("/fos/pgbar")
 
 term.clear();
-color(0xffff00)
-print("Making Directories...")
-color(0xffffff)
-
 fs.makeDirectory("/FOS")
 fs.makeDirectory("/FOS/Desktop")
 fs.makeDirectory("/FOS/lang")
 fs.makeDirectory("/FOS/lang/fos")
 fs.makeDirectory("/FOS/system")
-fs.makeDirectory("/FOS/system/tmp")
-fs.makeDirectory("/FOS/system/tmp/fos")
-pgbar.bar(2, 3, 25, 1)
+--fs.makeDirectory("/FOS/system/tmp")
+--fs.makeDirectory("/FOS/system/tmp/fos")
 
-term.setCursor(1, 6)
+term.setCursor(1, 1)
+pgbar.fullbar(1, h, w, 1)
+gpu.setBackground(0x000000)
 
-color(0xffff00)
-print("Installing Main File...")
-color(0xffffff)
-os.execute("wget -f https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/fos.lua /fos/fos.lua")
-pgbar.bar(2, 3, 25, 20)
-color(0xffff00)
-print("Installing Languages...")
-color(0xffffff)
-os.execute("wget -f https://raw.githubusercontent.com/MrFredber/FOS/master/Language/fos/russian.lang /fos/lang/fos/russian.lang")
-os.execute("wget -f https://raw.githubusercontent.com/MrFredber/FOS/master/Language/fos/english.lang /fos/lang/fos/english.lang")
-os.execute("wget -f https://raw.githubusercontent.com/MrFredber/FOS/master/Language/fos/help.lang /fos/lang/fos/help.lang")
-pgbar.bar(2, 3, 25, 40)
-color(0xffff00)
-print("Installing System files...")
-color(0xffffff)
-os.execute("wget -f https://raw.githubusercontent.com/MrFredber/FOS/master/System/lang /fos/system/lang")
-os.execute("wget -f https://raw.githubusercontent.com/MrFredber/FOS/master/System/ver /fos/system/ver")
-pgbar.bar(2, 3, 25, 60)
-color(0xffff00)
-print("Installing Libraries...")
-color(0xffffff)
-os.execute("wget -f https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/desktop.lua /lib/fos/desktop.lua")
-os.execute("wget -f https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/icons.lua /lib/fos/icons.lua")
-os.execute("wget -f https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/debug.lua /lib/fos/debug.lua")
-pgbar.bar(2, 3, 25, 80)
-color(0xffff00)
-print("Installing  Other files...")
-color(0xffffff)
-os.execute("wget -f https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/bsod.lua /fos/bsod.lua")
-os.execute("wget -f https://raw.githubusercontent.com/MrFredber/FOS/master/Home/fos /home/fos")
-pgbar.bar(2, 3, 25, 100)
+local commands = {
+	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/fos.lua /fos/fos.lua",
+	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Language/fos/russian.lang /fos/lang/fos/russian.lang",
+	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Language/fos/english.lang /fos/lang/fos/english.lang",
+	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Language/fos/testlang.help /fos/lang/fos/testlang.help",
+	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/System/settings /fos/system/settings",
+	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/System/settings.help /fos/system/settings.help",
+	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/desktop.lua /lib/fos/desktop.lua",
+	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/icons.lua /lib/fos/icons.lua",
+	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/debug.lua /lib/fos/debug.lua",
+	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/bsod.lua /fos/bsod.lua",
+	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Home/fos /home/fos.lnk"
+}
 
-color(0xffff00)
+local names = {"fos.lua","russian.lang","english.lang","testlang.help","settings","settings.help","desktop.lua","icons.lua","debug.lua","bsod.lua","fos.lnk"}
+i = 1
+
+while i ~= #commands do
+	a = 100/#commands
+	b = i+1
+	procent = a*b
+	term.clear();
+	pgbar.fullbar(1, h, w, procent)
+	gpu.setBackground(0x000000)
+	gpu.set(1, h-1, "Installing: ")
+	gpu.set(13, h-1, names[i])
+	os.execute(commands[i])
+	i = i+1
+end
+
 print("restarting computer...")
 os.sleep(1)
 require("computer").shutdown(true)

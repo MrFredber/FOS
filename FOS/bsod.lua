@@ -1,10 +1,6 @@
-local com = require("component")
-local colors = require("colors")
 local comp = require("computer")
-
-local gpu = com.gpu
-
-gpu.setResolution(50, 25)
+local gpu = require("component").gpu
+gpu.setResolution(50, 13)
 local w, h = gpu.getResolution();
 
 gpu.setBackground(0x0000ff)
@@ -17,8 +13,7 @@ gpu.set(1, 7, "If you see this screen in second time, delete the")
 gpu.set(1, 8, "last installed programm.")
 gpu.set(1, 10, "If you see this screen in third time and more,")
 gpu.set(1, 11, "send the report to https://clck.ru/K9Tce")
-qpu.set(1, 13, "Technical Information:")
+gpu.set(1, 13, "Technical Information:")
 
-qpu.set(1, 15
 comp.beep(100, 6)
 comp.shutdown(true)
