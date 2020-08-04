@@ -31,16 +31,17 @@ local commands = {
 	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Language/fos/russian.lang /fos/lang/fos/russian.lang",
 	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Language/fos/english.lang /fos/lang/fos/english.lang",
 	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Language/fos/testlang.help /fos/lang/fos/testlang.help",
-	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/System/settings /fos/system/settings",
+	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/System/settings.cfg /fos/system/settings.cfg",
 	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/System/settings.help /fos/system/settings.help",
 	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/desktop.lua /lib/fos/desktop.lua",
 	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/icons.lua /lib/fos/icons.lua",
 	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/debug.lua /lib/fos/debug.lua",
 	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/bsod.lua /fos/bsod.lua",
-	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Home/fos /home/fos.lnk"
+	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Home/fos /home/fos.lnk",
+	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/Desktop/Settings.lua /fos/desktop/Settings.lua"
 }
 
-local names = {"fos.lua","russian.lang","english.lang","testlang.help","settings","settings.help","desktop.lua","icons.lua","debug.lua","bsod.lua","fos.lnk"}
+local names = {"fos.lua","russian.lang","english.lang","testlang.help","settings.cfg","settings.help","desktop.lua","icons.lua","debug.lua","bsod.lua","fos.lnk","Settings.lua"}
 i = 1
 
 while i ~= #commands do

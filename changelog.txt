@@ -1,3 +1,16 @@
+a2-1:
+
+-Added icon to .help
+-Redesigned icon of Unknown File
+-Added icon to .cfg
+-Renamed settings -> settings.cfg
+-Fixed bug with types of files (lualualualua before is a .lua)
+-A little optimised os 
+-Fixed bug with open files with names like "RAM test.lua"
+-Added a file Settings.lua
+-Added icon to Settings.lua
+-The development of a program for configuring the system has begun. It doesn't work at the moment.
+
 a2:
 
 -Now version is a variable, not a file

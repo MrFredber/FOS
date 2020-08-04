@@ -32,8 +32,6 @@ function desktop.workplace(filesname, path)
   w, h = gpu.getResolution();
 wf = 0 --начало имени файла
 hf = 8 --начало имени файла
-delay = 0 --оступ от иконки
-delaymax = 2 --оступ от иконки
 wi = 0 --координаты иконок
 hi = 0 --координаты иконок
 i = 0 --счётчик
@@ -49,14 +47,8 @@ while i ~= #filesname do
     hi = hf-5
 
   end
-
-  while delay < delaymax+1 do
-
-    gpu.set(wf+1, hf, " ")
-    wf = wf+1
-    delay = delay+1
-
-  end  
+gpu.fill(wf+1,hf, w, 1, " ")
+wf = wf+3
   
   filename = fs.name(filesname[i])
   gpu.set(wf+1, hf, filename)
@@ -70,20 +62,23 @@ while i ~= #filesname do
   dir = fs.isDirectory(p)
 
   if dir ~= false then
-  icons.folder(wi, hi)
-  elseif string.find(filename,".lua") ~= nil then
-  icons.lua(wi, hi)
-  else if string.find(filename, ".lang") ~= nil then
-  icons.lang(wi, hi)
+    icons.folder(wi, hi)
+  elseif string.find(filename, "Settings.lua", _, true) ~= nil then
+    icons.settings(wi, hi)
+  elseif string.find(filename,".lua", _, true) ~= nil then
+    icons.lua(wi, hi)
+  elseif string.find(filename, ".lang", _, true) ~= nil then
+    icons.lang(wi, hi)
+  elseif string.find(filename, ".help", _, true) ~= nil then
+    icons.help(wi, hi)
+  elseif string.find(filename, ".cfg", _, true) ~= nil then
+    icons.cfg(wi,hi)
   else
-  icons.unkFile(wi, hi)
+    icons.unkFile(wi, hi)
   end
 
-  wsave = wf
+  gpu.fill(wf+1, hf,w,1," ")
 
-  gpu.fill(wf, hf,w,1," ")
-
-  wf = wsave
   if hf+7 > h and wf >= w-10 then
     desktop.error()
   end
@@ -94,7 +89,6 @@ function desktop.error(...)
 gpu.setBackground(0xFF0000)
 gpu.set(w, h-1, "!")
 gpu.setBackground(0x2b2b2b)
-end
 end
 
 function desktop.createButtons(filesname, sett, x, y)

@@ -1,6 +1,5 @@
 local icons = {}
 local gpu = require("component").gpu
-local term = require("term")
 local color = gpu.setBackground
 local foreground = gpu.setForeground
 local fill = gpu.fill
@@ -9,7 +8,9 @@ local set = gpu.set
 function icons.unkFile(x, y)
 
 color(0x000000)
-fill(x, y, 8, 4, " ")
+foreground(0x272727)
+fill(x, y, 8, 4, "?")
+foreground(0xffffff)
 fill(x+2, y, 2, 1, "⣿")
 fill(x+4, y+1, 1, 1, "⣿")
 fill(x+3, y+2, 1, 1, "⣿")
@@ -65,6 +66,39 @@ fill(x+2, y, 2, 9, " ")
 fill(x+4, y, 4, 2, " ")
 fill(x+4, y+4, 3, 2, " ")
 color(0x000000)
+end
+
+function icons.help(x,y)
+color(0x171717)
+foreground(0xffffff)
+fill(x, y, 8, 4, " ")
+set(x+2, y+1, "is a")
+foreground(0xff0000)
+set(x+3, y, "err")
+set(x+2, y+2, "error")
+color(0x727272)
+foreground(0xffffff)
+fill(x, y+3, 8, 1, " ")
+set(x+1, y+3, ".help")
+color(0x2b2b2b)
+end
+
+function icons.cfg(x, y)
+color(0x171717)
+fill(x, y, 8, 4,"-")
+color(0x727272)
+fill(x, y+3, 8, 1," ")
+set(x+2,y+3,".cfg")
+color(0x2b2b2b)
+end
+function icons.settings(x, y)
+color(0x171717)
+fill(x, y, 8, 4, " ")
+set(x+2, y, "╭--╮")
+set(x+2, y+1,"│╲╱│")
+set(x+2, y+2,"│╱╲│")
+set(x+2, y+3,"╰--╯")
+color(0x2b2b2b)
 end
 
 return icons

@@ -27,14 +27,14 @@ local gpu = com.gpu
 
 local w, h = gpu.getResolution();
 local a = 0
-local ver = "a2"
+local ver = "a2-1"
 local path = "/fos"
 local lang = {}
 local sett = {}
 local filesname = {}
 local langpath = "/fos/lang/fos"
 local settpath = "/fos/system/"
-local settname = "settings"
+local settname = "settings.cfg"
 local fullsettpath = fs.concat(settpath, settname)
 local settfile = io.open(fullsettpath, "r")
 
@@ -97,8 +97,9 @@ if x ~= nil and y ~= nil and y ~= h and a ~= 1 then
 	gpu.set(4, 1, ver) --Версия
 	desktop.workplace(filesname, path);
 	openfile = fs.concat(path, openfilename)
+	--print(openfile)
 	if fs.isDirectory(openfile) ~= true and openfilename ~= nil then
-		os.execute(openfile)
+		os.execute("'" .. openfile .. "'")
 	end
 end
 
