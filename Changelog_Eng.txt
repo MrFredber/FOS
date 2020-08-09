@@ -1,0 +1,55 @@
+a2-2:
+
+-Now the system uses 6.5 KB less RAM
+-Added a Russian version of Shell Message
+-Changed and added a string names in testlang.help
+-Edited a Resolution Error in both .lang packages
+-Changelog is now available in Russian Language
+-Changed the wording of changes in previous versions
+-Now you can check your RAM usage (I don't know why I added it)
+
+a2-1:
+
+-Added icon to .help
+-Redesigned icon of Unknown File
+-Added icon to .cfg
+-Renamed settings -> settings.cfg
+-Fixed bug with types of files (initially lualualualua was defined as .lua)
+-A little optimised FOS 
+-Fixed bug with open files with names like "RAM test.lua"
+-Added a programm Settings.lua
+-Added icon to Settings.lua
+-The development of a program for configuring the system has begun. It doesn't work at the moment.
+
+a2:
+
+-Now version is a variable, not a file
+-Changed a logo on taskbar
+-Fixed bsod.lua
+-Redesigned Logo
+-Redesigned icon of Unknown File
+-Redesigned .lang icon
+-Optimised FOS
+-Fixed bug with files, located outside the monitor's borders
+-Renamed lang -> settings (not .lang package)
+-Now help files have own type (.help)
+-Added settings.help
+-Now you can open files in FOS (Yeah!)
+-Optimised progress bar in pgbar library (bar)
+-Added new progress bar (fullbar)
+-Renamed fos -> fos.lnk
+-Optimised  and redesigned Installer
+
+a1-1:
+
+-Added a shortcut in /home
+-Version of system now on left upper corner
+-Pastebin is Glitching, so i uploaded installer to GitHub
+
+a1:
+
+-Added a Message in shell
+-Added debug library
+-Added System Logo
+-Fixed Visual Bug in pgbar library
+-Now version of system showing on right bottom corner

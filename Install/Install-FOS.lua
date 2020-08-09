@@ -38,10 +38,11 @@ local commands = {
 	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/debug.lua /lib/fos/debug.lua",
 	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/bsod.lua /fos/bsod.lua",
 	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Home/fos /home/fos.lnk",
-	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/Desktop/Settings.lua /fos/desktop/Settings.lua"
+	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/Desktop/Settings.lua /fos/desktop/Settings.lua",
+	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/RAM test.lua /fos/RAM test.lua",
 }
 
-local names = {"fos.lua","russian.lang","english.lang","testlang.help","settings.cfg","settings.help","desktop.lua","icons.lua","debug.lua","bsod.lua","fos.lnk","Settings.lua"}
+local names = {"fos.lua","russian.lang","english.lang","testlang.help","settings.cfg","settings.help","desktop.lua","icons.lua","debug.lua","bsod.lua","fos.lnk","Settings.lua", "RAM test.lua"}
 i = 1
 
 while i ~= #commands do

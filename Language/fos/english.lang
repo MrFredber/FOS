@@ -1,4 +1,6 @@
 S
 O
 R
-for launch FOS you need a normal screen resolution
+You need at least 80x25 screen resolution to run FOS
+Shell
+(to return to the system, write 'fos')

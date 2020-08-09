@@ -1,6 +1,5 @@
 local pgbar = {}
 local gpu = require("component").gpu
-local term = require("term")
 
 function pgbar.bar(x, y, width, procent)
 

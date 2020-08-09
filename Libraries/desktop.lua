@@ -1,10 +1,7 @@
 local desktop = {}
 local fs = require("filesystem")
-local com = require("component")
-local gpu = com.gpu
+local gpu = require("component").gpu
 local term = require("term")
-local io = require("io")
-local srl = require("serialization")
 local icons = require("/fos/icons")
 local debug = require("/fos/debug")
 
