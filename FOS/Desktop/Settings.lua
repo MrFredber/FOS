@@ -1,54 +1,65 @@
-local com = require("component")
-local gpu = com.gpu
+local gpu = require("component").gpu
 local io = require("io")
-local w, h = gpu.getResolution()
-local set = gpu.set
-local color = gpu.setBackground
 local os = require("os")
-local fill = gpu.fill
-local event = require("event")
-local cords = {
-	x = {1, 10, 1, 10, 1, 10},
-	y = {1, 3, 4, 6, 7, 9}
-}
+local term = require("term")
+sett = {}
+lang = {}
+settfile = io.open("/fos/system/settings.cfg", "r")
 
-function draw(x, y)
-	sett = {}
-	file = io.open("/fos/system/settings.cfg", "r")
-	for var in file:lines() do
-		table.insert(sett, var)
+for var in settfile:lines() do
+	table.insert(sett, var)
+end
+settfile:close()
+langfile = io.open("/fos/lang/settings/"..sett[1], "r")
+for var in langfile:lines() do
+	table.insert(lang, var)
+end
+langfile:close()
+gpu.setBackground(0x000000)
+gpu.setForeground(0xffffff)
+term.clear()
+print(lang[3]) --do changes
+print("1 - " .. lang[1])
+print(lang[4] .. " - " .. lang[2])
+print(">")
+term.setCursor(2,4)
+local dochange = io.read()
+
+--Main
+
+if dochange == "1" then
+	print(lang[5]) --lang
+	print("1 - " .. lang[6])
+	print("2 - " .. lang[7])
+	print(lang[4] .. " - " .. lang[9])
+	print(">")
+	term.setCursor(2, 9)
+	langchoice = io.read()
+	if langchoice == "1" then
+		language = "english.lang"
+	elseif langchoice == "2" then
+		language = "russian.lang"
+	else
+		language = sett[1]
 	end
-	color(0x424242)
-	fill(x, y, 10, 9, " ")
-
-end
-
-function select(x, y, xp, yp, cords)
-	c = 1
-	i = 1
-	a = 0
-	while c-1 ~= #cords do
-		if xp >= cords.x[c] and xp <= cords.x[c+1] and yp >= cords.y[c] and yp <= cords.y[c+1] then
-			gpu.setBackground(0x7a7a7a)
-     		gpu.fill(cords.x[c], cords.y[c], 10, 3, " ")
-     		gpu.setBackground(0x424242)
-			a = i
-		end
-		c = c+2
-    	i = i+1
-    end
-	set(x+1, y+1, "Language")
-	set(x+2, y+4, "debug")
-	set(x+2, y+7, "Other")
-end
-
-draw(1, 1)
-while true do
-	local _, _, xp, yp = event.pull("touch")
-	if xp ~= nil and yp ~= nil then
-		select(1, 1, xp, yp, cords)
+	print(lang[8]) --icon buttons
+	print("1 - " .. lang[1])
+	print("2 - " .. lang[2])
+	print(lang[4] .. " - " .. lang[9])
+	print(">")
+	term.setCursor(2, 14)
+	iconbutton = io.read()
+	if iconbutton == "1" then
+		iconbuttons = "true"
+	elseif iconbutton == "2" then
+		iconbuttons = "false"
+	else
+		iconbuttons = sett[2]
 	end
+	settfile = io.open("/fos/system/settings.cfg", "w")
+	settfile:write(language .. "\n" .. iconbuttons)
+	settfile:close()
+	require("computer").shutdown(true)
+else
+	os.exit()
 end
-select(1, 1)
-
-os.exit()

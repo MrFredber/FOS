@@ -1,0 +1,22 @@
+[FOS]
+
+	To Shell
+	Power Off 
+	Reboot
+	Resolution Error
+	Shell
+	Shell Message
+	Version
+	Settings
+
+[Settings]
+
+	Yes
+	No
+	Change Parametres
+	Any Key
+	Select Language
+	English
+	Russian
+	Icon Buttons
+	Nothing To Do

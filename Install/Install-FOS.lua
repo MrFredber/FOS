@@ -3,14 +3,35 @@ local fs = require("filesystem")
 local internet = com.internet
 local gpu = com.gpu
 local os = require("os")
-local event = require("event")
 local term = require("term")
-local kb = require("keyboard")
-local color = gpu.setForeground
+local io = require("io")
 local w, h = gpu.getResolution();
+local depth = gpu.maxDepth()
+term.clear()
+
+print("Choise Language:\n1 - English\n2 - Русский")
+term.setCursor(1, 5)
+term.write(">")
+local langchoise = io.read()
+
+
+if depth == 1 then  --if comp is TIER 1
+	if langchoise == "2" then
+		print("Фатальная ошибка: FOS не поддерживается на вашем компьютере. Требуется как минимум TIER 2 компьютер и GPU")
+		else
+		print("Fatal Error: FOS is not supported on your computer. Requires at least a TIER 2 computer and GPU.")
+	end
+	os.exit()
+end
+
+if langchoise == "2" then --before installing
+	print("Установка необохдимых файлов...")
+	else
+	print("Installing required files...")
+end
 
 fs.makeDirectory("/lib/fos")
-os.execute("wget -f https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/pgbar.lua /lib/fos/pgbar.lua")
+os.execute("wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/pgbar.lua /lib/fos/pgbar.lua")
 local pgbar = require("/fos/pgbar")
 
 term.clear();
@@ -18,46 +39,90 @@ fs.makeDirectory("/FOS")
 fs.makeDirectory("/FOS/Desktop")
 fs.makeDirectory("/FOS/lang")
 fs.makeDirectory("/FOS/lang/fos")
+fs.makeDirectory("/FOS/lang/settings")
 fs.makeDirectory("/FOS/system")
---fs.makeDirectory("/FOS/system/tmp")
---fs.makeDirectory("/FOS/system/tmp/fos")
 
 term.setCursor(1, 1)
-pgbar.fullbar(1, h, w, 1)
+
+if depth == 4 then --if comp is TIER 2
+	pgbar.bar(1, h, w, 1)
+	gpu.setForeground(0xff0000)
+	if langchoise == "2" then
+		print("Ошибка: Ваш ПК не поддерживает pgbar.fullbar()")
+		else
+		print("Error: Your PC don't support pgbar.fullbar()")
+	end
+	gpu.setForeground(0xffffff)
+	else
+	pgbar.fullbar(1, h, w, 1)
+end
+
 gpu.setBackground(0x000000)
 
 local commands = {
 	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/fos.lua /fos/fos.lua",
-	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Language/fos/russian.lang /fos/lang/fos/russian.lang",
+	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Language/lang.help /fos/lang/lang.man",
 	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Language/fos/english.lang /fos/lang/fos/english.lang",
-	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Language/fos/testlang.help /fos/lang/fos/testlang.help",
+	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Language/fos/russian.lang /fos/lang/fos/russian.lang",
+	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Language/settings/english.lang /fos/lang/settings/english.lang",
+	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Language/settings/russian.lang /fos/lang/settings/russian.lang",
 	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/System/settings.cfg /fos/system/settings.cfg",
 	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/System/settings.help /fos/system/settings.help",
 	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/desktop.lua /lib/fos/desktop.lua",
 	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/icons.lua /lib/fos/icons.lua",
 	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/debug.lua /lib/fos/debug.lua",
-	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/bsod.lua /fos/bsod.lua",
-	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Home/fos /home/fos.lnk",
+	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/bsod.lua /fos/desktop/bsod.lua",
+	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/RAM%20test.lua /fos/desktop/'RAM test.lua'",
 	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/Desktop/Settings.lua /fos/desktop/Settings.lua",
-	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/RAM test.lua /fos/RAM test.lua",
+	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Home/fos /home/fos.lnk"
 }
 
-local names = {"fos.lua","russian.lang","english.lang","testlang.help","settings.cfg","settings.help","desktop.lua","icons.lua","debug.lua","bsod.lua","fos.lnk","Settings.lua", "RAM test.lua"}
-i = 1
+local names = {
+	"/FOS/fos.lua","/FOS/lang/lang.man","/FOS/lang/fos/english.lang","/FOS/lang/fos/russian.lang","/fos/lang/settings/english.lang","/fos/lang/settings/russian.lang","/FOS/system/settings.cfg",
+	"/FOS/system/settings.help","/lib/fos/desktop.lua","/lib/fos/icons.lua","/lib/fos/debug.lua","/FOS/Desktop/bsod.lua","/FOS/Desktop/RAM test.lua","/FOS/Desktop/Settings.lua","/home/fos.lnk"
+}
 
-while i ~= #commands do
+if langchoise == "2" then
+	print("Установка системы...")
+	else
+	print("Installing system...")
+end
+
+i = 1
+while i-1 ~= #commands do
 	a = 100/#commands
-	b = i+1
-	procent = a*b
-	term.clear();
-	pgbar.fullbar(1, h, w, procent)
+	procent = a*i
+	gpu.fill(1, h-1, w, 2, " ")
+
+	if depth == 4 then
+		pgbar.bar(1, h, w, procent)
+		else
+		pgbar.fullbar(1, h, w, procent)
+	end
 	gpu.setBackground(0x000000)
-	gpu.set(1, h-1, "Installing: ")
-	gpu.set(13, h-1, names[i])
+	if langchoise == "2" then 
+		gpu.set(1, h-1, "Установка: ")	
+		gpu.set(12, h-1, names[i])
+		else 
+		gpu.set(1, h-1, "Installing: ")	
+		gpu.set(13, h-1, names[i])
+	end
 	os.execute(commands[i])
 	i = i+1
 end
 
-print("restarting computer...")
+local file = io.open("/fos/system/settings.cfg", "w") --writing settings
+if langchoise == "2" then
+	file:write("russian.lang\nfalse")
+	else
+	file:write("english.lang\nfalse")
+end
+file:close()
+
+if langchoise == "2" then
+	print("Перезагрузка компьютера...")
+	else
+	print("Restarting computer...")
+end
 os.sleep(1)
 require("computer").shutdown(true)

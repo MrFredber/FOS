@@ -25,7 +25,7 @@ function desktop.files(path)
   return filesname
 end
 
-function desktop.workplace(filesname, path)
+function desktop.workplace(filesname, path, lang)
   w, h = gpu.getResolution();
 wf = 0 --начало имени файла
 hf = 8 --начало имени файла
@@ -48,6 +48,10 @@ gpu.fill(wf+1,hf, w, 1, " ")
 wf = wf+3
   
   filename = fs.name(filesname[i])
+  --print(filename)
+  if string.find(filename, "Settings.lua", _, true) ~= nil then
+    gpu.set(wf+1, hf, lang[8])
+  end
   gpu.set(wf+1, hf, filename)
   delay = 0
   ifx = wf
@@ -66,8 +70,8 @@ wf = wf+3
     icons.lua(wi, hi)
   elseif string.find(filename, ".lang", _, true) ~= nil then
     icons.lang(wi, hi)
-  elseif string.find(filename, ".help", _, true) ~= nil then
-    icons.help(wi, hi)
+  elseif string.find(filename, ".man", _, true) ~= nil then
+    icons.man(wi, hi)
   elseif string.find(filename, ".cfg", _, true) ~= nil then
     icons.cfg(wi,hi)
   else

@@ -1,12 +1,29 @@
+a3:
+
+-Fixed bug with no downloading file RAM test.lua
+-Added restriction on installing FOS
+-Fixed bug with no working installer on Tier 2 Computers
+-Now version is typing "Ver"
+-Added a Russian translation of Version
+-Now you can choose the language when installing the system
+-Moved and Renamed ../lang/fos/testlang.help -> ..lang/lang.man
+-The installer now specifies the path of the files
+-Changed the order of installing files
+-A litlle decreased RAM consumption 
+-Reduced the brightness of the red color in the menu
+-Now the menu is more convenient
+-Now you can configure the system
+-Changed the desktop path
+
 a2-2:
 
 -Now the system uses 6.5 KB less RAM
--Added a Russian version of Shell Message
+-Added a Russian translation of Shell Message
 -Changed and added a string names in testlang.help
 -Edited a Resolution Error in both .lang packages
 -Changelog is now available in Russian Language
 -Changed the wording of changes in previous versions
--Now you can check your RAM usage (I don't know why I added it)
+-Now you can check RAM usage (I don't know why I added it)
 
 a2-1:
 
