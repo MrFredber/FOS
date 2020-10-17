@@ -2,9 +2,12 @@ local gpu = require("component").gpu
 local io = require("io")
 local os = require("os")
 local term = require("term")
-sett = {}
-lang = {}
-settfile = io.open("/fos/system/settings.cfg", "r")
+local sett = {}
+local lang = {}
+local foslang = {}
+local settfile = io.open("/fos/system/settings.cfg", "r")
+local w, h = gpu.getResolution();
+local debug = require("/fos/debug")
 
 for var in settfile:lines() do
 	table.insert(sett, var)
@@ -15,14 +18,14 @@ for var in langfile:lines() do
 	table.insert(lang, var)
 end
 langfile:close()
-gpu.setBackground(0x000000)
-gpu.setForeground(0xffffff)
-term.clear()
+gpu.setBackground(0x828282)
+gpu.fill(1, 2, w, h-2, " ")
+print("")
 print(lang[3]) --do changes
 print("1 - " .. lang[1])
 print(lang[4] .. " - " .. lang[2])
 print(">")
-term.setCursor(2,4)
+term.setCursor(2,5)
 local dochange = io.read()
 
 --Main
@@ -33,7 +36,7 @@ if dochange == "1" then
 	print("2 - " .. lang[7])
 	print(lang[4] .. " - " .. lang[9])
 	print(">")
-	term.setCursor(2, 9)
+	term.setCursor(2, 10)
 	langchoice = io.read()
 	if langchoice == "1" then
 		language = "english.lang"
@@ -47,7 +50,7 @@ if dochange == "1" then
 	print("2 - " .. lang[2])
 	print(lang[4] .. " - " .. lang[9])
 	print(">")
-	term.setCursor(2, 14)
+	term.setCursor(2, 15)
 	iconbutton = io.read()
 	if iconbutton == "1" then
 		iconbuttons = "true"
@@ -61,5 +64,5 @@ if dochange == "1" then
 	settfile:close()
 	require("computer").shutdown(true)
 else
-	os.exit()
+	--os.exit()
 end

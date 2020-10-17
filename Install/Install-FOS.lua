@@ -43,25 +43,12 @@ fs.makeDirectory("/FOS/lang/settings")
 fs.makeDirectory("/FOS/system")
 
 term.setCursor(1, 1)
-
-if depth == 4 then --if comp is TIER 2
-	pgbar.bar(1, h, w, 1)
-	gpu.setForeground(0xff0000)
-	if langchoise == "2" then
-		print("Ошибка: Ваш ПК не поддерживает pgbar.fullbar()")
-		else
-		print("Error: Your PC don't support pgbar.fullbar()")
-	end
-	gpu.setForeground(0xffffff)
-	else
-	pgbar.fullbar(1, h, w, 1)
-end
-
+pgbar.fullbar(1, h, w, 1)
 gpu.setBackground(0x000000)
 
 local commands = {
 	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/fos.lua /fos/fos.lua",
-	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Language/lang.help /fos/lang/lang.man",
+	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Language/lang.man /fos/lang/lang.man",
 	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Language/fos/english.lang /fos/lang/fos/english.lang",
 	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Language/fos/russian.lang /fos/lang/fos/russian.lang",
 	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Language/settings/english.lang /fos/lang/settings/english.lang",
@@ -71,15 +58,14 @@ local commands = {
 	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/desktop.lua /lib/fos/desktop.lua",
 	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/icons.lua /lib/fos/icons.lua",
 	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/debug.lua /lib/fos/debug.lua",
-	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/bsod.lua /fos/desktop/bsod.lua",
 	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/RAM%20test.lua /fos/desktop/'RAM test.lua'",
-	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/Desktop/Settings.lua /fos/desktop/Settings.lua",
-	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Home/fos /home/fos.lnk"
+	"wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/Desktop/Settings.lua /fos/desktop/Settings.lua"
 }
 
 local names = {
-	"/FOS/fos.lua","/FOS/lang/lang.man","/FOS/lang/fos/english.lang","/FOS/lang/fos/russian.lang","/fos/lang/settings/english.lang","/fos/lang/settings/russian.lang","/FOS/system/settings.cfg",
-	"/FOS/system/settings.help","/lib/fos/desktop.lua","/lib/fos/icons.lua","/lib/fos/debug.lua","/FOS/Desktop/bsod.lua","/FOS/Desktop/RAM test.lua","/FOS/Desktop/Settings.lua","/home/fos.lnk"
+	"/FOS/fos.lua","/FOS/lang/lang.man","/FOS/lang/fos/english.lang","/FOS/lang/fos/russian.lang","/fos/lang/settings/english.lang",
+	"/fos/lang/settings/russian.lang","/FOS/system/settings.cfg","/FOS/system/settings.help","/lib/fos/desktop.lua","/lib/fos/icons.lua",
+	"/lib/fos/debug.lua","/FOS/Desktop/RAM test.lua","/FOS/Desktop/Settings.lua"
 }
 
 if langchoise == "2" then
@@ -93,12 +79,7 @@ while i-1 ~= #commands do
 	a = 100/#commands
 	procent = a*i
 	gpu.fill(1, h-1, w, 2, " ")
-
-	if depth == 4 then
-		pgbar.bar(1, h, w, procent)
-		else
-		pgbar.fullbar(1, h, w, procent)
-	end
+	pgbar.fullbar(1, h, w, procent)
 	gpu.setBackground(0x000000)
 	if langchoise == "2" then 
 		gpu.set(1, h-1, "Установка: ")	
@@ -117,6 +98,9 @@ if langchoise == "2" then
 	else
 	file:write("english.lang\nfalse")
 end
+file:close()
+local file = io.open("/home/.shrc", "w") --writing startup settings
+file:write("/fos/fos\ncd /fos")
 file:close()
 
 if langchoise == "2" then

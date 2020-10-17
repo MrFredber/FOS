@@ -1,3 +1,22 @@
+a4: (Redesign and Optimisation of all)
+
+-Redesigned Settings Icon
+-The Icons.lua library is cleared of garbage, so the system uses 1 KB less RAM
+-Now RAM test.lua opens and don't closes immediately
+-Added Sleep function (reduces computer consumption by 10 times)
+-Changed Menu
+-Now system starts automatically
+-Fixed a bug with a broken "fos" command"
+-Now after exit to shell you will be located in the system folder
+-Deleted fos.lnk
+-Deleted bsod.lua
+-Now the Settings are written in their own language
+-Now the names of launched files are written in the system
+-Fixed bug with downloading a file
+-Now TIER 2 computers support the pgbar.fullbar()
+-Redisigned pgbar.bar()
+-Work has started to improve the Settings
+
 a3:
 
 -Fixed bug with no downloading file RAM test.lua

@@ -5,9 +5,74 @@ local term = require("term")
 local icons = require("/fos/icons")
 local debug = require("/fos/debug")
 
+function desktop.drawMenu(lang, sett)
+  i = 1
+  smax = 0
+  while i ~= 4 do
+    slen = string.len(lang[i])
+    if slen > smax then
+      smax = slen
+    end
+    i = i+1
+  end 
+  if sett[1] == "russian.lang" then
+    smax = smax/2
+  end
+  gpu.setBackground(0x009400)
+  gpu.fill(1, h-4, smax, 1, " ")
+  offset = 0
+  slen = string.len(lang[1])
+  if sett[1] == "russian.lang" then
+    slen = slen/2
+  end
+  if slen <= smax-1 then
+    div = slen/2
+    offset = smax/2-div
+  end
+  gpu.set(1+offset, h-4, lang[1])
+  gpu.setBackground(0x0000ff)
+  gpu.fill(1, h-3, smax, 1, " ")
+  offset = 0
+  slen = string.len(lang[4])
+  if sett[1] == "russian.lang" then
+    slen = slen/2
+  end
+  if slen <= smax-1 then
+    div = slen/2
+    offset = smax/2-div
+  end
+  gpu.set(1+offset, h-3, lang[4])
+  gpu.setBackground(0xb40000)
+  gpu.fill(1, h-2, smax, 1, " ")
+  offset = 0
+  slen = string.len(lang[2])
+  if sett[1] == "russian.lang" then
+    slen = slen/2
+  end
+  if slen <= smax-1 then
+    div = slen/2
+    offset = smax/2-div
+  end
+  gpu.set(1+offset, h-2, lang[2])
+  gpu.setBackground(0xffb400)
+  gpu.fill(1, h-1, smax, 1, " ")
+  offset = 0
+  slen = string.len(lang[3])
+  if sett[1] == "russian.lang" then
+    slen = slen/2
+  end
+  if slen <= smax-1 then
+    div = slen/2
+    offset = smax/2-div
+  end
+  gpu.set(1+offset, h-1, lang[3])
+  return smax
+end
+
 function desktop.sysBackground( ... )
 w, h = gpu.getResolution();
 gpu.setBackground(0x0069ff)
+gpu.setForeground(0xffffff)
 gpu.fill(1, h, w, 1, " ")
 gpu.set(1, h, "⡯")
 gpu.setBackground(0x2b2b2b)
@@ -26,7 +91,7 @@ function desktop.files(path)
 end
 
 function desktop.workplace(filesname, path, lang)
-  w, h = gpu.getResolution();
+w, h = gpu.getResolution();
 wf = 0 --начало имени файла
 hf = 8 --начало имени файла
 wi = 0 --координаты иконок
@@ -48,11 +113,11 @@ gpu.fill(wf+1,hf, w, 1, " ")
 wf = wf+3
   
   filename = fs.name(filesname[i])
-  --print(filename)
   if string.find(filename, "Settings.lua", _, true) ~= nil then
-    gpu.set(wf+1, hf, lang[8])
+    gpu.set(wf+1, hf, lang[9])
+  else
+    gpu.set(wf+1, hf, filename)
   end
-  gpu.set(wf+1, hf, filename)
   delay = 0
   ifx = wf
   wf = wf+8
@@ -77,6 +142,8 @@ wf = wf+3
   else
     icons.unkFile(wi, hi)
   end
+  gpu.setBackground(0x2b2b2b)
+  gpu.setForeground(0xffffff)
 
   gpu.fill(wf+1, hf,w,1," ")
 
@@ -85,12 +152,6 @@ wf = wf+3
   end
 end
 end --конец функции
-
-function desktop.error(...)
-gpu.setBackground(0xFF0000)
-gpu.set(w, h-1, "!")
-gpu.setBackground(0x2b2b2b)
-end
 
 function desktop.createButtons(filesname, sett, x, y)
   gpu.setBackground(0x00ff00)
@@ -140,4 +201,17 @@ function desktop.pressButton(cords, filesname, x, y)
   return filesname[a]
 end
 
+
+function desktop.bsod(error)
+w, h = gpu.getResolution()
+gpu.setBackground(0x0000ff)
+gpu.fill(1, 1, w, h, " ")
+gpu.set(1, 1, "A Problem Has been detected and FOS closed the programm")
+gpu.set(1, 2, "Technical Information:")
+end
+function desktop.error(...)
+gpu.setBackground(0xFF0000)
+gpu.set(w, h-1, "!")
+gpu.setBackground(0x2b2b2b)
+end
 return desktop
