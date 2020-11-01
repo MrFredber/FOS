@@ -1,3 +1,23 @@
+a5: (Optimisation and upgrading the life)
+
+-Division of functions into libraries to reduce the use of RAM in the future.
+-The system uses 200 bytes less RAM (facepalm)
+-Added an icon on .txt
+-Now the system can open real txt files
+-Closing the view works for txt files
+-Now files run faster because you don't need to wait for the system to render the desktop.
+-Now files are highlighting correctly
+-Now the system does not redraw the desktop if it is not necessary
+-Rendering now takes +-50 MS less time (458 MS before, 400 MS now) (assuming there are 89 files on the desktop)
+-Changed the error condition and the error itself on the desktop
+-Added instructions for installing the system
+-Redesigned The Installer
+-Redesigned folder icon
+-System applications are now represented as .app packages
+-Added .spic (scripted picture) format
+-Cut out the Settings icon from the system
+-Now in the Installer, installation is performed by category
+
 a4: (Redesign and Optimisation of all)
 
 -Redesigned Settings Icon

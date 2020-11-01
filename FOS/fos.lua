@@ -1,28 +1,32 @@
 --FOS (Fredber Operational System) is a Russian os made to facilitate the use of the OpenComputers computer
 
---debugs functions: print(tableprint(table))
+--debugs functions: print(debug.tableprint(table))
 
 --Libraries
 local c = require("component")
+local term = require("term")
 local gpu = c.gpu
 local w, h = gpu.getResolution();
-local icons = require("fos/icons")
-icons.logo(w/2-5, h/2-4)
+term.clear()
+gpu.fill(w/2-3, h/2-4, 2, 9, "⣿")
+gpu.fill(w/2-1, h/2-4, 4, 2, "⣿")
+gpu.fill(w/2-1, h/2, 3, 2, "⣿")
 local screen = c.screen
 local fs = require("filesystem")
-local term = require("term")
 local event = require("event")
 local os = require("os")
 local comp = require("computer")
 local io = require("io")
 
-local desktop = require("fos/desktop")
+local system = require("fos/system")
+local finder = require("fos/finder")
 local debug = require("fos/debug")
+local icons = require("fos/icons")
 
 --Variables
 
 local a = 0
-local ver = "a4"
+local ver = "a5"
 local path = "/fos/desktop"
 local lang = {}
 local sett = {}
@@ -47,13 +51,13 @@ os.exit()
 end
 
 --Functions
-
+print(system)
 local function draw(path, sett)
-	desktop.sysBackground()
+	system.background();
 	gpu.set(1, 1, lang[8] .. ver) --Version
-	local filesname = desktop.files(path);
-	local cords = desktop.createButtons(filesname, sett, 1, 1)
-	desktop.workplace(filesname, path, lang);
+	local filesname = finder.files(path);
+	local cords = system.createButtons(filesname, sett, 1, 1)
+	system.workplace(filesname, path, lang);
 return filesname
 end
 
@@ -67,15 +71,15 @@ while true do
 local _,_,x,y = event.pull("touch")
 
 if x ~= nil and y ~= nil and y ~= h and a ~= 1 then
-	desktop.sysBackground()
-	local filesname = desktop.files(path);
-	local cords = desktop.createButtons(filesname, sett, 1, 1)
-
-	local openfilename = desktop.pressButton(cords,filesname, x, y)
-	gpu.set(1, 1, lang[8] .. ver) --Версия
-	desktop.workplace(filesname, path, lang);
+	local filesname = finder.files(path);
+	local cords = system.createButtons(filesname, sett, 1, 1)
+	local openfilename, filepos = system.pressButton(cords,filesname, x, y)
+	system.updAfterPress(openfilename, filepos, lang)
 	local openfile = fs.concat(path, openfilename)
-	if fs.isDirectory(openfile) ~= true and openfilename ~= nil then
+ 	if string.find(openfile, ".app") ~= nil then
+		openfile = openfile.."/main.lua"
+	end
+	if openfile ~= nil and openfilename ~= nil then
 		gpu.setBackground(0xffffff)
 		gpu.fill(1,1,w,1," ")
 		gpu.setBackground(0xb40000)
@@ -101,15 +105,36 @@ if x ~= nil and y ~= nil and y ~= h and a ~= 1 then
 			gpu.setBackground(0xffffff)	
 			gpu.set(1, 1, openfilename)
 		end
+		print(openfilename)
 		gpu.setForeground(0xffffff)
-		os.execute("'" .. openfile .. "'")
-		draw(path, sett, lang)
+		if string.find(openfilename, ".txt") ~= nil then
+			openfiletext = {}
+			for var in io.open(openfile, "r"):lines() do
+				table.insert(openfiletext, var)
+			end
+			i = 1
+			gpu.setForeground(0x000000)
+			gpu.fill(1, 2, w, h-2," ")
+			while i-1 ~= #openfiletext do
+				print(openfiletext[i])
+				i = i+1
+			end
+			while true do
+				local _,_,x,y = event.pull("touch")
+				if x >= w-2 and x <= w and y == 1 then
+					break
+				end
+			end
+		else
+			os.execute("'" .. openfile .. "'")
+		end
+		draw(path, sett)
 	end
 end
 
 --Рисование меню
 if x == 1 and y == h and sleep ~= 1 then
-	smax = desktop.drawMenu(lang, sett)
+	smax = system.drawMenu(lang, sett)
 	a = 1
 	delay = 1
 end
