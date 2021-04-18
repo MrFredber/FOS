@@ -1,4 +1,4 @@
-[English](https://raw.githubusercontent.com/MrFredber/FOS/master/README.md) | Русский
+[English](https://github.com/MrFredber/FOS/blob/master/README.md) | Русский
 
 FOS - это графическая система для мода OpenComputers, вдохновлённая MineOS и Windows. Создана русским программистом-самоучкой. Прекрасный визуал и маленький размер системы включены в комплект поставки.
 
