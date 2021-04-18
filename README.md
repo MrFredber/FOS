@@ -3,6 +3,9 @@ English | Русский
 FOS is a GUI system for mod OpenComputers, inspired by MineOS and Windows. Created by russian self-taught programmer.
 Beautiful visual and small system size are included.
 
+![](https://raw.githubusercontent.com/MrFredber/FOS/master/Readme%20files/english1.png)
+![](https://raw.githubusercontent.com/MrFredber/FOS/master/Readme%20files/english2.png)
+
 ## How to Install
 
 To install FOS you can use Pastebin:
@@ -15,4 +18,4 @@ wget -f https://raw.githubusercontent.com/MrFredber/FOS/master/Install/Install-F
 
 If you see a bug, create a Issue in this repository
 
-Last Changes in version a6:
+P.S. Redesign coming soon
