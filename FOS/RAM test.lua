@@ -1,5 +1,4 @@
-require("component").gpu.setForeground(0x000000)
-require("term").setCursor(1,2)
-require("os").execute("free")
-print("This message will close in 5 seconds")
-os.sleep(5)
+local r=require
+r("term").clear()
+r("os").execute("free")
+r("event").pull("touch")

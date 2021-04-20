@@ -1,4 +1,4 @@
-a5: (Optimisation and upgrading the life)
+a5:
 
 -Division of functions into libraries to reduce the use of RAM in the future.
 -The system uses 200 bytes less RAM (facepalm)
@@ -18,7 +18,7 @@ a5: (Optimisation and upgrading the life)
 -Cut out the Settings icon from the system
 -Now in the Installer, installation is performed by category
 
-a4: (Redesign and Optimisation of all)
+a4:
 
 -Redesigned Settings Icon
 -The Icons.lua library is cleared of garbage, so the system uses 1 KB less RAM

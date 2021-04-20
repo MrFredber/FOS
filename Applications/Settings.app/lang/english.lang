@@ -1,0 +1,35 @@
+Computer
+Power safe, 
+Screen resol
+ution
+User
+User and 
+Password set
+tings
+Language
+
+
+
+Autostart
+
+
+
+lang=System language
+langMsg1=Do you want see more languages?
+langMsg2=Send pull request to the FOS repository on Github
+user=Password Protection
+userbtn=Change Password
+userColor=Color: 
+userRandom=Random
+userNick=Enter your new username
+userColorMsg=Enter new color
+userPassword=Enter new password
+compPowerSave=Power Saving Mode
+compPowerSaveMsg=(Removes the background, which may be unusual)
+compResolution=Screen Resolution: 
+compResolutionMsg=Enter new resolution in format 'width,height'
+autoAdd=Enter the path to the file
+autoSub=Enter the file number
+compResolutionErr=The resolution is set incorrectly
+autoSubErr=The number is set incorrectly
+autoMoveErr=Couldn't move it

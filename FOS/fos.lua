@@ -1,177 +1,216 @@
 --FOS (Fredber Operational System) is a Russian os made to facilitate the use of the OpenComputers computer
+--debug function: print(tools.tblprint(table))
+local r=require
+local c=r("component")
+local term=r("term")
+local gpu=c.gpu
+local fill=gpu.fill
+local os=r("os")
+local io=r("io")
+local fs=r("filesystem")
+local unicode=r("unicode")
+local lang={}
+local sett={}
+local user={}
+local compcfg={}
 
---debugs functions: print(debug.tableprint(table))
-
---Libraries
-local c = require("component")
-local term = require("term")
-local gpu = c.gpu
-local w, h = gpu.getResolution();
-term.clear()
-gpu.fill(w/2-3, h/2-4, 2, 9, "⣿")
-gpu.fill(w/2-1, h/2-4, 4, 2, "⣿")
-gpu.fill(w/2-1, h/2, 3, 2, "⣿")
-local screen = c.screen
-local fs = require("filesystem")
-local event = require("event")
-local os = require("os")
-local comp = require("computer")
-local io = require("io")
-
-local system = require("fos/system")
-local finder = require("fos/finder")
-local debug = require("fos/debug")
-local icons = require("fos/icons")
-
---Variables
-
-local a = 0
-local ver = "a5"
-local path = "/fos/desktop"
-local lang = {}
-local sett = {}
-local filesname = {}
-local settfile = io.open("/fos/system/settings.cfg", "r")
-
---Before starting
-
-for var in settfile:lines() do
-table.insert(sett, var)
+function fosLoad()
+	lang={}
+	sett={}
+	user={}
+	compcfg={}
+	file=io.open("/fos/system/lang.cfg","r")
+	for var in file:lines() do table.insert(sett,var) end
+	file:close()
+	file=io.open(fs.concat("/fos/lang/fos",sett[1]),"r")
+	for var in file:lines() do
+		check=var:find("=")
+		if check ~= nil then
+			arg=unicode.sub(var,1,check-1)
+			var=unicode.sub(var,check+1)
+			lang[arg]=var
+		else
+			table.insert(lang,var)
+		end
+	end
+	file:close()
+	if gpu.maxDepth() == 1 then
+		term.clear()
+		print(lang.depthErr)
+		os.exit()
+	end
+	file=io.open("/fos/system/user.cfg","r")
+	for var in file:lines() do table.insert(user,var) end
+	file:close()
+	local file=io.open("/fos/system/comp.cfg","r")
+	for var in file:lines() do
+		pos=var:find(",")
+		if pos ~= nil then
+			w=tonumber(var:sub(1,pos-1))
+			h=tonumber(var:sub(pos+1))
+		else
+			table.insert(compcfg,var)
+		end
+	end
+	gpu.setResolution(w,h)
 end
-langpath = fs.concat("/fos/lang/fos", sett[1])
-langfile = io.open(langpath, "r")
-for var in langfile:lines() do
-table.insert(lang, var)
-end
+fosLoad()
 
-if w < 79 or h < 24 then
-term.clear();
-print(lang[5])
-os.exit()
-end
+local screen=c.screen
+local event=r("event")
+local comp=r("computer")
+local color=gpu.setBackground
+local fcolor=gpu.setForeground
+local set=gpu.set
+local system=r("fos/system")
+local finder=r("fos/finder")
+local icons=r("fos/icons")
+local picture=r("fos/picture")
+local a=0
+local openfile=0
+local openfilename=0
+local openfiletext=0
+local lnk={}
+local slen=0
+local appname=0
+local appnamefile={}
+local delay=0
+local smax=0
+local ver="a6"
+local path="/fos/desktop"
+local filesname={}
 
 --Functions
-print(system)
-local function draw(path, sett)
-	system.background();
-	gpu.set(1, 1, lang[8] .. ver) --Version
-	local filesname = finder.files(path);
-	local cords = system.createButtons(filesname, sett, 1, 1)
-	system.workplace(filesname, path, lang);
-return filesname
-end
-
+local function draw()
+system.background();
+set(1,1,lang.ver..ver)
+local filesname=finder.files(path);
+local cords=system.createButtons(filesname,sett,1,1)
+system.workplace(filesname,path,lang,sett);
+return filesname end
 ----------
-
-draw(path, sett);
-local smax = 0
+if user[3] == "1" then
+	system.lock(lang)
+end
+draw();
 
 while true do
+local _,_,x,y=event.pull("touch")
 
-local _,_,x,y = event.pull("touch")
-
-if x ~= nil and y ~= nil and y ~= h and a ~= 1 then
-	local filesname = finder.files(path);
-	local cords = system.createButtons(filesname, sett, 1, 1)
-	local openfilename, filepos = system.pressButton(cords,filesname, x, y)
-	system.updAfterPress(openfilename, filepos, lang)
-	local openfile = fs.concat(path, openfilename)
- 	if string.find(openfile, ".app") ~= nil then
-		openfile = openfile.."/main.lua"
+if y ~= h and menu ~= 1 then
+	local filesname=finder.files(path);
+	local cords=system.createButtons(filesname,sett,1,1)
+	local openfilename,filepos=system.pressButton(cords,filesname,x,y)
+	system.updAfterPress(openfilename,filepos,lang,sett,path)
+	local openfile=fs.concat(path,openfilename)
+	if string.find(openfile,".lnk") ~= nil then
+		lnk={}
+		for var in io.open(openfile,"r"):lines() do	
+			table.insert(lnk, var) 
+		end
+		openfile=lnk[1]
+		openfilename=fs.name(lnk[1]).."/"
+	end
+ 	if string.find(openfile,".app") ~= nil then
+		openfile=openfile.."/main.lua"
+		appnamefile=io.open("/fos/apps/"..openfilename.."appname/"..sett[1],"r")
+		appname={}
+		for var in appnamefile:lines() do
+			table.insert(appname,var)
+		end
+		appnamefile:close()
+		openfilename=appname[1]
 	end
 	if openfile ~= nil and openfilename ~= nil then
-		gpu.setBackground(0xffffff)
-		gpu.fill(1,1,w,1," ")
-		gpu.setBackground(0xb40000)
-		gpu.fill(w-2,1,3,1," ")
-		gpu.set(w-1, 1, "X")
-		if openfilename == "Settings.lua" then
-			gpu.setBackground(0x1e90ff)
-			slen = string.len(lang[9])
-			if sett[1] == "russian.lang" then
-				slen = slen/2
+		color(0xffffff)
+		fill(1,1,w,1," ")
+		color(0xb40000)
+		fcolor(0xffffff)
+		set(w-2,1," X ")
+		color(0x1e90ff)
+		slen=unicode.len(openfilename)
+		fill(3,h,slen+2,1," ")
+		set(4,h,openfilename)
+		fcolor(0)
+		color(0xffffff)	
+		set(1,1,openfilename)
+		fcolor(0xffffff)
+		if string.find(openfilename,".txt") ~= nil then
+			openfiletext={}
+			slen=string.len(openfilename)
+			for var in io.open(openfile,"r"):lines() do
+				table.insert(openfiletext,var)
 			end
-			gpu.fill(3, h, slen+2, 1, " ")
-			gpu.set(4, h, lang[9])
-			gpu.setForeground(0x000000)
-			gpu.setBackground(0xffffff)
-			gpu.set(1, 1, lang[9])
-		else
-			gpu.setBackground(0x1e90ff)
-			slen = string.len(openfilename)
-			gpu.fill(3, h, slen+2, 1, " ")
-			gpu.set(4, h, openfilename)
-			gpu.setForeground(0x000000)
-			gpu.setBackground(0xffffff)	
-			gpu.set(1, 1, openfilename)
-		end
-		print(openfilename)
-		gpu.setForeground(0xffffff)
-		if string.find(openfilename, ".txt") ~= nil then
-			openfiletext = {}
-			for var in io.open(openfile, "r"):lines() do
-				table.insert(openfiletext, var)
+			i=1
+			fcolor(0)
+			fill(1,2,w,h-2," ")
+			term.setCursor(1,2)
+			if #openfiletext > h-2 then
+				set(slen+1,1," - "..lang.txtMany)
 			end
-			i = 1
-			gpu.setForeground(0x000000)
-			gpu.fill(1, 2, w, h-2," ")
 			while i-1 ~= #openfiletext do
 				print(openfiletext[i])
-				i = i+1
+				i=i+1
+				if i > h-2 then
+					break
+				end
 			end
 			while true do
-				local _,_,x,y = event.pull("touch")
+				local _,_,x,y=event.pull("touch")
 				if x >= w-2 and x <= w and y == 1 then
 					break
 				end
 			end
 		else
-			os.execute("'" .. openfile .. "'")
+			color(0)
+			fcolor(0xffffff)
+			local result,reason=loadfile(openfile)
+			if result then
+    			result,reason=xpcall(result,debug.traceback,...)
+			    if not result then
+			    	if type(reason) ~= "table" then
+			    		system.bsod(reason,lang)
+			    	end
+			    end
+			else
+				if type(reason) ~= "table" then
+			    	system.bsod(reason,lang)
+				end
+			end
 		end
-		draw(path, sett)
+		fosLoad()
+		draw()
 	end
 end
 
 --Рисование меню
 if x == 1 and y == h and sleep ~= 1 then
-	smax = system.drawMenu(lang, sett)
-	a = 1
-	delay = 1
+smax,data=system.drawMenu(lang,user)
+menu=1
+delay=1
 end
 
-if x >= 1 and x <= smax and y == h-4 and a == 1 and sleep ~= 1 then
-
-	--Go To Shell
-	gpu.setBackground(0x000000)
-	term.clear();
-	gpu.setBackground(0x2b2b2b)
-	gpu.fill(1, 1, w, 1, "-")
-	if sett[1] == "russian.lang" then
-		gpu.set(w/2-4, 1, lang[6])
-		gpu.set(w/2-21, 2, lang[7])
-		else
-		gpu.set(w/2-3, 1, lang[6])
-		gpu.set(w/2-19, 2, lang[7])
-	end
-	term.setCursor(1, 3)
-	os.sleep(0)
-	os.exit();
-
---Shutdown and Reboot
-elseif x > 0 and x <= smax and y == h-3 and a == 1 and sleep ~= 1 then
-	sleep = 1
+if x >= 1 and x <= smax and y == h-5 and menu == 1 and sleep ~= 1 then
+	menu=0
+	system.lock(lang)
+	draw()
+elseif x >= 1 and x <= smax and y == h-4 and menu == 1 and sleep ~= 1 then
+	lang=nil
+	system.shell()
+elseif x > 0 and x <= smax and y == h-3 and menu == 1 and sleep ~= 1 then
+	sleep=1
 	screen.turnOff()
-elseif x > 0 and x <= smax and y == h-2 and a == 1 and sleep ~= 1 then
+elseif x > 0 and x <= smax and y == h-2 and menu == 1 and sleep ~= 1 then
 	comp.shutdown(false)
-elseif x > 0 and x <= smax and y == h-1 and a == 1 and sleep ~= 1 then
+elseif x > 0 and x <= smax and y == h-1 and menu == 1 and sleep ~= 1 then
 	comp.shutdown(true)
 elseif sleep == 1 and x ~= 0 then
-	sleep = 0
+	sleep=0
 	screen.turnOn()
-elseif a == 1 and delay ~= 1 then --закрытие меню
-	local filesname, cords = draw(path, sett);
-	a = 0 --закрытое меню
-else 
-	delay = 0
+elseif menu == 1 and delay ~= 1 then
+	picture.draw(1,h-5,data)
+	menu=0
+else
+	delay=0
 end
 end
