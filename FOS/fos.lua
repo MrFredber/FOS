@@ -76,7 +76,7 @@ local appname=0
 local appnamefile={}
 local delay=0
 local smax=0
-local ver="a6"
+local ver="a6-1"
 local path="/fos/desktop"
 local filesname={}
 

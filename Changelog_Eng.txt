@@ -1,3 +1,58 @@
+a6-1:
+
+-Fixed the location of the error about the number of files on the desktop
+-Fixed the crash of the installer
+-Fix the command in README.md
+-Added minimal requirements in README.md
+-Removed garbage in the GitHub repository
+-Changed sentences in Changelog_Rus
+-Forgot to add the Changelog in English. Sorry.
+
+a6:
+
+-Cut out old settings
+-App names are now displayed correctly
+-In theory, the use of RAM has decreased (although it will not be possible to reduce the use soon)
+-Now all applications are in a separate folder
+-Added .lnk format
+-Garbage is removed, and other files take up less space
+-Removed .man icon
+-The pgbar library was crossed with debug and renamed to tools
+-Added the function of drawing buttons, levers and text input in tools.lua
+-Added password protection
+-Fixed a bug with an early processing error
+-Minimum PC requirements have been defined
+-Now strings from lang files work via Unicode
+-Remade RAM Test. lua
+-Fixed crashes after re-opening a file
+-Fixed icon error when opening a file
+-Fixed incorrect icon location when clicking on a file
+-Changed sentences in Changelog_Rus
+-Remaded the structure of .lang files
+-Changed the line "Shutdown" in the English localization (I didn't notice it before :))
+-Now the file names are centered and the line length is increased
+-Normal operation of the progress bar in the installer is returned
+-Added a limit on the display length of a text file
+-Now the order of files does not change when restarting (sorting)
+-Fixed a bug with crashing applications when re-opening FOS
+-Added a new version .spic
+-Now the system displays errors when the program crashes (Thanks, IgorTimofeev)
+-Added power saving mode
+-Now the system is not loads directly. Now system loads via the boot file (which can fix files)
+Otherwise, fix them using bootmgr by setting the keys /fixboot, /fixlangcfg, /fixusercfg, /fixcompcfg, or /fixlang
+(or enter "bootmgr /fixall" in the console if everything is very bad)
+-Added the picture library
+-Now when you close the menu, the system does not redraw the entire desktop
+-Now drawing .spic files moved to the picture library
+-Now the system can be run at any resolution
+Instead, the PC compatibility is now checking.
+-Added autorun of scripts at system startup
+-Fixed a bug with replacing the icon with the folder icon when clicking on a file
+-Redrawn the .cfg icon
+-It turns out that Pastebin works, but now you need to write paste with uppercase and lowercase letters
+-Completely remaded the installer
+-Now the installer shows file paths instead of categories
+
 a5:
 
 -Division of functions into libraries to reduce the use of RAM in the future.
