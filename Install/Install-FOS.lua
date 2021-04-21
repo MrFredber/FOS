@@ -356,7 +356,7 @@ if temp == "1" then
 	end
 end
 fcolor(0xffffff)
-set(1,h-1,lang.end)
+set(1,h-1,lang.ending)
 
 file=io.open("/home/.shrc","w")
 file:write("/fos/boot\ncd /fos")
