@@ -452,7 +452,7 @@ end
 function system.error(lang)
 color(0xFF0000)
 slen=len(lang.manyFiles)
-set(w-slen,h-1,lang.manyFiles)
+set(w-slen+1,h-1,lang.manyFiles)
 if comp[1] == "1" then
 	color(0)
 else
