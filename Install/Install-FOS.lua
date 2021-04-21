@@ -7,7 +7,7 @@ print("Your PC is TIER 1. To install FOS you need a minimum of TIER 2 PC.")
 os.exit()
 end
 local fs=r("filesystem")
-local internet=c.internet
+local unicode=r("unicode")
 local term=r("term")
 local io=r("io")
 local w,h=gpu.getResolution();
@@ -17,8 +17,10 @@ local fcolor=gpu.setForeground
 local set=gpu.set
 local event=r("event")
 local dir=fs.makeDirectory
+dir("/lib/fos")
 os.execute("wget -f https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/tools.lua /lib/fos/tools.lua")
-local tools=r("/fos/tools")
+os.execute("wget -f https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/picture.lua /lib/fos/picture.lua")
+local tools=r("fos/tools")
 term.clear()
 
 function reset()
@@ -250,7 +252,6 @@ while true do
 	end
 end
 
-dir("/home/foslang")
 dir("/FOS/desktop")
 dir("/FOS/apps/Settings.app/appname")
 dir("/FOS/apps/Settings.app/lang")
@@ -356,7 +357,7 @@ if temp == "1" then
 	end
 end
 fcolor(0xffffff)
-set(1,h-1,lang.ending)
+set(1,h-1,lang.last)
 
 file=io.open("/home/.shrc","w")
 file:write("/fos/boot\ncd /fos")
