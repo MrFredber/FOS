@@ -6,8 +6,8 @@ FOS is a GUI system for mod OpenComputers, inspired by MineOS and Windows. Creat
 ![](https://raw.githubusercontent.com/MrFredber/FOS/master/Readme%20files/english2.png)
 
 ## Minimal Requirements
-Tier 2 Graphic Card
-1x Tier 2 Memory or 2x Tier 1 Memory
+	Tier 2 Graphic Card
+	1x Tier 2 Memory or 2x Tier 1 Memory
 
 ## How to Install
 
