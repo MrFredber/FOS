@@ -8,6 +8,7 @@ os.exit()
 end
 local fs=r("filesystem")
 local unicode=r("unicode")
+local len=unicode.len
 local term=r("term")
 local io=r("io")
 local w,h=gpu.getResolution();
@@ -261,26 +262,22 @@ dir("/FOS/system")
 reset()
 term.setCursor(1,1)
 tools.fullbar(1,h,w,1)
-local c1={
+local files={
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/fos.lua /fos/fos.lua",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/boot.lua /fos/boot.lua",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/bootmgr.lua /fos/bootmgr.lua"}
-local c2={--lib
+	"https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/bootmgr.lua /fos/bootmgr.lua",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/system.lua /lib/fos/system.lua",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/finder.lua /lib/fos/finder.lua",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/icons.lua /lib/fos/icons.lua",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/picture.lua /lib/fos/picture.lua"}
-local c3={--apps
+	"https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/picture.lua /lib/fos/picture.lua",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/icon.spic /fos/apps/settings.app/icon.spic",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/main.lua /fos/apps/settings.app/main.lua"}
-local c4={--langs
+	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/main.lua /fos/apps/settings.app/main.lua",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Language/fos/english.lang /fos/lang/fos/english.lang",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Language/fos/russian.lang /fos/lang/fos/russian.lang",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/lang/english.lang /fos/apps/settings.app/lang/english.lang",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/lang/russian.lang /fos/apps/settings.app/lang/russian.lang",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/appname/english.lang /fos/apps/settings.app/appname/english.lang",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/appname/russian.lang /fos/apps/settings.app/appname/russian.lang"}
-local c5={--other
+	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/appname/russian.lang /fos/apps/settings.app/appname/russian.lang",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/RAM%20test.lua /fos/desktop/'RAM test.lua'",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/icon.pic /fos/apps/settings.app/icon.pic",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/icon.bmp /fos/apps/settings.app/icon.bmp"}
@@ -291,70 +288,20 @@ local names={
 	"/fos/lang/fos/russian.lang","/fos/apps/settings.app/lang/english.lang","/fos/apps/settings.app/lang/russian.lang",
 	"/fos/apps/settings.app/appname/english.lang","/fos/apps/settings.app/appname/russian.lang","/fos/desktop/'RAM test.lua'",
 	"/fos/apps/settings.app/icon.pic","/fos/apps/settings.app/icon.bmp"}
-cat=1
+i=1
 ibar=0
-if temp == "1" then
-	total=#c1+#c2+#c3+#c4+#c5
-else
-	total=#c1+#c2+#c3+#c4
-end
 percent=100/total
 color(0x2b2b2b)
-while cat-1 ~= #c2 do
+while i-1 ~= #files do
 	fcolor(0xffffff)
-	set(1,h-1,names[ibar+1])
+	set(1,h-1,names[i])
 	tools.fullbar(1,h,w,percent*ibar)
 	ibar=ibar+1
+	i=i+1
 	color(0x2b2b2b)
 	fcolor(0x3b3b3b)
-	os.execute("wget -fq "..c1[cat])
+	os.execute("wget -fq "..files[i])
 	fill(1,h-1,w,2,"⢕")
-end
-cat=1
-while cat-1 ~= #c2 do
-	fcolor(0xffffff)
-	set(1,h-1,names[ibar+1])
-	tools.fullbar(1,h,w,percent*ibar)
-	ibar=ibar+1
-	color(0x2b2b2b)
-	fcolor(0x3b3b3b)
-	os.execute("wget -fq "..c2[cat])
-	fill(1,h-1,w,2,"⢕")
-end
-cat=1
-while cat-1 ~= #c3 do
-	fcolor(0xffffff)
-	set(1,h-1,names[ibar+1])
-	tools.fullbar(1,h,w,percent*ibar)
-	ibar=ibar+1
-	color(0x2b2b2b)
-	fcolor(0x3b3b3b)
-	os.execute("wget -fq "..c3[cat])
-	fill(1,h-1,w,2,"⢕")
-end
-cat=1
-while cat-1 ~= #c4 do
-	fcolor(0xffffff)
-	set(1,h-1,names[ibar+1])
-	tools.fullbar(1,h,w,percent*ibar)
-	ibar=ibar+1
-	color(0x2b2b2b)
-	fcolor(0x3b3b3b)
-	os.execute("wget -fq "..c4[cat])
-	fill(1,h-1,w,2,"⢕")
-end
-cat=1
-if temp == "1" then
-	while cat-1 ~= #c5 do
-		fcolor(0xffffff)
-		set(1,h-1,names[ibar+1])
-		tools.fullbar(1,h,w,percent*ibar)
-		ibar=ibar+1
-		color(0x2b2b2b)
-		fcolor(0x3b3b3b)
-		os.execute("wget -fq "..c5[cat])
-		fill(1,h-1,w,2,"⢕")
-	end
 end
 fcolor(0xffffff)
 set(1,h-1,lang.last)
