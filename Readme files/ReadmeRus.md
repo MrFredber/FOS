@@ -5,6 +5,10 @@ FOS - это графическая система для мода OpenComputers
 ![](https://raw.githubusercontent.com/MrFredber/FOS/master/Readme%20files/russian1.png)
 ![](https://raw.githubusercontent.com/MrFredber/FOS/master/Readme%20files/russian2.png)
 
+## Минимальные требования
+Tier 2 Видеокарта
+1x Tier 2 Память или 2x Tier 1 Память
+
 ## Как Установить
 
 Чтобы установить FOS, вы можете использовать Pastebin:
@@ -13,7 +17,7 @@ FOS - это графическая система для мода OpenComputers
 
 Или использовать эту команду:
 
-	wget -f https://raw.githubusercontent.com/MrFredber/FOS/master/Install/Install-FOS.lua /tmp/Install-FOS.lua && tmp/Install-FOS.lua
+	wget -f https://raw.githubusercontent.com/MrFredber/FOS/master/Install/Install-FOS.lua /tmp/Install-FOS.lua && /tmp/Install-FOS.lua
 
 Если вы нашли баг, создайте Issue в этом репозитории.
 
