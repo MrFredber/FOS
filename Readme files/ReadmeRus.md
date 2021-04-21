@@ -6,8 +6,8 @@ FOS - это графическая система для мода OpenComputers
 ![](https://raw.githubusercontent.com/MrFredber/FOS/master/Readme%20files/russian2.png)
 
 ## Минимальные требования
-Tier 2 Видеокарта
-1x Tier 2 Память или 2x Tier 1 Память
+	Tier 2 Видеокарта
+	1x Tier 2 Память или 2x Tier 1 Память
 
 ## Как Установить
 
