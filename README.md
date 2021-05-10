@@ -2,8 +2,9 @@ English | [Русский](https://github.com/MrFredber/FOS/blob/master/Readme%2
 
 FOS is a GUI system for mod OpenComputers, inspired by MineOS and Windows. Created by russian self-taught programmer. Beautiful visual and small system size are included.
 
-![](https://raw.githubusercontent.com/MrFredber/FOS/master/Readme%20files/english1.png)
+![](https://raw.githubusercontent.com/MrFredber/FOS/master/Readme%20files/load.png)
 ![](https://raw.githubusercontent.com/MrFredber/FOS/master/Readme%20files/english2.png)
+![](https://raw.githubusercontent.com/MrFredber/FOS/master/Readme%20files/english1.png)
 
 ## Minimal Requirements
 	Tier 2 Graphic Card
