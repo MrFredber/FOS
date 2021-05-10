@@ -401,7 +401,7 @@ else
 end
 xu=w/2-5-xw/2
 iconUser(xu,5)
-color(0xffffff)
+fcolor(0)
 set(xu+9,6,user[1])
 if tonumber(user[2]) ~= nil or tonumber("0x"..user[2]) ~= nil then
 	set(xu+9,7,lang.userColor..user[2])
@@ -498,7 +498,10 @@ elseif x >= w/2-5-xw/2+8 and x <= w/2-5-xw/2+8+clen and y == 7 then
 elseif x >= w/2-plen/2-1 and x <= w/2+plen/2 and y == 12 and user[3] == "1" then
 	no=userInput(lang.userPassword)
 	if no ~= "yes" then
-		user[4]=tools.input(true)
+		temp=tools.input(true)
+		if temp ~= "" then
+			user[4]=temp
+		end
 	end
 	userDraw()
 end
