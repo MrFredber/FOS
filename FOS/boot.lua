@@ -1,103 +1,218 @@
+local raw_loadfile=...
+_G._OSVERSION="FredberOS (OpenOS 1.7.5)"
+local component=component
+local computer=computer
+local unicode=unicode
+_G.runlevel="S"
+local shutdown=computer.shutdown
+computer.runlevel=function() return _G.runlevel end
+computer.shutdown=function(reboot)
+_G.runlevel=reboot and 6 or 0
+if os.sleep then
+computer.pushSignal("shutdown")
+os.sleep(0.1)
+end
+shutdown(reboot)
+end
+local w,h
+local screen=component.list("screen", true)()
+local gpu=screen and component.list("gpu", true)()
+if gpu then
+gpu=component.proxy(gpu)
+if not gpu.getScreen() then
+gpu.bind(screen)
+end
+_G.boot_screen=gpu.getScreen()
+w,h=gpu.maxResolution()
+gpu.setResolution(w, h)
+gpu.setBackground(0x000000)
+gpu.setForeground(0xFFFFFF)
+gpu.fill(1, 1, w, h, " ")
+end
+local y=1
+local uptime=computer.uptime
+local pull=computer.pullSignal
+local last_sleep=uptime()
+local function status(msg)
+if gpu then
+gpu.set(1,y,msg)
+if y == h then
+gpu.copy(1,2,w,h-1,0,-1)
+gpu.fill(1,h,w,1," ")
+else
+y=y+1
+end
+end
+if uptime()-last_sleep > 1 then
+local signal=table.pack(pull(0))
+if signal.n > 0 then
+computer.pushSignal(table.unpack(signal,1,signal.n))
+end
+last_sleep=uptime()
+end
+end
+gpu.fill(w/2-2,h/2-5,2,9,"⣿")
+gpu.fill(w/2,h/2-5,4,2,"⣿")
+gpu.fill(w/2,h/2-1,3,2,"⣿")
+gpu.set(w/2-6,h/2+5,"Loading OpenOS")
+local function dofile(file)
+local program,reason=raw_loadfile(file)
+if program then
+local result=table.pack(pcall(program))
+if result[1] then
+return table.unpack(result,2,result.n)
+else
+error(result[2])
+end
+else
+error(reason)
+end
+end
+local package=dofile("/lib/package.lua")
+do
+_G.component=nil
+_G.computer=nil
+_G.process=nil
+_G.unicode=nil
+_G.package=package
+package.loaded.component=component
+package.loaded.computer=computer
+package.loaded.unicode=unicode
+package.loaded.buffer=dofile("/lib/buffer.lua")
+package.loaded.filesystem=dofile("/lib/filesystem.lua")
+_G.io=dofile("/lib/io.lua")
+end
+require("filesystem").mount(computer.getBootAddress(),"/")
+local function rom_invoke(method,...)
+return component.invoke(computer.getBootAddress(),method,...)
+end
+local scripts={}
+for _,file in ipairs(rom_invoke("list","boot")) do
+local path="boot/"..file
+if not rom_invoke("isDirectory",path) then
+table.insert(scripts,path)
+end
+end
+table.sort(scripts)
+for i=1,#scripts do
+dofile(scripts[i])
+end
+for c,t in component.list() do
+computer.pushSignal("component_added",c,t)
+end
+computer.pushSignal("init")
+require("event").pull(1,"init")
+_G.runlevel=1
+
+
 local r=require
-local term=r("term")
-local gpu=r("component").gpu
+local tr=r("term")
+local g=r("component").gpu
 local io=r("io")
 local os=r("os")
-local comp={}
-local auto={}
-local set=gpu.set
-function autostart()
-file=io.open("/fos/system/auto.cfg","r")
-for var in file:lines() do table.insert(auto,var) end
-file:close()
-term.clear()
-set(w/2-9,h/2,"Starting Scripts...")
+local c={}
+local a={}
+local s=g.set
+local z="/fos/system/"
+local function at()
+local f=io.open(z.."auto.cfg","r")
+for v in f:lines() do table.insert(a,v) end
+f:close()
+tr.clear()
+s(w/2-9,h/2,"Starting Scripts...")
 i=1
-while i-1 ~= #auto do
-	os.execute(auto[i])
-	i=i+1
+while i-1 ~= #a do
+os.execute(a[i])
+i=i+1
 end
 end
-function resolution()
-file=io.open("/fos/system/comp.cfg","r")
-for var in file:lines() do
-	pos=var:find(",")
-	if pos ~= nil then
-		w=tonumber(var:sub(1,pos-1))
-		h=tonumber(var:sub(pos+1))
-	else
-		comp[1]=var
-	end
-end
-file:close()
-gpu.setResolution(w,h)
-end
-
-result=pcall(resolution)
-if not result then
-	w,h=gpu.getResolution()
-end
-pcall(autostart)
-local fill=gpu.fill
-term.clear()
-fill(w/2-3,h/2-4,2,9,"⣿")
-fill(w/2-1,h/2-4,4,2,"⣿")
-fill(w/2-1,h/2,3,2,"⣿")
-local color=gpu.setBackground
-local fcolor=gpu.setForeground
-local fs=r("filesystem")
-
-function err(parm)
-color(0xffffff)
-fcolor(0)
-fill(w/2-9,h/2,18,3," ")
-set(w/2-8,h/2+1,"Repairing FOS...")
-os.execute("/fos/bootmgr /"..parm)
-end
-
-if fs.exists("/fos/system/lang.cfg") == false then
-	err("fixlangcfg")
-end
-if fs.exists("/fos/system/user.cfg") == false then
-	err("fixusercfg")
-end
-if fs.exists("/fos/system/comp.cfg") == false then
-	err("fixcompcfg")
-end
-if fs.exists("/fos/system/auto.cfg") == false then
-	err("fixautocfg")
-end
-
-function rsod(reason)
-color(0xb40000)
-fcolor(0xffffff)
-fill(1,1,w,h," ")
-term.setCursor(1,4)
-print(reason)
-_,y=term.getCursor()
-set(w/2-22,y+1,"If you see this in first time, reboot your PC")
-set(w/2-22,y+2,"If you see this in second time, use 'bootmgr'")
-set(w/2-38,y+3,"If you see this in third time, show this to the administrator, or the author")
-fcolor(0xb40000)
-color(0xffffff)
-set(w/2-16,2,"Critical error when starting FOS")
-set(w/2-18,y+5,"Touch the screen to exit to Shell...")
-r("event").pull("touch")
-color(0)
-fcolor(0xffffff)
-term.clear()
-end
-
-local result,reason=loadfile("/fos/fos.lua")
-if result then
-	result,reason=xpcall(result,debug.traceback,...)
-    if not result then
-    	if type(reason) ~= "table" then
-    		rsod(reason)
-    	end
-    end
+local function rl()
+local f=io.open(z.."comp.cfg","r")
+for v in f:lines() do
+p=v:find(",")
+if p ~= nil then
+w=tonumber(v:sub(1,p-1))
+h=tonumber(v:sub(p+1))
 else
-	if type(reason) ~= "table" then
-    	rsod(reason)
-	end
+c[1]=v
+end
+end
+f:close()
+g.setResolution(w,h)
+end
+local rs=pcall(rl)
+if not rs then w,h=g.getResolution() end
+pcall(at)
+local fl=g.fill
+tr.clear()
+fl(w/2-2,h/2-5,2,9,"⣿")
+fl(w/2,h/2-5,4,2,"⣿")
+fl(w/2,h/2-1,3,2,"⣿")
+gpu.set(w/2-5,h/2+5,"Starting FOS")
+local cl=g.setBackground
+local fc=g.setForeground
+local fs=r("filesystem")
+local function o(parm)
+cl(0xffffff)
+fc(0)
+fl(w/2-9,h/2,18,3," ")
+s(w/2-8,h/2+1,"Repairing FOS...")
+end
+if fs.exists(z.."lang.cfg") == false then
+o()
+local f=io.open(z.."lang.cfg","w")
+f:write("english.lang")
+f:close()
+end
+if fs.exists(z.."user.cfg") == false then
+o()
+local f=io.open(z.."user.cfg","w")
+f:write("User\n\n0")
+f:close()
+end
+if fs.exists(z.."comp.cfg") == false then
+o()
+local w,h=g.maxResolution()
+local f=io.open(z.."comp.cfg","w")
+f:write("0\n"..w..","..h)
+f:close()
+end
+if fs.exists(z.."auto.cfg") == false then
+o()
+local f=io.open(z.."auto.cfg","w")
+f:write("")
+f:close()
+end
+local function d(e)
+cl(0xb40000)
+fc(0xffffff)
+fl(1,1,w,h," ")
+tr.setCursor(1,4)
+print(e)
+_,y=tr.getCursor()
+local t="If you see this in "
+s(w/2-22,y+1,t.."first time, reboot your PC")
+s(w/2-22,y+2,t.."second time, use 'bootmgr'")
+s(w/2-38,y+3,t.."third time, show this to the administrator, or the author")
+fc(0xb40000)
+cl(0xffffff)
+s(w/2-16,2,"Critical error while running FOS")
+s(w/2-18,y+5,"Touch the screen to exit to Shell...")
+r("event").pull("touch")
+cl(0)
+fc(0xffffff)
+tr.clear()
+end
+local rs,e=loadfile("/fos/fos.lua")
+if rs then
+rs,e=xpcall(rs,debug.traceback,...)
+if not rs then
+if type(e) ~= "table" then
+d(e)
+end
+end
+else
+if type(e) ~= "table" then
+d(e)
+end
 end

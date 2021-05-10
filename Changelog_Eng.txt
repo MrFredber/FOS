@@ -1,3 +1,21 @@
+a6-2:
+
+-In bootmgr "/fixall " key has been removed
+-Bootmgr now supports running with multiple keys
+-Changed the loader
+-Now it will work instead of the standard OpenOS
+-Fixed the installer
+-Fixed the lever that configures the installation of other files
+-Redrawn icons: planet, user, Settings.app, .cfg, unknown format
+-Removed shell drawing (no longer needed)
+-Now a file .shrc no longer changes
+-In bootmgr the operation of the "/fixboot" key has been changed
+-Added system startup via the "/home" folder
+-Fixed a strange bug with shutting down and restarting in locked mode
+-Several times faster screenshot rendering via picture.draw (added connection of adjacent characters)
+-Changed the central first phrase in rsod
+-The number of system crashes may have decreased
+
 a6-1:
 
 -Fixed the location of the error about the number of files on the desktop

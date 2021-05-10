@@ -12,7 +12,7 @@ local set=gpu.set
 local data={}
 
 function tools.bar(x,y,width,procent)
-w,h=gpu.getResolution()
+local w,h=gpu.getResolution()
 fcolor(0x777777)
 fill(x,y,width,1,"⠒")
 fcolor(0x00bf00)
@@ -24,7 +24,7 @@ fcolor(0xffffff)
 end
 
 function tools.fullbar(x,y,width,procent)
-w,h=gpu.getResolution();
+local w,h=gpu.getResolution();
 fcolor(0x777777)
 fill(x,y,width,1,"⣿")
 fcolor(0x00bf00)

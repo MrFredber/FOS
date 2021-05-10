@@ -3,7 +3,7 @@ local c=r("component")
 local gpu=c.gpu
 local os=r("os")
 if gpu.maxDepth() == 1 then
-print("Your PC is TIER 1. To install FOS you need a minimum of TIER 2 PC.")
+print("Screen/GPU does not support touches.")
 os.exit()
 end
 local fs=r("filesystem")
@@ -18,13 +18,14 @@ local fcolor=gpu.setForeground
 local set=gpu.set
 local event=r("event")
 local dir=fs.makeDirectory
+local langchoise=""
 dir("/lib/fos")
 os.execute("wget -f https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/tools.lua /lib/fos/tools.lua")
 os.execute("wget -f https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/picture.lua /lib/fos/picture.lua")
 local tools=r("fos/tools")
 term.clear()
 
-function reset()
+local function reset()
 color(0x2b2b2b)
 fcolor(0x3b3b3b)
 fill(1,1,w,h,"⢕")
@@ -47,12 +48,16 @@ set(xw+10,hw+2,"Choose language")
 set(xw+10,hw+3,"Выберите язык")
 tools.btn(xw+4,hw+6,"English")
 tools.btn(xw+15,hw+6,"Русский")
+fcolor(0x0000ff)
+set(xw+7,hw+1,"⣶⡄")
+set(xw+1,hw+4,"⠘⠿    ⠿⠃")
+fcolor(0x00ff00)
+set(xw+1,hw+1,"⢠⣶")
 color(0x0000ff)
-fill(xw+3,hw+1,4,4," ")
-fill(xw+1,hw+2,8,2," ")
-color(0x00ff00)
-fill(xw+3,hw+2,2,2," ")
-fill(xw+5,hw+3,2,1," ")
+set(xw+3,hw+1,"⣿⣿⡟⣿")
+set(xw+1,hw+2,"⣿⣿⣿⠟⠋ ⡀ ")
+set(xw+1,hw+3," ⠉⠿⣆⣠⠈  ")
+set(xw+3,hw+4," ⠛⠁ ")
 color(0xb40000)
 fcolor(0xffffff)
 set(xw+23,hw," X ")
@@ -79,8 +84,8 @@ if langchoise == nil then
 else
 	os.execute("wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Install/"..langchoise.." /tmp/lang")
 end
-lang={}
-file=io.open("/tmp/lang","r")
+local lang={}
+local file=io.open("/tmp/lang","r")
 for var in file:lines() do
 	check=var:find("=")
 	if check ~= nil then
@@ -124,7 +129,7 @@ set(xw,hw+17,"LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, AR
 set(xw,hw+18,"FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER")
 set(xw,hw+19,"DEALINGS IN THE SOFTWARE.")
 while true do
-	_,_,x,y=event.pull("touch")
+	local _,_,x,y=event.pull("touch")
 	if x >= math.floor(w/2-slen/2-1) and x <= math.floor(w/2+slen/2) and y == hw+21 then
 		break
 	end
@@ -143,13 +148,13 @@ while i-1 ~= 4 do
 	end
 	i=i+1
 end
-user={"","","0",""}
-userclr=math.random(16777215)
+local user={"","","0",""}
+local userclr=math.random(16777215)
 reset()
 xw=math.floor(w/2-max/2-1)
 hw=math.floor(h/2-7)
 
-function userdraw()
+local function userdraw()
 color(0)
 fcolor(0xffffff)
 fill(xw+1,hw+1,max+2,16," ")
@@ -165,7 +170,13 @@ tools.lvr(xw+max-5,hw+9,user[3])
 if user[3] == "1" then
 	set(xw+1,hw+11,lang.password)
 end
+fcolor(userclr)
+set(w/2-3,hw+1,"⢠⡶⢿⡿⢶⡄")
+set(w/2-3,hw+2,"⣿⣇⣸⣇⣸⣿")
+set(w/2-3,hw+3,"⠘⠿⣮⣵⠿⠃")
+set(w/2-3,hw+4,"⣀⣤⣿⣿⣤⣀")
 color(0xe0e0e0)
+fcolor(0)
 fill(xw+1,hw+7,max,1," ")
 set(xw+1,hw+7,user[1])
 if user [3] == "1" then
@@ -173,15 +184,10 @@ if user [3] == "1" then
 	slen=len(user[4])
 	fill(xw+1,hw+12,slen,1,"*")
 end
-color(userclr)
-set(w/2-2,hw+1,"    ")
-set(w/2-2,hw+2,"    ")
-set(w/2-1,hw+3,"  ")
-set(w/2-3,hw+4,"      ")
 end
 userdraw()
 
-function userInput(s)
+local function userInput(s)
 color(0xffffff)
 fcolor(0)
 term.setCursor(1,h)
@@ -199,7 +205,7 @@ return text
 end
 
 while true do
-	_,_,x,y=event.pull("touch")
+	local _,_,x,y=event.pull("touch")
 	if x >= xw+max-5 and x <= xw+max and y == hw+9 then
 		if user[3] == "1" then
 			user[3]="0"
@@ -225,7 +231,7 @@ max=slen+7
 xw=math.floor(w/2-max/2-1)
 hw=math.floor(h/2-2)
 
-function download()
+local function download()
 color(0)
 fcolor(0xffffff)
 fill(xw+1,hw+1,max+2,5," ")
@@ -240,7 +246,7 @@ end
 download()
 
 while true do
-	_,_,x,y=event.pull("touch")
+	local _,_,x,y=event.pull("touch")
 	if x >= xw+max-5 and x <= xw+max and y == hw+1 then
 		if temp == "1" then
 			temp="0"
@@ -264,7 +270,8 @@ term.setCursor(1,1)
 tools.fullbar(1,h,w,1)
 local files={
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/fos.lua /fos/fos.lua",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/boot.lua /fos/boot.lua",
+	"https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/boot.lua /lib/core/boot.lua",
+	"https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/foslink.lua /home/fos",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/bootmgr.lua /fos/bootmgr.lua",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/system.lua /lib/fos/system.lua",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/finder.lua /lib/fos/finder.lua",
@@ -277,45 +284,62 @@ local files={
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/lang/english.lang /fos/apps/settings.app/lang/english.lang",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/lang/russian.lang /fos/apps/settings.app/lang/russian.lang",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/appname/english.lang /fos/apps/settings.app/appname/english.lang",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/appname/russian.lang /fos/apps/settings.app/appname/russian.lang",
+	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/appname/russian.lang /fos/apps/settings.app/appname/russian.lang"}
+local other={
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/RAM%20test.lua /fos/desktop/'RAM test.lua'",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/icon.pic /fos/apps/settings.app/icon.pic",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/icon.bmp /fos/apps/settings.app/icon.bmp"}
 
 local names={
-	"/fos/fos.lua","/fos/boot.lua","/fos/bootmgr.lua","/lib/fos/system.lua","/lib/fos/finder.lua","/lib/fos/icons.lua",
-	"/lib/fos/picture.lua","/fos/apps/settings.app/icon.spic","/fos/apps/settings.app/main.lua","/fos/lang/fos/english.lang",
-	"/fos/lang/fos/russian.lang","/fos/apps/settings.app/lang/english.lang","/fos/apps/settings.app/lang/russian.lang",
-	"/fos/apps/settings.app/appname/english.lang","/fos/apps/settings.app/appname/russian.lang","/fos/desktop/'RAM test.lua'",
-	"/fos/apps/settings.app/icon.pic","/fos/apps/settings.app/icon.bmp"}
+	"/fos/fos.lua","/lib/core/boot.lua","/home/fos","/fos/bootmgr.lua","/lib/fos/system.lua","/lib/fos/finder.lua",
+	"/lib/fos/icons.lua","/lib/fos/picture.lua","/fos/apps/settings.app/icon.spic","/fos/apps/settings.app/main.lua",
+	"/fos/lang/fos/english.lang","/fos/lang/fos/russian.lang","/fos/apps/settings.app/lang/english.lang",
+	"/fos/apps/settings.app/lang/russian.lang",	"/fos/apps/settings.app/appname/english.lang",
+	"/fos/apps/settings.app/appname/russian.lang"}
+local othernames={"/fos/desktop/'RAM test.lua'","/fos/apps/settings.app/icon.pic","/fos/apps/settings.app/icon.bmp"}
+
 i=1
 ibar=0
-percent=100/total
+percent=100/#files
 color(0x2b2b2b)
-while i-1 ~= #files do
+while i ~= #files do
 	fcolor(0xffffff)
 	set(1,h-1,names[i])
 	tools.fullbar(1,h,w,percent*ibar)
-	ibar=ibar+1
-	i=i+1
 	color(0x2b2b2b)
 	fcolor(0x3b3b3b)
 	os.execute("wget -fq "..files[i])
 	fill(1,h-1,w,2,"⢕")
+	ibar=ibar+1
+	i=i+1
+end
+if temp == "1" then
+	i=1
+	ibar=0
+	percent=100/#other
+	color(0x2b2b2b)
+	while i ~= #other do
+		fcolor(0xffffff)
+		set(1,h-1,othernames[i])
+		tools.fullbar(1,h,w,percent*ibar)
+		color(0x2b2b2b)
+		fcolor(0x3b3b3b)
+		os.execute("wget -fq "..other[i])
+		fill(1,h-1,w,2,"⢕")
+		ibar=ibar+1
+		i=i+1
+	end
 end
 fcolor(0xffffff)
 set(1,h-1,lang.last)
 
-file=io.open("/home/.shrc","w")
-file:write("/fos/boot\ncd /fos")
-file:close()
-file=io.open("/fos/desktop/Settings.lnk","w")
+local file=io.open("/fos/desktop/Settings.lnk","w")
 file:write("/fos/apps/settings.app")
 file:close()
-file=io.open("/fos/system/lang.cfg","w")
+local file=io.open("/fos/system/lang.cfg","w")
 file:write(langchoise)
 file:close()
-file=io.open("/fos/system/user.cfg","w")
+local file=io.open("/fos/system/user.cfg","w")
 if user[1] == "" then
 	user[1]="User"
 end
@@ -326,11 +350,11 @@ else
 	file:write("0")
 end
 file:close()
-w,h=gpu.maxResolution()
-file=io.open("/fos/system/comp.cfg","w")
+local w,h=gpu.maxResolution()
+local file=io.open("/fos/system/comp.cfg","w")
 file:write("0\n"..w..","..h)
 file:close()
-file=io.open("/fos/system/auto.cfg","w")
+local file=io.open("/fos/system/auto.cfg","w")
 file:write("")
 file:close()
 r("computer").shutdown(true)

@@ -1,38 +1,79 @@
 local picture={}
 local gpu=require("component").gpu
+local w,h=gpu.getResolution()
+local unicode=require("unicode")
 local set=gpu.set
 local color=gpu.setBackground
 local fcolor=gpu.setForeground
 
 function picture.screenshot(x,y,width,height)
-local data={width=width,height=height,color={},fcolor={},txt={}}
+local data={compressed=true,width=width,height=height,color={},fcolor={},txt={}}
 hi=1
+ti=1
+ci=1
 while hi ~= height+1 do
 	i=1
-	temp={txt={},c={},f={}}
+	temp={txt={},f={},c={},stack={}}
 	while i ~= width+1 do
-		temp.txt[i],temp.f[i],temp.c[i]=gpu.get(x+i-1,y+hi-1)
+		temp.stack[ci],tfclr,tclr=gpu.get(x+i-1,y+hi-1)
+		if x+i < w+1 then
+			txt,fclr,clr=gpu.get(x+i,y+hi-1)
+		end
+		if tfclr ~= fclr or tclr ~= clr or i+2 > width then
+			table.insert(temp.c,ti,ci)
+			table.insert(temp.c,ti+1,tclr)
+			table.insert(temp.f,ti,ci)
+			table.insert(temp.f,ti+1,tfclr)
+			table.insert(temp.txt,table.concat(temp.stack))
+			temp.stack={}
+			ci=0
+			ti=ti+2
+		end
+		ci=ci+1
 		i=i+1
 	end
 	data.color[hi]=temp.c
 	data.fcolor[hi]=temp.f
 	data.txt[hi]=temp.txt
 	hi=hi+1
+	ti=1
+	ci=1
 end
 return data
 end
 
 function picture.draw(x,y,data)
 hi=1
-while hi ~= data.height+1 do
-	i=1
-	while i ~= data.width+1 do 
-		color(data.color[hi][i])
-		fcolor(data.fcolor[hi][i])
-		set(x+i-1,y+hi-1,data.txt[hi][i])
-		i=i+1
+if data.compressed == true then
+	while hi ~= data.height+1 do
+		i=1
+		ti=1
+		ai=1
+		while i ~= data.width+1 do
+			if data.txt[hi][ti] == nil or data.color[hi][ai+1] == nil or data.fcolor[hi][ai+1] == nil then
+				break
+			else
+				color(data.color[hi][ai+1])
+				fcolor(data.fcolor[hi][ai+1])
+				set(x+i-1,y+hi-1,data.txt[hi][ti])
+			end
+			i=i+unicode.len(data.txt[hi][ti])
+			ai=ai+2
+			ti=ti+1
+		end
+		hi=hi+1
 	end
-	hi=hi+1
+else
+	while hi ~= data.height+1 do
+		i=1
+		while i ~= data.width+1 do 
+			color(data.color[hi][i])
+			fcolor(data.fcolor[hi][i])
+			set(x+i-1,y+hi-1,data.txt[hi][i])
+			i=i+1
+		end
+		hi=hi+1
+	end
 end
 end
 

@@ -7,7 +7,7 @@ local term=r("term")
 local io=r("io")
 local event=r("event")
 local unicode=r("unicode")
-local comp=r("computer")
+local computer=r("computer")
 local os=r("os")
 local icons=r("/fos/icons")
 local tools=r("/fos/tools")
@@ -19,43 +19,9 @@ local fcolor=gpu.setForeground
 local set=gpu.set
 local len=unicode.len
 local comp={}
-file=io.open("/fos/system/comp.cfg","r")
+local file=io.open("/fos/system/comp.cfg","r")
 for var in file:lines() do table.insert(comp,var) end
 file:close()
-
-function system.shell()
-lang={}
-sett={}
-file=io.open("/fos/system/lang.cfg","r")
-for var in file:lines() do table.insert(sett,var) end
-file:close()
-file=io.open(fs.concat("/fos/lang/fos",sett[1]), "r")
-for var in file:lines() do
-check=var:find("=")
-if check ~= nil then
-arg=unicode.sub(var,1,check-1)
-var=unicode.sub(var,check+1)
-lang[arg]=var
-else
-table.insert(lang,var)
-end
-end
-file:close()
-color(0)
-fcolor(0xffffff)
-term.clear()
-color(0x2b2b2b)
-fill(1,1,w,1,"-")
-slen=unicode.len(lang.shellExit)
-set(w/2-slen/2,1,lang.shellExit)
-slen=unicode.len(lang.shellMsg)
-set(w/2-slen/2,2,lang.shellMsg)
-term.setCursor(1,3)
-lang=nil
-arg=nil
-check=nil
-os.exit()
-end
 
 function system.drawMenu(lang,user)
 data={}
@@ -124,7 +90,7 @@ end
 function system.lock(lang)
 local user={}
 local txt=""
-file=io.open("/fos/system/user.cfg","r")
+local file=io.open("/fos/system/user.cfg","r")
 for var in file:lines() do table.insert(user,var) end
 file:close()
 w,h=gpu.getResolution()
@@ -157,11 +123,12 @@ color(0xe0e0e0)
 fill(x,y,20+xw,6," ")
 fcolor(0)
 set(x+10,y+2,user[1])
-color(tonumber(user[2]) or tonumber("0x"..user[2]) or math.random(16777215))
-set(x+3,y+1,"    ")
-set(x+3,y+2,"    ")
-set(x+4,y+3,"  ")
-set(x+2,y+4,"      ")
+fcolor(tonumber(user[2]) or tonumber("0x"..user[2]) or math.random(16777215))
+set(x+2,y+1,"⢠⡶⢿⡿⢶⡄")
+set(x+2,y+2,"⣿⣇⣸⣇⣸⣿")
+set(x+2,y+3,"⠘⠿⣮⣵⠿⠃")
+set(x+2,y+4,"⣀⣤⣿⣿⣤⣀")
+fcolor(0)
 color(0xffffff)
 fill(x+10,y+3,9+xw,1," ")
 sleep=0
@@ -198,11 +165,14 @@ if tx >= x+10 and tx <= x+18+xw and ty == math.floor(y+3) then
 		set(xi-slen/2,y+4,lang.incorrect)
 	end
 elseif tx >= w/2-tlen/2 and tx <= w/2-tlen/2+1+slen1 and ty == h-1 and sleep ~= 1 then
-	comp.shutdown()
+	computer.shutdown()
 elseif tx >= w/2-tlen/2+slen1+3 and tx <= w/2+tlen/2+1-slen4-slen3-8 and ty == h-1 and sleep ~= 1 then
-	comp.shutdown(true)
+	computer.shutdown(true)
 elseif tx >= w/2+tlen/2+1-slen4-slen3-6 and tx <= w/2+tlen/2+1-slen4-5 and ty == h-1 and sleep ~= 1 then
-	system.shell(lang)
+	color(0)
+	fcolor(0xffffff)
+	term.clear()
+	os.exit()
 elseif tx >= w/2+tlen/2+1-slen4-3 and tx <= w/2+tlen/2-1 and ty == h-1 and sleep ~= 1 then
 	sleep=1
 	screen.turnOff()
@@ -215,7 +185,7 @@ end
 
 function system.background()
 comp={}
-file=io.open("/fos/system/comp.cfg","r")
+local file=io.open("/fos/system/comp.cfg","r")
 for var in file:lines() do table.insert(comp,var) end
 file:close()
 w,h=gpu.getResolution()
@@ -254,28 +224,28 @@ while i ~= #filesname do
   if filesname[i]:find(".lnk",1,true) ~= nil then
   	lnk={}
   	appname={}
-  	lnkfile=io.open(p,"r")
-	for var in lnkfile:lines() do 
+  	local file=io.open(p,"r")
+	for var in file:lines() do 
 		table.insert(lnk, var) 
 	end
-	lnkfile:close()
-	appnamefile=io.open(lnk[1].."/appname/"..langsett[1],"r")
-	for var in appnamefile:lines() do 
+	file:close()
+	local file=io.open(lnk[1].."/appname/"..langsett[1],"r")
+	for var in file:lines() do 
 		table.insert(appname, var) 
 	end
-	appnamefile:close()
+	file:close()
 	slen=len(appname[1])
 	if slen > 10 then
 		slen=10
 	end
     set(wf+8-slen/2,hf,unicode.sub(appname[1],1,slen))
-    iconfile=io.open(lnk[1].."/icon.spic","r")
-    icondata={}
-    for var in iconfile:lines() do
-      table.insert(icondata,var)
+    local file=io.open(lnk[1].."/icon.spic","r")
+    local data={}
+    for var in file:lines() do
+      table.insert(data,var)
     end
-    iconfile:close()
-    picture.spic(wi,hi,icondata)
+    file:close()
+    picture.spic(wi,hi,data)
   else
     slen=len(filename)
   if slen > 10 then
@@ -380,28 +350,28 @@ if filename:find(".lnk",1,true) ~= nil then
   	lnk={}
   	appname={}
   	p=fs.concat(path,filename)
-	lnkfile=io.open(p,"r")
-	for var in lnkfile:lines() do 
+	local file=io.open(p,"r")
+	for var in file:lines() do 
 		table.insert(lnk, var) 
 	end
-	lnkfile:close()
-	appnamefile=io.open(lnk[1].."/appname/"..langsett[1],"r")
-	for var in appnamefile:lines() do 
+	file:close()
+	local file=io.open(lnk[1].."/appname/"..langsett[1],"r")
+	for var in file:lines() do 
 		table.insert(appname, var) 
 	end
-	appnamefile:close()
+	file:close()
 	slen=len(appname[1])
 	if slen > 10 then
 		slen=10
 	end
     set(wf+8-slen/2,hf,unicode.sub(appname[1],1,slen))
-    iconfile=io.open(lnk[1].."/icon.spic","r")
-    icondata={}
-    for var in iconfile:lines() do
-      table.insert(icondata,var)
+    local file=io.open(lnk[1].."/icon.spic","r")
+    data={}
+    for var in file:lines() do
+      table.insert(data,var)
     end
-    iconfile:close()
-    picture.spic(wi,hi,icondata)
+    file:close()
+    picture.spic(wi,hi,data)
 else
 	slen=len(filename)
 	if slen > 10 then

@@ -13,25 +13,24 @@ local len=unicode.len
 local lang={}
 local user={}
 local comp={}
+local auto={}
+local max=0
+local no=""
 local open=nil
 local file=io.open("/fos/system/user.cfg","r")
-for var in file:lines() do
-table.insert(user,var)
-end
+for var in file:lines() do table.insert(user,var) end
 file:close()
-file=io.open("/fos/system/comp.cfg","r")
+local file=io.open("/fos/system/comp.cfg","r")
 for var in file:lines() do table.insert(comp,var) end
 file:close()
 local userColor=tonumber(user[2]) or tonumber("0x"..user[2]) or math.random(16777215)
 local w,h=gpu.getResolution();
 local langsett={}
-local langsettfile=io.open("/fos/system/lang.cfg","r")
-for var in langsettfile:lines() do
-table.insert(langsett,var)
-end
-langsettfile:close()
-local langfile=io.open("/fos/apps/settings.app/lang/"..langsett[1],"r")
-for var in langfile:lines() do
+local file=io.open("/fos/system/lang.cfg","r")
+for var in file:lines() do table.insert(langsett,var) end
+file:close()
+local file=io.open("/fos/apps/settings.app/lang/"..langsett[1],"r")
+for var in file:lines() do
 check=var:find("=")
 if check ~= nil then
 arg=unicode.sub(var,1,check-1)
@@ -41,26 +40,30 @@ else
 table.insert(lang,var)
 end
 end
-langfile:close()
+file:close()
 
-function iconLang(x,y)
+local function iconLang(x,y)
+fcolor(0x0000ff)
+set(x+6,y,"⣶⡄")
+set(x,y+3,"⠘⠿    ⠿⠃")
+fcolor(0x00ff00)
+set(x,y,"⢠⣶")
 color(0x0000ff)
-fill(x+2,y,4,4," ")
-fill(x,y+1,8,2," ")
-color(0x00ff00)
-fill(x+2,y+1,2,2," ")
-fill(x+4,y+2,2,1," ")
+set(x+2,y,"⣿⣿⡟⣿")
+set(x,y+1,"⣿⣿⣿⠟⠋ ⡀ ")
+set(x,y+2," ⠉⠿⣆⣠⠈  ")
+set(x+2,y+3," ⠛⠁ ")
 end
 
-function iconUser(x,y)
-color(userColor)
-set(x+2,y,"    ")
-set(x+2,y+1,"    ")
-set(x+3,y+2,"  ")
-set(x+1,y+3,"      ")
+local function iconUser(x,y)
+fcolor(userColor)
+set(x+1,y,"⢠⡶⢿⡿⢶⡄")
+set(x+1,y+1,"⣿⣇⣸⣇⣸⣿")
+set(x+1,y+2,"⠘⠿⣮⣵⠿⠃")
+set(x+1,y+3,"⣀⣤⣿⣿⣤⣀")
 end
 
-function iconComp(x,y)
+local function iconComp(x,y)
 color(0x0094ff)
 fcolor(0)
 set(x,y,"⡏⠉⠉⠉⠉⠉⠉⢹")
@@ -73,7 +76,7 @@ color(0xffffff)
 set(x+3,y+3,"⣸⣇")
 end
 
-function iconAuto(x,y)
+local function iconAuto(x,y)
 color(0xffffff)
 fcolor(0)
 set(x,y,"⡏⠍⠭⠭⠭⠭⠭⢹")
@@ -82,8 +85,8 @@ set(x,y+2,"⡇⠅⠭⠭⠭⠭⠭⢸")
 set(x,y+3,"⣇⣁⣭⣭⣭⣭⣉⣸")
 end
 
-function MainMenu()
-cords={x={},y={}}
+local function MainMenu()
+local cords={x={},y={}}
 if comp[1] == "1" then
 	color(0)
 else
@@ -158,7 +161,7 @@ end
 return open
 end
 
-function autoDraw()
+local function autoDraw()
 color(0xffffff)
 fcolor(0)
 fill(5,5,w-8,h-5," ")
@@ -166,15 +169,13 @@ color(0xe0e0e0)
 max=0
 i=1
 while i-1 ~= #auto do
---print(tools.tblprint(auto))
---event.pull("touch")
 	slen=len(auto[i])
 	if slen > max then
 		max=slen
 	end
 	i=i+1
 end
-max=max+8+len(#auto)
+max=max+8+#auto
 fill(w/2-max/2,h/2-#auto/2,max,#auto," ")
 i=1
 while i-1 ~= #auto do
@@ -191,8 +192,8 @@ tools.btn(w/2+2,h/2+#auto/2+1,"-")
 return max
 end
 
-function autoApply()
-file=io.open("/fos/system/auto.cfg","w")
+local function autoApply()
+local file=io.open("/fos/system/auto.cfg","w")
 i=1
 while i-1 ~= #auto do
 	file:write(auto[i])
@@ -204,9 +205,9 @@ end
 file:close()
 end
 
-function autostart()
+local function autostart()
 auto={}
-file=io.open("/fos/system/auto.cfg","r")
+local file=io.open("/fos/system/auto.cfg","r")
 for var in file:lines() do table.insert(auto,var) end
 file:close()
 max=autoDraw()
@@ -262,12 +263,12 @@ while true do
 end
 end
 
-function autoSubTbl()
+local function autoSubTbl()
 table.remove(auto,var)
 table.pack(auto)
 end
 
-function autoMove(tbl1,tbl2)
+local function autoMove(tbl1,tbl2)
 if tbl1 > #auto or tbl1 < 1 or tbl2 > #auto or tbl2 < 1 then
 	tools.error(lang.autoMoveErr.." ("..tbl1..";"..tbl2..")")
 else
@@ -278,13 +279,13 @@ else
 end
 end
 
-function compApply()
-file=io.open("/fos/system/comp.cfg","w")
+local function compApply()
+local file=io.open("/fos/system/comp.cfg","w")
 file:write(comp[1].."\n"..comp[2])
 file:close()
 end
 
-function compDraw()
+local function compDraw()
 color(0xffffff)
 fcolor(0)
 fill(5,5,w-8,h-5," ")
@@ -306,10 +307,10 @@ if comp[1] == "1" then
 end
 end
 
-function computer()
+local function computer()
 compDraw()
 while true do
-	_,_,x,y=event.pull("touch")
+	local _,_,x,y=event.pull("touch")
 	if x >= 6 and x <= 9 and y == 4 then
 		compApply()
 		break
@@ -372,7 +373,7 @@ while true do
 		break
 	end
 	if langchoise ~= nil then
-		file=io.open("/fos/system/lang.cfg","w")
+		local file=io.open("/fos/system/lang.cfg","w")
 		file:write(langchoise)
 		file:close()
 		lang=nil
@@ -381,7 +382,7 @@ while true do
 end
 end
 
-function userDraw()
+local function userDraw()
 userColor=tonumber(user[2]) or tonumber("0x"..user[2]) or math.random(16777215)
 color(0xffffff)
 fill(5,5,w-8,h-5," ")
@@ -424,7 +425,7 @@ end
 return tlen,ulen,xw,plen
 end
 
-function userInput(txt)
+local function userInput(txt)
 slen=len(txt)
 x=w/2-slen/2
 color(0)
@@ -441,7 +442,7 @@ fill(x+1,h/2,slen+2,1," ")
 exit=0
 while exit ~= 1 do
 	no=false
-	_,_,tx,ty=event.pull("touch")
+	local _,_,tx,ty=event.pull("touch")
 	if tx >= x+1 and tx <= x+slen+2 and ty == math.floor(h/2) then
 		exit=1
 	elseif tx >= x+slen+1 and tx <= x+slen+3 and ty == math.floor(h/2-2) then
@@ -452,8 +453,8 @@ end
 return no
 end
 
-function userApply()
-file=io.open("/fos/system/user.cfg","w")
+local function userApply()
+local file=io.open("/fos/system/user.cfg","w")
 file:write(user[1].."\n"..user[2].."\n")
 if user[3] ~= "0" and user[4] ~= nil then
 	file:write("1\n"..user[4])
@@ -463,7 +464,7 @@ end
 file:close()
 end
 
-function userSett()
+local function userSett()
 tlen,ulen,xw,plen=userDraw()
 while true do
 local _,_,x,y=event.pull("touch")

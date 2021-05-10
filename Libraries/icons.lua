@@ -7,26 +7,23 @@ local set=gpu.set
 
 function icons.unkFile(x,y)
 color(0)
-fcolor(0x272727)
-fill(x,y,8,4,"?")
-fcolor(0xffffff)
-fill(x+2,y,2,1,"⣿")
-fill(x+4,y+1,1,1,"⣿")
-fill(x+3,y+2,1,1,"⣿")
-set(x+3,y+3,"■")
+set(x,y,"⠀⢠⣶⠟⠛⢶⡄⠀")
+set(x,y+1,"⠀⠈⠁⠀⢀⣼⠇⠀")
+set(x,y+2,"⠀⠀⠀⢰⡟⠁⠀⠀")
+set(x,y+3,"⠀⠀⠀⠰⠆⠀⠀⠀")
 end
 
 function icons.folder(x,y)
 fcolor(0xffff00)
 set(x,y,"⣤⣤⣄")
 fcolor(0xffcf00)
-set(x,y+1,"⣿⣿⣿⣿⣿⣿⣿⣿")
+fill(x,y+1,8,1,"⣿")
 color(0xffb100)
 fcolor(0xff9500)
-set(x,y+2,"⣤⣤⣤⣤⣤⣤⣤⣤")
+fill(x,y+2,8,1,"⣤")
 color(0xff7800)
 fcolor(0xff5b00)
-set(x,y+3,"⣤⣤⣤⣤⣤⣤⣤⣤")
+fill(x,y+3,8,1,"⣤")
 end
 
 function icons.lua(x,y)
@@ -48,12 +45,16 @@ set(x+2,y+3,".lua")
 end
 
 function icons.lang(x,y)
+fcolor(0x0000ff)
+set(x+6,y,"⣶⡄")
+set(x,y+3,"⠘⠿    ⠿⠃")
+fcolor(0x00ff00)
+set(x,y,"⢠⣶")
 color(0x0000ff)
-fill(x+2,y,4,4," ")
-fill(x,y+1,8,2," ")
-color(0x00ff00)
-fill(x+2,y+1,2,2," ")
-fill(x+4,y+2,2,1," ")
+set(x+2,y,"⣿⣿⡟⣿")
+set(x,y+1,"⣿⣿⣿⠟⠋ ⡀ ")
+set(x,y+2," ⠉⠿⣆⣠⠈  ")
+set(x+2,y+3," ⠛⠁ ")
 end
 
 function icons.txt(x,y)
@@ -71,12 +72,10 @@ end
 
 function icons.cfg(x,y)
 color(0x171717)
-set(x,y," ⢀⣀⠜⠣⣀⡀ ")
-set(x,y+1,"⣀⠜⢁⢔⡢⡈⠣⣀")
-set(x,y+2,"⠉⢢⡈⠪⠕⢁⡔⠉")
-color(0x727272)
-fill(x,y+3,8,1," ")
-set(x+2,y+3,".cfg")
+set(x,y,"⠀⡠⠢⠎⠱⠔⢄⠀")
+set(x,y+1,"⡨⠆⠀⣷⣄⠀⠰⢅")
+set(x,y+2,"⢑⠆⠀⡿⠋⠀⠰⡊")
+set(x,y+3,"⠀⠑⠔⢆⡰⠢⠊⠀")
 end
 
 return icons

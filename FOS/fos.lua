@@ -9,20 +9,21 @@ local os=r("os")
 local io=r("io")
 local fs=r("filesystem")
 local unicode=r("unicode")
+local len=unicode.len
 local lang={}
 local sett={}
 local user={}
 local compcfg={}
 
-function fosLoad()
+local function fosLoad()
 	lang={}
 	sett={}
 	user={}
 	compcfg={}
-	file=io.open("/fos/system/lang.cfg","r")
+	local file=io.open("/fos/system/lang.cfg","r")
 	for var in file:lines() do table.insert(sett,var) end
 	file:close()
-	file=io.open(fs.concat("/fos/lang/fos",sett[1]),"r")
+	local file=io.open(fs.concat("/fos/lang/fos",sett[1]),"r")
 	for var in file:lines() do
 		check=var:find("=")
 		if check ~= nil then
@@ -39,7 +40,7 @@ function fosLoad()
 		print(lang.depthErr)
 		os.exit()
 	end
-	file=io.open("/fos/system/user.cfg","r")
+	local file=io.open("/fos/system/user.cfg","r")
 	for var in file:lines() do table.insert(user,var) end
 	file:close()
 	local file=io.open("/fos/system/comp.cfg","r")
@@ -76,7 +77,8 @@ local appname=0
 local appnamefile={}
 local delay=0
 local smax=0
-local ver="a6-1"
+local menu=0
+local ver="a6-2"
 local path="/fos/desktop"
 local filesname={}
 
@@ -103,22 +105,20 @@ if y ~= h and menu ~= 1 then
 	local openfilename,filepos=system.pressButton(cords,filesname,x,y)
 	system.updAfterPress(openfilename,filepos,lang,sett,path)
 	local openfile=fs.concat(path,openfilename)
-	if string.find(openfile,".lnk") ~= nil then
+	if openfile:find(".lnk") ~= nil then
 		lnk={}
-		for var in io.open(openfile,"r"):lines() do	
-			table.insert(lnk, var) 
-		end
+		for var in io.open(openfile,"r"):lines() do	table.insert(lnk,var) end
 		openfile=lnk[1]
 		openfilename=fs.name(lnk[1]).."/"
 	end
- 	if string.find(openfile,".app") ~= nil then
+ 	if openfile:find(".app") ~= nil then
 		openfile=openfile.."/main.lua"
-		appnamefile=io.open("/fos/apps/"..openfilename.."appname/"..sett[1],"r")
+		local file=io.open("/fos/apps/"..openfilename.."appname/"..sett[1],"r")
 		appname={}
-		for var in appnamefile:lines() do
+		for var in file:lines() do
 			table.insert(appname,var)
 		end
-		appnamefile:close()
+		file:close()
 		openfilename=appname[1]
 	end
 	if openfile ~= nil and openfilename ~= nil then
@@ -128,19 +128,17 @@ if y ~= h and menu ~= 1 then
 		fcolor(0xffffff)
 		set(w-2,1," X ")
 		color(0x1e90ff)
-		slen=unicode.len(openfilename)
+		slen=len(openfilename)
 		fill(3,h,slen+2,1," ")
 		set(4,h,openfilename)
 		fcolor(0)
 		color(0xffffff)	
 		set(1,1,openfilename)
 		fcolor(0xffffff)
-		if string.find(openfilename,".txt") ~= nil then
+		if openfilename:find(".txt") ~= nil then
 			openfiletext={}
-			slen=string.len(openfilename)
-			for var in io.open(openfile,"r"):lines() do
-				table.insert(openfiletext,var)
-			end
+			slen=len(openfilename)
+			for var in io.open(openfile,"r"):lines() do	table.insert(openfiletext,var) end
 			i=1
 			fcolor(0)
 			fill(1,2,w,h-2," ")
@@ -196,7 +194,10 @@ if x >= 1 and x <= smax and y == h-5 and menu == 1 and sleep ~= 1 then
 	draw()
 elseif x >= 1 and x <= smax and y == h-4 and menu == 1 and sleep ~= 1 then
 	lang=nil
-	system.shell()
+	color(0)
+	fcolor(0xffffff)
+	term.clear()
+	os.exit()
 elseif x > 0 and x <= smax and y == h-3 and menu == 1 and sleep ~= 1 then
 	sleep=1
 	screen.turnOff()
