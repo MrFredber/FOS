@@ -161,6 +161,34 @@ end
 return open
 end
 
+local function userInput(txt)
+slen=len(txt)
+x=w/2-slen/2
+color(0)
+fill(x+1,h/2-1,slen+4,4," ")
+color(0xe0e0e0)
+fill(x,h/2-2,slen+4,4," ")
+color(0xb40000)
+fcolor(0xffffff)
+set(x+slen+1,h/2-2," X ")
+fcolor(0)
+color(0xffffff)
+set(x,h/2-2,txt.." ")
+fill(x+1,h/2,slen+2,1," ")
+exit=0
+while exit ~= 1 do
+	no=false
+	local _,_,tx,ty=event.pull("touch")
+	if tx >= x+1 and tx <= x+slen+2 and ty == math.floor(h/2) then
+		exit=1
+	elseif tx >= x+slen+1 and tx <= x+slen+3 and ty == math.floor(h/2-2) then
+		no="yes"
+		exit=1
+	end
+end
+return no
+end
+
 local function autoDraw()
 color(0xffffff)
 fcolor(0)
@@ -423,34 +451,6 @@ if comp[1] == "1" then
 	fill(1,14,w,h-14," ")
 end
 return tlen,ulen,xw,plen
-end
-
-local function userInput(txt)
-slen=len(txt)
-x=w/2-slen/2
-color(0)
-fill(x+1,h/2-1,slen+4,4," ")
-color(0xe0e0e0)
-fill(x,h/2-2,slen+4,4," ")
-color(0xb40000)
-fcolor(0xffffff)
-set(x+slen+1,h/2-2," X ")
-fcolor(0)
-color(0xffffff)
-set(x,h/2-2,txt.." ")
-fill(x+1,h/2,slen+2,1," ")
-exit=0
-while exit ~= 1 do
-	no=false
-	local _,_,tx,ty=event.pull("touch")
-	if tx >= x+1 and tx <= x+slen+2 and ty == math.floor(h/2) then
-		exit=1
-	elseif tx >= x+slen+1 and tx <= x+slen+3 and ty == math.floor(h/2-2) then
-		no="yes"
-		exit=1
-	end
-end
-return no
 end
 
 local function userApply()
