@@ -20,5 +20,3 @@ Or use this command:
 	wget -f https://raw.githubusercontent.com/MrFredber/FOS/master/Install/Install-FOS.lua /tmp/Install-FOS.lua && /tmp/Install-FOS.lua
 
 If you see a bug, create a Issue in this repository.
-
-P.S. Redesign coming soon.
