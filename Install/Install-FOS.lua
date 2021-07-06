@@ -366,7 +366,9 @@ end
 dir("/FOS/desktop")
 dir("/FOS/apps/Settings.app/appname")
 dir("/FOS/apps/Settings.app/lang")
+dir("/FOS/apps/Explorer.app/appname")
 dir("/FOS/lang/fos")
+dir("/FOS/lang/shared")
 dir("/FOS/system")
 
 reset()
@@ -383,24 +385,22 @@ local files={
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/picture.lua /lib/fos/picture.lua",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/icon.spic /fos/apps/settings.app/icon.spic",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/main.lua /fos/apps/settings.app/main.lua",
+	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Explorer.app/icon.spic /fos/apps/explorer.app/icon.spic",
+	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Explorer.app/main.lua /fos/apps/explorer.app/main.lua",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Language/fos/english.lang /fos/lang/fos/english.lang",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Language/fos/russian.lang /fos/lang/fos/russian.lang",
+	"https://raw.githubusercontent.com/MrFredber/FOS/master/Language/shared/english.lang /fos/lang/shared/english.lang",
+	"https://raw.githubusercontent.com/MrFredber/FOS/master/Language/shared/russian.lang /fos/lang/shared/russian.lang",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/lang/english.lang /fos/apps/settings.app/lang/english.lang",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/lang/russian.lang /fos/apps/settings.app/lang/russian.lang",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/appname/english.lang /fos/apps/settings.app/appname/english.lang",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/appname/russian.lang /fos/apps/settings.app/appname/russian.lang"}
+	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/appname/russian.lang /fos/apps/settings.app/appname/russian.lang",
+	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Explorer.app/appname/english.lang /fos/apps/explorer.app/appname/english.lang",
+	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Explorer.app/appname/russian.lang /fos/apps/explorer.app/appname/russian.lang"}
 local other={
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/RAM%20test.lua /fos/desktop/'RAM test.lua'",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/icon.pic /fos/apps/settings.app/icon.pic",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/icon.bmp /fos/apps/settings.app/icon.bmp"}
-
-local names={
-	"/fos/fos.lua","/lib/core/boot.lua","/home/fos","/fos/bootmgr.lua","/lib/fos/system.lua","/lib/fos/finder.lua",
-	"/lib/fos/icons.lua","/lib/fos/picture.lua","/fos/apps/settings.app/icon.spic","/fos/apps/settings.app/main.lua",
-	"/fos/lang/fos/english.lang","/fos/lang/fos/russian.lang","/fos/apps/settings.app/lang/english.lang",
-	"/fos/apps/settings.app/lang/russian.lang",	"/fos/apps/settings.app/appname/english.lang",
-	"/fos/apps/settings.app/appname/russian.lang"}
-local othernames={"/fos/desktop/'RAM test.lua'","/fos/apps/settings.app/icon.pic","/fos/apps/settings.app/icon.bmp"}
 
 i=1
 ibar=0
@@ -408,7 +408,8 @@ percent=100/#files
 color(0x2b2b2b)
 while i ~= #files do
 	fcolor(0xffffff)
-	set(1,h-1,names[i])
+	temp=files[i]:find(" ")
+	set(1,h-1,files[i]:sub(temp+1))
 	tools.fullbar(1,h,w,percent*ibar)
 	color(0x2b2b2b)
 	fcolor(0x3b3b3b)
@@ -424,7 +425,8 @@ if temp == "1" then
 	color(0x2b2b2b)
 	while i ~= #other do
 		fcolor(0xffffff)
-		set(1,h-1,othernames[i])
+		temp=other[i]:find(" ")
+		set(1,h-1,other[i]:sub(temp+1))
 		tools.fullbar(1,h,w,percent*ibar)
 		color(0x2b2b2b)
 		fcolor(0x3b3b3b)
