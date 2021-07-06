@@ -7,27 +7,32 @@
 пользователя
 и пароля
 Язык
-
-
+Настройки
+языка
 
 Автозапуск
-
-
-
+Скриптов во
+время запуск
+а системы
 lang=Язык Системы
 langMsg1=Хочешь видеть больше языков?
 langMsg2=Отсылай pull request в репозиторий FOS на Github
 user=Защита Паролем
 userbtn=Сменить Пароль
-userColor=Цвет: 
+userColor=Цвет
 userRandom=Рандомный
 userNick=Введите новое имя пользователя
-userColorMsg=Введите новый цвет
+userColorTitle=Установка цвета
 userPassword=Введите новый пароль
-compPowerSave=Режим Энергосбережения
-compPowerSaveMsg=(Удаляет фон, что может быть непривычно)
+compPowerSafe=Режим Энергосбережения
+compPowerSafeMsg=(Удаляет фон, что может быть непривычно)
 compResolution=Разрешение Экрана: 
-compResolutionMsg=Введите новое разрешение в формате 'ширина,высота'
+compResolutionTitle=Установка разрешения
+width=Ширина
+height=Высота
+compResolutionCompErr=Это не число
+cancel=Отмена
+default=По умолчанию
 autoAdd=Введите путь до файла
 autoSub=Введите номер файла
 compResolutionErr=Разрешение задано неправильно

@@ -1,25 +1,34 @@
---FOS (Fredber Operational System) is a Russian os made to facilitate the use of the OpenComputers computer
---debug function: print(tools.tblprint(table))
 local r=require
-local c=r("component")
-local term=r("term")
-local os=r("os")
-local io=r("io")
-local fs=r("filesystem")
-local unicode=r("unicode")
+local gpu=r("component").gpu
+local tools=r("fos/tools")
+local finder=r("fos/finder")
 local system=r("fos/system")
-local gpu=c.gpu
-local fill=gpu.fill
+local picture=r("fos/picture")
+local event=r("event")
+local os=r("os")
+local unicode=r("unicode")
+local fs=r("filesystem")
+local term=r("term")
 local len=unicode.len
+local fill=gpu.fill
+local color=gpu.setBackground
+local fcolor=gpu.setForeground
+local set=gpu.set
+local cords={}
 local lang={}
 local slang={}
 local reg={}
-local file,sysfcolor,syscolor
+local pos,sysfcolor,syscolor,slen,openfilename,filepos,eSkipCon,file,w,h,click,data
+local path="/"
+local args={...}
+if type(args[1]) == "string" then
+path=args[1]
+end
 
-function fosLoad()
+function expLoad()
 lang={}
 slang={}
-reg={}
+sett={}
 file=io.open("/fos/system/registry","r")
 for var in file:lines() do
 if var:find("=") ~= nil then
@@ -49,13 +58,6 @@ if gpu.maxDepth() == 1 then
 	print(lang.depthErr)
 	os.exit()
 end
-if reg.powerSafe == "1" then
-	syscolor=0
-	sysfcolor=0xffffff
-else
-	syscolor=0x2b2b2b
-	sysfcolor=0
-end
 file=io.open(fs.concat("/fos/lang/shared",reg.lang),"r")
 for var in file:lines() do
 	check=var:find("=")
@@ -68,48 +70,43 @@ for var in file:lines() do
 	end
 end
 file:close()
-gpu.setResolution(tonumber(reg.width),tonumber(reg.height))
-system.update(reg,lang,slang)
+if reg.powerSafe == "1" then
+	syscolor=0
+	sysfcolor=0xffffff
+else
+	syscolor=0xffffff
+	sysfcolor=0
 end
-fosLoad()
-
-local screen=c.screen
-local event=r("event")
-local comp=r("computer")
-local finder=r("fos/finder")
-local icons=r("fos/icons")
-local picture=r("fos/picture")
-local tools=r("fos/tools")
-local color=gpu.setBackground
-local fcolor=gpu.setForeground
-local set=gpu.set
-local lnk={}
-local filesname={}
-local appnamefile={}
-local cords={}
-local data,openfile,openfilename,openfiletext,pos,filepos,skipCon,slen,appname,delay,smax,menu=0,0,0,0,0,0,0,0,0,0,0,0
-local path="/fos/desktop"
-
---Functions
-function draw()
-system.background(syscolor);
-set(1,1,lang.ver..reg.ver)
-filesname=finder.files(path);
-system.workplace(syscolor,0xffffff,filesname,path);
-cords=system.createButtons(syscolor,filesname,sett,1,1)
+w=tonumber(reg.width)
+h=tonumber(reg.height)
 end
-----------
-if reg.passwordProtection == "1" then
-	system.lock(syscolor)
-end
-draw();
 
+function expDraw()
+color(syscolor)
+fill(1,1,w,h-1," ")
+tools.btn(3,1,"<-")
+color(0xb40000)
+fcolor(0xffffff)
+set(w-2,1," X ")
+color(syscolor)
+fcolor(sysfcolor)
+slen=len(path)
+set(w/2-slen/2+1,1,path)
+filesname=finder.files(path)
+system.workplace(syscolor,sysfcolor,filesname,path)
+cords=system.createButtons(syscolor,filesname)
+end
+
+expLoad()
+expDraw()
+data=picture.screenshot(1,h,w,1)
 while true do
+picture.draw(1,h,data)
+eSkipCon=0
 local _,_,x,y,click=event.pull("touch")
-
-if y ~= h and menu ~= 1 then
-	openfilename,filepos,skipCon=system.pressButton(cords,filesname,x,y,click)
-	if skipCon == 0 then
+if y ~= 1 and y ~= h then
+	openfilename,filepos,eSkipCon=system.pressButton(cords,filesname,x,y,click)
+	if eSkipCon == 0 then
 		system.updAfterPress(openfilename,filepos,path)
 		openfile=fs.concat(path,openfilename)
 		if openfile:find(".lnk") ~= nil then
@@ -124,7 +121,6 @@ if y ~= h and menu ~= 1 then
 		end
  		if openfile:find(".app") ~= nil then
  			openfilename=unicode.sub(openfile,11)
-			openfile=openfile.."/main.lua"
 			if fs.exists("/fos/apps/"..openfilename.."/appname/"..reg.lang) == true then
 				file=io.open("/fos/apps/"..openfilename.."/appname/"..reg.lang,"r")
 				appname={}
@@ -137,30 +133,22 @@ if y ~= h and menu ~= 1 then
 		end
 		if openfile ~= nil and openfilename ~= nil then
 			color(0x1e90ff)
-			fcolor(0xffffff)
-			slen=len(openfilename)
-			fill(3,h,slen+2,1," ")
-			set(4,h,openfilename)
 			color(0)
 			fcolor(0xffffff)
 			if openfilename:find(".txt") ~= nil then
 				color(0xb40000)
 				fcolor(0xffffff)
 				set(w-2,1," X ")
-				if reg.powerSafe == "1" then
-					color(0)
-				else
-					color(0xffffff)
-				end
+				color(syscolor)
 				fcolor(sysfcolor)
 				fill(1,1,w-3,1," ")
+				fill(1,2,w,h-2," ")
 				openfilename=unicode.sub(openfilename,1,-5)
 				set(1,1,openfilename.." - "..lang.txtName)
 				openfiletext={}
 				slen=len(openfilename)
 				for var in io.open(openfile,"r"):lines() do	table.insert(openfiletext,var) end
 				i=1
-				fill(1,2,w,h-2," ")
 				term.setCursor(1,2)
 				if #openfiletext > h-2 then
 					set(slen+1,1," - "..lang.txtMany.." - "..lang.txtName)
@@ -181,10 +169,10 @@ if y ~= h and menu ~= 1 then
 			else
 				color(0)
 				fcolor(0xffffff)
-				if fs.isDirectory(openfile) == true then
-					local result,reason=loadfile("/fos/apps/Explorer.app/main.lua")
+				if fs.isDirectory(openfile) ~= true then
+					local result,reason=loadfile(openfile)
 					if result then
-    					result,reason=xpcall(result,debug.traceback,openfile)
+	    				result,reason=xpcall(result,debug.traceback,...)
 					    if not result then
 					    	if type(reason) ~= "table" then
 					    		system.bsod(reason)
@@ -196,112 +184,77 @@ if y ~= h and menu ~= 1 then
 						end
 					end
 				else
-					local result,reason=loadfile(openfile)
-					if result then
-    					result,reason=xpcall(result,debug.traceback,...)
-					    if not result then
-					    	if type(reason) ~= "table" then
-					    		system.bsod(reason)
-					    	end
-					    end
-					else
-						if type(reason) ~= "table" then
-					    	system.bsod(reason)
-						end
-					end
+					path=openfile
 				end
 			end
-			fosLoad()
-			draw()
+			expLoad()
+			expDraw()
 		end
 	end
 end
-
---Рисование меню
-if x == 1 and y == h and sleep ~= 1 and click == 0 then
-	smax,data=system.drawMenu()
-	menu=1
-	delay=1
-elseif x == 1 and y == h and sleep ~= 1 and click == 1 and menu == 0 then
-	pos=tools.conMenu(1,h-1,{lang.about})
-	if pos == 1 then
-		tools.error("Coming soon.")
-	end
-elseif y ~= h and sleep ~= 1 and click == 1 and skipCon == 1 then
+if y ~= h and click == 1 and eSkipCon == 1 then
 	pos=tools.conMenu(x,y,{slang.conEdit,"|","<gray>"..slang.conCopy,"<gray>"..slang.conPaste,"<gray>"..slang.conCut,"|",slang.conCreate,slang.conCreateDir,slang.conDelete,slang.conRename,"|","<gray>"..slang.conProp})
 	if pos == 1 then
+		if reg.powerSafe == "1" then
+			color(0)
+		else
+			color(0x2b2b2b)
+		end
+		fcolor(0xffffff)
 		os.execute("edit '"..path.."/"..openfilename.."'")
-		draw()
+		expDraw()
 	elseif pos == 10 then
 		temp=system.createWindow(openfilename,path)
 		if temp ~= nil then
 			fs.rename(path.."/"..openfilename,path.."/"..temp)
 		end
-		draw()
+	expDraw()
 	elseif pos == 7 then
 		temp=system.createWindow(slang.newFile,path)
 		if temp ~= nil then
 			file=io.open(path.."/"..temp,"w")
 			file:close()
 		end
-		draw()
+	expDraw()
 	elseif pos == 8 then
 		temp=system.createWindow(slang.newFolder,path,1)
 		if temp ~= nil then
 			fs.makeDirectory(path.."/"..temp)
 		end
-		draw()
+	expDraw()
 	elseif pos == 9 then
 		temp=system.deleteWindow(openfilename,path)
 		if temp ~= nil then
 			fs.remove(path.."/"..temp)
 		end
-		draw()
+	expDraw()
 	end
-elseif y ~= h and sleep ~= 1 and click == 1 and skipCon == 0 then
+elseif y ~= h and click == 1 and eSkipCon == 0 then
 	pos=tools.conMenu(x,y,{"<gray>"..slang.conPaste,"|",slang.conCreate,slang.conCreateDir,"|",slang.conRefresh})
 	if pos == 6 then
-		draw()
+		expDraw()
 	elseif pos == 3 then
 		temp=system.createWindow(slang.newFile,path)
 		if temp ~= nil then
 			file=io.open(path.."/"..temp,"w")
 			file:close()
 		end
-		draw()
+		expDraw()
 	elseif pos == 4 then
 		temp=system.createWindow(slang.newFolder,path,1)
 		if temp ~= nil then
 			fs.makeDirectory(path.."/"..temp)
 		end
-		draw()
+		expDraw()
 	end
-end
-
-if x >= 1 and x <= smax and y == h-5 and menu == 1 and sleep ~= 1 and reg.passwordProtection == "1" then
-	menu=0
-	system.lock(syscolor)
-	draw()
-elseif x >= 1 and x <= smax and y == h-4 and menu == 1 and sleep ~= 1 then
-	lang=nil
-	color(0)
-	fcolor(0xffffff)
-	term.clear()
+elseif x >= 2 and x <= 5 and y == 1 then
+	if len(path) > 1 then
+		temp=fs.segments(path)
+		temp=len(temp[#temp])
+		path=unicode.sub(path,1,-(temp+2))
+		expDraw()
+	end
+elseif x >= w-2 and x <= w and y == 1 then
 	os.exit()
-elseif x > 0 and x <= smax and y == h-3 and menu == 1 and sleep ~= 1 then
-	sleep=1
-	screen.turnOff()
-elseif x > 0 and x <= smax and y == h-2 and menu == 1 and sleep ~= 1 then
-	comp.shutdown(false)
-elseif x > 0 and x <= smax and y == h-1 and menu == 1 and sleep ~= 1 then
-	comp.shutdown(true)
-elseif sleep == 1 and x ~= 0 then
-	sleep=0
-	screen.turnOn()
-elseif menu == 1 and delay ~= 1 then
-	picture.draw(1,h-5,data)
-	menu=0
-else
-	delay=0
 end
 end

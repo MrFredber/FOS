@@ -1,6 +1,45 @@
+a7:
+
+-The process of taking a screenshot (picture.screenshot) has been accelerated
+-Added a context menu
+-Added an icon for a critical error (tools.error)
+-Fixed errors in Settings application
+-Changed the structure of tools.error
+-Added a Explorer application
+-Fixed the .cfg icon for the Explorer application
+-Now the system supports applications with missing files (except main.lua)
+-Now FOS does not draw the upper strip. This should be done by the application, if necessary
+-Now the system supports custom colors on the desktop
+-Now the system uses the registry instead of .cfg files (except auto.cfg)
+-Improved Power Saving Mode
+-The Power Saving Mode is now changes without graphic bugs
+-The system operation has been accelerated
+-Fixed a bug with the exit button working in any case
+-Improved the process of changing the screen resolution
+-Now the Settings app will not apply the screen resolution if it is not supported
+-Improved the color changing process
+-Changed the message in bootmgr
+-Changed RSOD
+-Fixed a graphic bug with the text color when launching some applications
+-Added a file editing
+-Added file/folder renaming
+-Added file/folder creation
+-Added .spic icon
+-Added file/folder deletion
+-Fixed bugs with files at non-standard screen resolutions
+-Now the system version is stored in the registry
+-Now system supports opening folders on the desktop
+-Perhaps a bug with the language in the settings was fixed independently
+-In Settings application added descriptions for language and autostart
+-The key "/fixregistry" was added to bootmgr
+-The message in bootmgr has been changed
+Now it is output if there are no arguments
+-Added an error output to bootmgr when the script cannot determine the key
+-The installer has been changed
+
 a6-2:
 
--In bootmgr "/fixall " key has been removed
+-In bootmgr "/fixall" key has been removed
 -Bootmgr now supports running with multiple keys
 -Changed the loader
 -Now it will work instead of the standard OpenOS
@@ -15,6 +54,7 @@ a6-2:
 -Several times faster screenshot rendering via picture.draw (added connection of adjacent characters)
 -Changed the central first phrase in rsod
 -The number of system crashes may have decreased
+-Now you can't set the password "" (just by pressing Enter)
 
 a6-1:
 
@@ -173,7 +213,7 @@ a1-1:
 
 -Added a shortcut in /home
 -Version of system now on left upper corner
--Pastebin is Glitching, so i uploaded installer to GitHub
+-Pastebin is glitching, so i uploaded installer to GitHub
 
 a1:
 

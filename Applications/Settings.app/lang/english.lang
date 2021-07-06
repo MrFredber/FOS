@@ -7,27 +7,32 @@ User and
 Password set
 tings
 Language
-
-
+Language set
+tings
 
 Autostart
-
-
-
+Scripts dur
+ing system
+startup
 lang=System language
 langMsg1=Do you want see more languages?
 langMsg2=Send pull request to the FOS repository on Github
 user=Password Protection
 userbtn=Change Password
-userColor=Color: 
+userColor=Color
 userRandom=Random
 userNick=Enter your new username
-userColorMsg=Enter new color
+userColorTitle=Setting color
 userPassword=Enter new password
-compPowerSave=Power Saving Mode
-compPowerSaveMsg=(Removes the background, which may be unusual)
+compPowerSafe=Power Saving Mode
+compPowerSafeMsg=(Removes the background, which may be unusual)
 compResolution=Screen Resolution: 
-compResolutionMsg=Enter new resolution in format 'width,height'
+compResolutionTitle=Setting resolution
+width=Width
+height=Height
+compResolutionCompErr=This is not a number
+cancel=Cancel
+default=Default
 autoAdd=Enter the path to the file
 autoSub=Enter the file number
 compResolutionErr=The resolution is set incorrectly

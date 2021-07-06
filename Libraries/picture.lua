@@ -7,6 +7,7 @@ local color=gpu.setBackground
 local fcolor=gpu.setForeground
 
 function picture.screenshot(x,y,width,height)
+w,h=gpu.getResolution()
 local data={compressed=true,width=width,height=height,color={},fcolor={},txt={}}
 hi=1
 ti=1
@@ -15,11 +16,14 @@ while hi ~= height+1 do
 	i=1
 	temp={txt={},f={},c={},stack={}}
 	while i ~= width+1 do
-		temp.stack[ci],tfclr,tclr=gpu.get(x+i-1,y+hi-1)
+		if ci == 1 then
+			temp.stack[ci],tfclr,tclr=gpu.get(x+i-1,y+hi-1)
+		end
 		if x+i < w+1 then
-			txt,fclr,clr=gpu.get(x+i,y+hi-1)
+			temp.stack[ci+1],fclr,clr=gpu.get(x+i,y+hi-1)
 		end
 		if tfclr ~= fclr or tclr ~= clr or i+2 > width then
+			table.remove(temp.stack,ci+1)
 			table.insert(temp.c,ti,ci)
 			table.insert(temp.c,ti+1,tclr)
 			table.insert(temp.f,ti,ci)
@@ -91,6 +95,9 @@ if data[1] == "2" then --ver 2
 			p=s:find("|")
 			b=s:sub(0,p-1)
 			set(x+tonumber(a),y+tonumber(b),s:sub(p+1))
+		elseif data[count]:find("fcolor") ~= nil then
+			p=data[count]:find("|")
+			fcolor(tonumber(data[count]:sub(p+1)))
 		elseif data[count]:find("color") ~= nil then
 			p=data[count]:find("|")
 			color(tonumber(data[count]:sub(p+1)))
@@ -101,10 +108,13 @@ if data[1] == "2" then --ver 2
 	end
 else --ver 1
 	while count-1 ~= #data do
-		if string.find(data[count],"set") ~= nil then
+		if data[count]:find("set") ~= nil then
 			set(x+tonumber(data[count+1]),y+tonumber(data[count+2]),data[count+3])
 			count=count+3
-		elseif string.find(data[count],"color") ~= nil then
+		elseif data[count]:find("fcolor") ~= nil then
+			fcolor(tonumber(data[count+1]))
+			count=count+1
+		elseif data[count]:find("color") ~= nil then
 			color(tonumber(data[count+1]))
 			count=count+1
 		else

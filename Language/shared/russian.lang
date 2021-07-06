@@ -1,0 +1,17 @@
+conEdit=Изменить
+conCopy=Копировать
+conPaste=Вставить
+conCut=Вырезать
+conCreate=Создать файл
+conCreateDir=Создать папку
+conCreateLnk=Создать ярлык
+conDelete=Удалить
+conRename=Переименовать
+conProp=Свойства
+conRefresh=Обновить
+cancel=Отмена
+name=Имя
+newFile=Новый файл
+newFolder=Новая папка
+deleteConfirm=Вы уверены, что хотите навсегда удалить этот файл?
+deleteConfirmFolder=Вы уверены, что хотите навсегда удалить эту папку?

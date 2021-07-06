@@ -12,3 +12,5 @@ txtMany=The entire file doesn't fit on the screen
 incorrect=Incorrect
 bsod=FOS detected an error during program execution
 bsodExit=Tap on the screen to continue...
+about=About system
+txtName=Text viewer

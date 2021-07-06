@@ -27,7 +27,7 @@ w,h=gpu.maxResolution()
 gpu.setResolution(w, h)
 gpu.setBackground(0x000000)
 gpu.setForeground(0xFFFFFF)
-gpu.fill(1, 1, w, h, " ")
+gpu.fill(1,1,w,h," ")
 end
 local y=1
 local uptime=computer.uptime
@@ -107,6 +107,7 @@ _G.runlevel=1
 
 local r=require
 local tr=r("term")
+local pc=r("computer")
 local g=r("component").gpu
 local io=r("io")
 local os=r("os")
@@ -126,59 +127,21 @@ os.execute(a[i])
 i=i+1
 end
 end
-local function rl()
-local f=io.open(z.."comp.cfg","r")
-for v in f:lines() do
-p=v:find(",")
-if p ~= nil then
-w=tonumber(v:sub(1,p-1))
-h=tonumber(v:sub(p+1))
-else
-c[1]=v
-end
-end
-f:close()
-g.setResolution(w,h)
-end
-local rs=pcall(rl)
-if not rs then w,h=g.getResolution() end
 pcall(at)
 local fl=g.fill
 tr.clear()
 fl(w/2-2,h/2-5,2,9,"⣿")
 fl(w/2,h/2-5,4,2,"⣿")
 fl(w/2,h/2-1,3,2,"⣿")
-gpu.set(w/2-5,h/2+5,"Starting FOS")
+s(w/2-5,h/2+5,"Starting FOS")
 local cl=g.setBackground
 local fc=g.setForeground
 local fs=r("filesystem")
-local function o(parm)
+if fs.exists(z.."auto.cfg") == false then
 cl(0xffffff)
 fc(0)
 fl(w/2-9,h/2,18,3," ")
 s(w/2-8,h/2+1,"Repairing FOS...")
-end
-if fs.exists(z.."lang.cfg") == false then
-o()
-local f=io.open(z.."lang.cfg","w")
-f:write("english.lang")
-f:close()
-end
-if fs.exists(z.."user.cfg") == false then
-o()
-local f=io.open(z.."user.cfg","w")
-f:write("User\n\n0")
-f:close()
-end
-if fs.exists(z.."comp.cfg") == false then
-o()
-local w,h=g.maxResolution()
-local f=io.open(z.."comp.cfg","w")
-f:write("0\n"..w..","..h)
-f:close()
-end
-if fs.exists(z.."auto.cfg") == false then
-o()
 local f=io.open(z.."auto.cfg","w")
 f:write("")
 f:close()
@@ -197,11 +160,16 @@ s(w/2-38,y+3,t.."third time, show this to the administrator, or the author")
 fc(0xb40000)
 cl(0xffffff)
 s(w/2-16,2,"Critical error while running FOS")
-s(w/2-18,y+5,"Touch the screen to exit to Shell...")
-r("event").pull("touch")
+s(w/2-13,y+5,"Left click to reboot PC...")
+s(w/2-15,y+6,"Right click to exit to Shell...")
+_,_,_,_,clk=r("event").pull("touch")
+if clk == 1 then
 cl(0)
 fc(0xffffff)
 tr.clear()
+else
+pc.shutdown(true)
+end
 end
 local rs,e=loadfile("/fos/fos.lua")
 if rs then
