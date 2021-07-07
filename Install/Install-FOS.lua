@@ -406,7 +406,7 @@ i=1
 ibar=0
 percent=100/#files
 color(0x2b2b2b)
-while i ~= #files do
+while i-1 ~= #files do
 	fcolor(0xffffff)
 	temp=files[i]:find(" ")
 	set(1,h-1,files[i]:sub(temp+1))
@@ -423,7 +423,7 @@ if temp == "1" then
 	ibar=0
 	percent=100/#other
 	color(0x2b2b2b)
-	while i ~= #other do
+	while i-1 ~= #other do
 		fcolor(0xffffff)
 		temp=other[i]:find(" ")
 		set(1,h-1,other[i]:sub(temp+1))
