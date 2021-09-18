@@ -18,14 +18,14 @@ local cords={}
 local lang={}
 local slang={}
 local reg={}
-local pos,sysfcolor,syscolor,slen,openfilename,filepos,eSkipCon,file,w,h,click,data
+local pos,mainfcolor,secondfcolor,maincolor,secondcolor,slen,openfilename,filepos,eSkipCon,file,w,h,click,data
 local path="/"
 local args={...}
 if type(args[1]) == "string" then
 path=args[1]
 end
 
-function expLoad()
+local function expLoad()
 lang={}
 slang={}
 sett={}
@@ -71,34 +71,48 @@ for var in file:lines() do
 end
 file:close()
 if reg.powerSafe == "1" then
-	syscolor=0
-	sysfcolor=0xffffff
+	maincolor=0
+	secondcolor=0x404040
+	mainfcolor=0xffffff
+elseif reg.darkMode == "1" then
+	maincolor=0x202020
+	secondcolor=0x404040
+	mainfcolor=0xffffff
 else
-	syscolor=0xffffff
-	sysfcolor=0
+	maincolor=0xe0e0e0
+	secondcolor=0xffffff
+	mainfcolor=0
 end
+--if (green < 160) textColor = 'FFFFFF';
+--else textColor = '000000';
 w=tonumber(reg.width)
 h=tonumber(reg.height)
 end
 
-function expDraw()
-color(syscolor)
+local function draw()
+color(maincolor)
+fcolor(mainfcolor)
 fill(1,1,w,h-1," ")
-tools.btn(3,1,"<-")
-color(0xb40000)
-fcolor(0xffffff)
-set(w-2,1," X ")
-color(syscolor)
-fcolor(sysfcolor)
-slen=len(path)
-set(w/2-slen/2+1,1,path)
 filesname=finder.files(path)
-system.workplace(syscolor,sysfcolor,filesname,path)
-cords=system.createButtons(syscolor,filesname)
+system.workplace(maincolor,mainfcolor,filesname,path)
+cords=system.createButtons(maincolor,filesname)
+color(secondcolor)
+fill(1,1,w,1," ")
+fill(1,h-1,w,1," ")
+set(2,1,"≡  ◁")
+set(w-1,1,"X")
+slen=len(path)
+if slen > w-9 then
+	temp=slen-(w-10)
+	set(7,1,unicode.sub(path,temp))
+else
+	set(7,1,path)
+end
+set(2,h-1,slang.items..": "..#filesname)
 end
 
 expLoad()
-expDraw()
+draw()
 data=picture.screenshot(1,h,w,1)
 while true do
 picture.draw(1,h,data)
@@ -139,8 +153,8 @@ if y ~= 1 and y ~= h then
 				color(0xb40000)
 				fcolor(0xffffff)
 				set(w-2,1," X ")
-				color(syscolor)
-				fcolor(sysfcolor)
+				color(maincolor)
+				fcolor(mainfcolor)
 				fill(1,1,w-3,1," ")
 				fill(1,2,w,h-2," ")
 				openfilename=unicode.sub(openfilename,1,-5)
@@ -188,7 +202,7 @@ if y ~= 1 and y ~= h then
 				end
 			end
 			expLoad()
-			expDraw()
+			draw()
 		end
 	end
 end
@@ -202,57 +216,62 @@ if y ~= h and click == 1 and eSkipCon == 1 then
 		end
 		fcolor(0xffffff)
 		os.execute("edit '"..path.."/"..openfilename.."'")
-		expDraw()
+		draw()
 	elseif pos == 10 then
 		temp=system.createWindow(openfilename,path)
 		if temp ~= nil then
 			fs.rename(path.."/"..openfilename,path.."/"..temp)
 		end
-	expDraw()
+	draw()
 	elseif pos == 7 then
 		temp=system.createWindow(slang.newFile,path)
 		if temp ~= nil then
 			file=io.open(path.."/"..temp,"w")
 			file:close()
 		end
-	expDraw()
+	draw()
 	elseif pos == 8 then
 		temp=system.createWindow(slang.newFolder,path,1)
 		if temp ~= nil then
 			fs.makeDirectory(path.."/"..temp)
 		end
-	expDraw()
+	draw()
 	elseif pos == 9 then
 		temp=system.deleteWindow(openfilename,path)
 		if temp ~= nil then
 			fs.remove(path.."/"..temp)
 		end
-	expDraw()
+	draw()
 	end
 elseif y ~= h and click == 1 and eSkipCon == 0 then
 	pos=tools.conMenu(x,y,{"<gray>"..slang.conPaste,"|",slang.conCreate,slang.conCreateDir,"|",slang.conRefresh})
 	if pos == 6 then
-		expDraw()
+		draw()
 	elseif pos == 3 then
 		temp=system.createWindow(slang.newFile,path)
 		if temp ~= nil then
 			file=io.open(path.."/"..temp,"w")
 			file:close()
 		end
-		expDraw()
+		draw()
 	elseif pos == 4 then
 		temp=system.createWindow(slang.newFolder,path,1)
 		if temp ~= nil then
 			fs.makeDirectory(path.."/"..temp)
 		end
-		expDraw()
+		draw()
 	end
-elseif x >= 2 and x <= 5 and y == 1 then
-	if len(path) > 1 then
-		temp=fs.segments(path)
+elseif x >= 4 and x <= 6 and y == 1 then
+	lastpath=path
+	temp=fs.segments(path)
+	if #temp > 1 then
 		temp=len(temp[#temp])
 		path=unicode.sub(path,1,-(temp+2))
-		expDraw()
+	else
+		path="/"
+	end
+	if lastpath ~= path then
+		draw()
 	end
 elseif x >= w-2 and x <= w and y == 1 then
 	os.exit()

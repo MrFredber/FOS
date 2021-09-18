@@ -1,22 +1,11 @@
-Компьютер
-Экономия эне
-ргии, Разреш
-ение экрана
-Пользователь
-Настройки 
-пользователя
-и пароля
-Язык
-Настройки
-языка
-
-Автозапуск
-Скриптов во
-время запуск
-а системы
-lang=Язык Системы
-langMsg1=Хочешь видеть больше языков?
-langMsg2=Отсылай pull request в репозиторий FOS на Github
+SystemName=Система
+SystemDisplay=Дисплей
+PersonalizationName=Персонализация
+DateAndLangName=Время и язык
+AppsName=Приложения
+langName=Язык
+lang=Язык интерфейса FOS
+langMsg=Хочешь видеть больше языков? Отсылай pull request в репозиторий FOS на Github
 user=Защита Паролем
 userbtn=Сменить Пароль
 userColor=Цвет
@@ -24,17 +13,39 @@ userRandom=Рандомный
 userNick=Введите новое имя пользователя
 userColorTitle=Установка цвета
 userPassword=Введите новый пароль
-compPowerSafe=Режим Энергосбережения
-compPowerSafeMsg=(Удаляет фон, что может быть непривычно)
-compResolution=Разрешение Экрана: 
-compResolutionTitle=Установка разрешения
+powerSafe=Режим Энергосбережения
+powerSafeMsg=(Удаляет фон, что может быть непривычно)
+resolution=Разрешение экрана
+resolutionMsg=Настроить разрешение по размеру подключённого дисплея
 width=Ширина
 height=Высота
-compResolutionCompErr=Это не число
+notNumber=Введённое значение не является числом
+resolutionAbove=Введённое значение меньше 
+resolutionErr=Разрешение задано неправильно или оно уже установлено
 cancel=Отмена
 default=По умолчанию
+ok=Ок
 autoAdd=Введите путь до файла
 autoSub=Введите номер файла
-compResolutionErr=Разрешение задано неправильно
 autoSubErr=Номер задан неправильно
 autoMoveErr=Не удалось передвинуть
+colors=Цвета интерфейса
+light=Светлый
+dark=Тёмный
+PersonalizationMode=Режим
+PersonalizationModeMsg=Изменение основных цветов в FOS и приложениях
+moduleErr=Возникла ошибка в модуле.
+moduleErrMsg1=Чтобы увидеть сообщение об ошибке, нажмите
+moduleErrMsg2=здесь.
+moduleCorrupted=(Повреждённый модуль)
+PersonalizationModeBlocked=Изменения режима не будут вступать, пока включён 'Режим энергосбережения'
+timeName=Дата и время
+DateAndLangNow=Текущие дата и время
+DateAndLangFormat=Формат даты и времени
+taskbarSeconds=Показывать секунды на часах (нужна перезагрузка)
+DateAndLangZone=Часовой пояс
+PersonalizationContrast=Контрастный цвет
+PersonalizationContrastFOS=Цвета FOS
+PersonalizationCustom=Пользовательский цвет
+set=Установить
+PersonalizationHeaders=Использовать контрастный цвет для заголовков

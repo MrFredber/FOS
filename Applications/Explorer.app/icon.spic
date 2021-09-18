@@ -10,5 +10,8 @@ fcolor|0xff5b00
 color|0xff7800
 set|0|3|⣤⣤⣤⣤⣤⣤⣤⣤
 color|0x0094ff
-set|2|2|    
-set|2|3|    
+fcolor|0x0062ff
+set|2|2|⣤⣤⣤⣤
+color|0x0040ff
+fcolor|0x0000ff
+set|2|3|⣤⣤⣤⣤

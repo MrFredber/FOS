@@ -19,7 +19,6 @@ local set=gpu.set
 local event=r("event")
 local dir=fs.makeDirectory
 local langchoise=""
-local file
 dir("/lib/fos")
 os.execute("wget -f https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/tools.lua /lib/fos/tools.lua")
 os.execute("wget -f https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/picture.lua /lib/fos/picture.lua")
@@ -28,12 +27,11 @@ term.clear()
 
 local function reset()
 color(0x2b2b2b)
-fcolor(0x3b3b3b)
-fill(1,1,w,h,"⢕")
+fill(1,1,w,h," ")
 color(0xffffff)
 fcolor(0)
 fill(1,1,w,1," ")
-set(1,1,"FOS Installer")
+set(2,1,"FOS Installer")
 color(0)
 fcolor(0xffffff)
 end
@@ -47,17 +45,21 @@ fcolor(0)
 fill(xw,hw,26,8," ")
 set(xw+10,hw+2,"Choose language")
 set(xw+10,hw+3,"Выберите язык")
-tools.btn(xw+4,hw+6,"English")
-tools.btn(xw+15,hw+6,"Русский")
-fcolor(0x0000ff)
+tools.btn(xw+3,hw+6,"English")
+tools.btn(xw+14,hw+6,"Русский")
+fcolor(0x0094ff)
 set(xw+7,hw+1,"⣶⡄")
+fcolor(0x0000ff)
 set(xw+1,hw+4,"⠘⠿    ⠿⠃")
 fcolor(0x00ff00)
 set(xw+1,hw+1,"⢠⣶")
-color(0x0000ff)
+color(0x0094ff)
 set(xw+3,hw+1,"⣿⣿⡟⣿")
+color(0x0062ff)
 set(xw+1,hw+2,"⣿⣿⣿⠟⠋ ⡀ ")
+color(0x0040ff)
 set(xw+1,hw+3," ⠉⠿⣆⣠⠈  ")
+color(0x0000ff)
 set(xw+3,hw+4," ⠛⠁ ")
 color(0xb40000)
 fcolor(0xffffff)
@@ -86,7 +88,7 @@ else
 	os.execute("wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Install/"..langchoise.." /tmp/lang")
 end
 local lang={}
-file=io.open("/tmp/lang","r")
+local file=io.open("/tmp/lang","r")
 for var in file:lines() do
 	check=var:find("=")
 	if check ~= nil then
@@ -106,11 +108,11 @@ fill(xw+1,hw+1,75,23," ")
 color(0xffffff)
 fcolor(0)
 fill(xw,hw,75,23," ")
-set(xw,hw,lang.license)
+set(xw+1,hw,lang.license)
 slen=len(lang.licenseMsg)
 set(w/2-slen/2,hw+22,lang.licenseMsg)
 slen=len(lang.accept)
-tools.btn(w/2-slen/2,hw+21,lang.accept)
+tools.btn(w/2-slen/2-1,hw+21,lang.accept)
 color(0xe0e0e0)
 fill(xw,hw+1,75,19," ")
 set(xw,hw+1,"Copyright (C) 2021 Mr.Fredber")
@@ -130,7 +132,7 @@ set(xw,hw+17,"LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, AR
 set(xw,hw+18,"FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER")
 set(xw,hw+19,"DEALINGS IN THE SOFTWARE.")
 while true do
-	_,_,x,y=event.pull("touch")
+	local _,_,x,y=event.pull("touch")
 	if x >= math.floor(w/2-slen/2-1) and x <= math.floor(w/2+slen/2) and y == hw+21 then
 		break
 	end
@@ -144,7 +146,7 @@ fill(xw+1,hw+1,75,17," ")
 color(0xffffff)
 fcolor(0)
 fill(xw,hw,75,17," ")
-set(xw,hw,lang.installType)
+set(xw+1,hw,lang.installType)
 set(xw+10,hw+2,lang.typeUpgrade)
 set(xw+10,hw+7,lang.typeInstall)
 set(xw+10,hw+12,lang.typeWipe)
@@ -199,8 +201,8 @@ set(w/2-slen/2,ch+2,lang[temp[installtype]] or "Null")
 slen1=len(lang.yes)
 slen2=len(lang.no)
 tlen=w/2-(slen1+slen2+5)/2
-tools.btn(tlen+1,ch+4,lang.yes)
-tools.btn(tlen+slen1+4,ch+4,lang.no)
+tools.btn(tlen,ch+4,lang.yes)
+tools.btn(tlen+slen1+3,ch+4,lang.no)
 while true do
 	_,_,x,y=event.pull("touch")
 	if x >= tlen and x <= tlen+1+slen1 and y == ch+4 then
@@ -240,7 +242,7 @@ if installtype == 2 or installtype == 3 then
 	while i-1 ~= 4 do
 		slen=len(lang[temp[i]])
 		if i == 4 then
-			slen=slen+7
+			slen=slen+5
 		end
 		if slen > max then
 			max=slen
@@ -263,8 +265,8 @@ if installtype == 2 or installtype == 3 then
 	set(xw+1,hw+6,lang.username)
 	set(xw+1,hw+9,lang.passwordLvr)
 	btnlen=len(lang.next)
-	tools.btn(w/2-btnlen/2,hw+14,lang.next)
-	tools.lvr(xw+max-5,hw+9,reg.passwordProtection)
+	tools.btn(w/2-btnlen/2-1,hw+14,lang.next)
+	tools.lvr(xw+max-3,hw+9,reg.passwordProtection)
 	if reg.passwordProtection == "1" then
 		set(xw+1,hw+11,lang.password)
 	end
@@ -279,7 +281,7 @@ if installtype == 2 or installtype == 3 then
 	set(xw+1,hw+7,reg.username)
 	if reg.passwordProtection == "1" then
 		fill(xw+1,hw+12,max,1," ")
-		slen=len(reg.password)
+		slen=len(reg.password or "")
 		fill(xw+1,hw+12,slen,1,"*")
 	end
 	end
@@ -297,8 +299,7 @@ if installtype == 2 or installtype == 3 then
 	end
 	text=unicode.sub(text,1,-2)
 	color(0x2b2b2b)
-	fcolor(0x3b3b3b)
-	fill(1,h,w,1,"⢕")
+	fill(1,h,w,1," ")
 	return text
 	end
 	
@@ -326,7 +327,7 @@ end
 reset()
 temp="1"
 slen=len(lang.other)
-max=slen+7
+max=slen+5
 xw=math.floor(w/2-max/2-1)
 hw=math.floor(h/2-2)
 
@@ -338,9 +339,9 @@ color(0xffffff)
 fcolor(0)
 fill(xw,hw,max+2,5," ")
 set(xw+1,hw+1,lang.other)
-tools.lvr(xw+max-5,hw+1,temp)
+tools.lvr(xw+max-3,hw+1,temp)
 slen=len(lang.install)
-tools.btn(w/2-slen/2,hw+3,lang.install)
+tools.btn(w/2-slen/2-1,hw+3,lang.install)
 end
 download()
 
@@ -366,6 +367,10 @@ end
 dir("/FOS/desktop")
 dir("/FOS/apps/Settings.app/appname")
 dir("/FOS/apps/Settings.app/lang")
+dir("/FOS/apps/Settings.app/modules/1_System")
+dir("/FOS/apps/Settings.app/modules/3_Personalization")
+dir("/FOS/apps/Settings.app/modules/4_Apps")
+dir("/FOS/apps/Settings.app/modules/6_DateAndLang")
 dir("/FOS/apps/Explorer.app/appname")
 dir("/FOS/lang/fos")
 dir("/FOS/lang/shared")
@@ -382,8 +387,11 @@ local files={
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/system.lua /lib/fos/system.lua",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/finder.lua /lib/fos/finder.lua",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/icons.lua /lib/fos/icons.lua",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/picture.lua /lib/fos/picture.lua",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/icon.spic /fos/apps/settings.app/icon.spic",
+	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/modules/1_System/main.lua /fos/apps/settings.app/modules/1_System/main.lua",
+	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/modules/3_Personalization/main.lua /fos/apps/settings.app/modules/3_Personalization/main.lua",
+	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/modules/4_Apps/main.lua /fos/apps/settings.app/modules/4_Apps/main.lua",
+	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/modules/6_DateAndLang/main.lua /fos/apps/settings.app/modules/6_DateAndLang/main.lua",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/main.lua /fos/apps/settings.app/main.lua",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Explorer.app/icon.spic /fos/apps/explorer.app/icon.spic",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Explorer.app/main.lua /fos/apps/explorer.app/main.lua",
@@ -412,9 +420,8 @@ while i-1 ~= #files do
 	set(1,h-1,files[i]:sub(temp+1))
 	tools.fullbar(1,h,w,percent*ibar)
 	color(0x2b2b2b)
-	fcolor(0x3b3b3b)
 	os.execute("wget -fq "..files[i])
-	fill(1,h-1,w,2,"⢕")
+	fill(1,h-1,w,2," ")
 	ibar=ibar+1
 	i=i+1
 end
@@ -429,9 +436,8 @@ if temp == "1" then
 		set(1,h-1,other[i]:sub(temp+1))
 		tools.fullbar(1,h,w,percent*ibar)
 		color(0x2b2b2b)
-		fcolor(0x3b3b3b)
 		os.execute("wget -fq "..other[i])
-		fill(1,h-1,w,2,"⢕")
+		fill(1,h-1,w,2," ")
 		ibar=ibar+1
 		i=i+1
 	end
@@ -458,9 +464,16 @@ reg.width=tostring(w)
 reg.height=tostring(h)
 reg.userColor="0x0094ff"
 reg.powerSafe="0"
-reg.ver="a7"
+reg.ver="b1"
 reg.lang=langchoise
 reg.gpu=tostring(gpu.maxDepth())
+reg.dataType="%d.%m.%Y %H:%M:%S"
+reg.contrastColorHeaders="1"
+reg.taskbarShowSeconds="1"
+reg.timeZone=7
+reg.desktopColor=0x2b2b2b
+reg.darkMode="0"
+reg.contrastColor=0xd95be6
 file=io.open("/fos/system/auto.cfg","w")
 file:write("")
 file:close()
@@ -523,9 +536,16 @@ else
 				compError()
 			end
 		end
-		reg.ver="a7"
+		reg.ver="b1"
 		reg.gpu=tostring(gpu.maxDepth())
 		reg.lang=langchoise
+		reg.dataType="%d.%m.%Y %H:%M:%S"
+		reg.contrastColorHeaders="1"
+		reg.taskbarShowSeconds="1"
+		reg.timeZone=7
+		reg.desktopColor=0x2b2b2b
+		reg.darkMode="0"
+		reg.contrastColor=0xd95be6
 	else
 		reg={}
 		file=io.open("/fos/system/registry","r")
@@ -540,6 +560,7 @@ else
 		end
 		end
 		file:close()
+		reg.ver="b1"
 	end
 end
 file=io.open("/fos/system/registry","w")

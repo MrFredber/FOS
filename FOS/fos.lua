@@ -8,15 +8,14 @@ local io=r("io")
 local fs=r("filesystem")
 local unicode=r("unicode")
 local system=r("fos/system")
+local tools=r("fos/tools")
 local gpu=c.gpu
 local fill=gpu.fill
 local len=unicode.len
-local lang={}
-local slang={}
-local reg={}
+local lang,slang,reg={},{},{}
 local file,sysfcolor,syscolor
 
-function fosLoad()
+local function fosLoad()
 lang={}
 slang={}
 reg={}
@@ -68,31 +67,27 @@ for var in file:lines() do
 	end
 end
 file:close()
-gpu.setResolution(tonumber(reg.width),tonumber(reg.height))
-system.update(reg,lang,slang)
+w,h=system.update(reg,lang,slang)
 end
 fosLoad()
 
 local screen=c.screen
 local event=r("event")
+local thread=r("thread")
 local comp=r("computer")
 local finder=r("fos/finder")
 local icons=r("fos/icons")
 local picture=r("fos/picture")
-local tools=r("fos/tools")
 local color=gpu.setBackground
 local fcolor=gpu.setForeground
 local set=gpu.set
-local lnk={}
-local filesname={}
-local appnamefile={}
-local cords={}
-local data,openfile,openfilename,openfiletext,pos,filepos,skipCon,slen,appname,delay,smax,menu=0,0,0,0,0,0,0,0,0,0,0,0
+local lnk,filesname,appnamefile,cords={},{},{},{}
+local menu,delay,sleep,smax,data,openfile,openfilename,openfiletext,pos,filepos,skipCon,slen,appname=0,0,0,0
 local path="/fos/desktop"
 
 --Functions
-function draw()
-system.background(syscolor);
+local function draw()
+system.background(syscolor,0xffffff);
 set(1,1,lang.ver..reg.ver)
 filesname=finder.files(path);
 system.workplace(syscolor,0xffffff,filesname,path);
@@ -107,7 +102,7 @@ draw();
 while true do
 local _,_,x,y,click=event.pull("touch")
 
-if y ~= h and menu ~= 1 then
+if y ~= h and menu == 0 then
 	openfilename,filepos,skipCon=system.pressButton(cords,filesname,x,y,click)
 	if skipCon == 0 then
 		system.updAfterPress(openfilename,filepos,path)
@@ -135,7 +130,7 @@ if y ~= h and menu ~= 1 then
 				openfilename=appname[1]
 			end
 		end
-		if openfile ~= nil and openfilename ~= nil then
+		if openfile ~= nil and openfilename ~= nil and menu == 0 then
 			color(0x1e90ff)
 			fcolor(0xffffff)
 			slen=len(openfilename)
@@ -217,8 +212,8 @@ if y ~= h and menu ~= 1 then
 	end
 end
 
---Рисование меню
-if x == 1 and y == h and sleep ~= 1 and click == 0 then
+--System Menu
+if x == 1 and y == h and sleep ~= 1 and click == 0 and menu == 0 then
 	smax,data=system.drawMenu()
 	menu=1
 	delay=1
@@ -278,28 +273,31 @@ elseif y ~= h and sleep ~= 1 and click == 1 and skipCon == 0 then
 	end
 end
 
-if x >= 1 and x <= smax and y == h-5 and menu == 1 and sleep ~= 1 and reg.passwordProtection == "1" then
-	menu=0
-	system.lock(syscolor)
-	draw()
-elseif x >= 1 and x <= smax and y == h-4 and menu == 1 and sleep ~= 1 then
+if x >= 1 and x <= smax and y >= h-13 and y <= h-10 and menu == 1 and sleep ~= 1 and click == 0 then
+	pos=tools.conMenu(x,y,{lang.logoff})
+	if pos == 1 and reg.passwordProtection == "1" then
+		menu=0
+		system.lock(syscolor)
+		draw()
+	end
+elseif x >= 1 and x <= smax and y == h-8 and menu == 1 and sleep ~= 1 and click == 0 then
 	lang=nil
 	color(0)
 	fcolor(0xffffff)
 	term.clear()
 	os.exit()
-elseif x > 0 and x <= smax and y == h-3 and menu == 1 and sleep ~= 1 then
+elseif x > 0 and x <= smax and y == h-6 and menu == 1 and sleep ~= 1 and click == 0 then
 	sleep=1
 	screen.turnOff()
-elseif x > 0 and x <= smax and y == h-2 and menu == 1 and sleep ~= 1 then
+elseif x > 0 and x <= smax and y == h-4 and menu == 1 and sleep ~= 1 and click == 0 then
 	comp.shutdown(false)
-elseif x > 0 and x <= smax and y == h-1 and menu == 1 and sleep ~= 1 then
+elseif x > 0 and x <= smax and y == h-2 and menu == 1 and sleep ~= 1 and click == 0 then
 	comp.shutdown(true)
-elseif sleep == 1 and x ~= 0 then
+elseif sleep == 1 then
 	sleep=0
 	screen.turnOn()
 elseif menu == 1 and delay ~= 1 then
-	picture.draw(1,h-5,data)
+	picture.draw(1,h-14,data)
 	menu=0
 else
 	delay=0

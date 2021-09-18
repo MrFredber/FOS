@@ -281,14 +281,21 @@ while i-1 ~= #args do
 	i=i+1
 end
 fcolor(secondcolor)
-color(temp1)
-set(x,y,"⣾")
-color(temp2)
-set(x+max-1,y,"⣷")
-color(temp3)
-set(x,y+#args-1,"⢿")
-color(0x101010)
-set(x+max-1,y+#args-1,"⡿")
+if #args == 1 then
+	color(temp1)
+	set(x,y,"⢾")
+	color(temp2)
+	set(x+max-1,y,"⡷")
+else
+	color(temp1)
+	set(x,y,"⣾")
+	color(temp2)
+	set(x+max-1,y,"⣷")
+	color(temp3)
+	set(x,y+#args-1,"⢿")
+	color(0x101010)
+	set(x+max-1,y+#args-1,"⡿")
+end
 fcolor(0x101010)
 _,_,temp=gpu.get(x+max,y)
 color(temp)

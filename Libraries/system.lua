@@ -12,90 +12,124 @@ local os=r("os")
 local icons=r("/fos/icons")
 local tools=r("/fos/tools")
 local picture=r("fos/picture")
-local data={}
-local reg={}
-local lang={}
-local slang={}
+local data,reg,lang,slang={},{},{},{}
 local fill=gpu.fill
 local color=gpu.setBackground
 local fcolor=gpu.setForeground
 local set=gpu.set
 local len=unicode.len
-local max,ch,cw
+local max,ch,cw,w,h,time,timeCorrection
 
 function system.update(registry,language,sharedlang)
+w,h=gpu.getResolution()
 reg=registry
 lang=language
 slang=sharedlang
+if reg.darkMode == "1" then
+	maincolor=0x202020
+	secondcolor=0x404040
+	mainfcolor=0xffffff
+	secondfcolor=0xbbbbbb
+else
+	maincolor=0xdddddd
+	secondcolor=0xffffff
+	mainfcolor=0
+	secondfcolor=0x707070
+end
+tools.update(reg)
+timeCorrection=reg.timeZone*3600
+temp=io.open("/tmp/time","w")
+temp:close()
+temp=fs.lastModified("/tmp/time")
+time=tonumber(string.sub(temp,1,-4))+timeCorrection
+return w,h
 end
 
 function system.drawMenu()
 data={}
-fcolor(0xffffff)
+color(maincolor)
 i=1
-smax=0
-local t={"shell","shutdown","reboot","sleep","logoff"}
-while i ~= 4 do
-	slen=len(lang[t[i]])
-	if slen > smax then
-		smax=slen
-	end
-	i=i+1
-end
-data=picture.screenshot(1,h-5,smax,5)
+smax=26
+data=picture.screenshot(1,h-14,smax+1,14)
+fill(1,h-14,smax,14," ")
+local userColor=tonumber(reg.userColor) or tonumber("0x"..reg.userColor) or math.random(16777215)
+fcolor(userColor)
+set(2,h-13,"⢠⡶⢿⡿⢶⡄")
+set(2,h-12,"⣿⣇⣸⣇⣸⣿")
+set(2,h-11,"⠘⠿⣮⣵⠿⠃")
+set(2,h-10,"⣀⣤⣿⣿⣤⣀")
+fcolor(mainfcolor)
+set(10,h-12,unicode.sub(reg.username,1,15))
+color(secondcolor)
+fill(2,h-8,24,8," ")
+set(3,h-8,lang.shell)
+set(3,h-6,lang.sleep)
+set(3,h-4,lang.shutdown)
+set(3,h-2,lang.reboot)
+fcolor(secondcolor)
+color(maincolor)
+set(2,h-9,"⢀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⡀")
+set(2,h-1,"⠈⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠁")
+set(2,h-7,"⢈⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⡁")
+set(2,h-5,"⢈⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⡁")
+set(2,h-3,"⢈⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⡁")
+fcolor(secondfcolor)
 if reg.passwordProtection == "1" then
-	color(tonumber(reg.userColor) or tonumber("0x"..reg.userColor) or math.random(16777215))
-	fill(1,h-5,smax,1," ")
-	offset=0
-	slen=len(lang.logoff)
-	if slen <= smax-1 then
-		div=slen/2
-		offset=smax/2-div
-	end
-	set(1+offset,h-5,lang.logoff)
+	set(10,h-11,unicode.sub(slang.passwordYes,1,15))
+else
+	set(10,h-11,unicode.sub(slang.passwordNo,1,15))
 end
-color(0x009400)
-fill(1,h-4,smax,1," ")
-offset=0
-slen=len(lang.shell)
-if slen <= smax-1 then
-	div=slen/2
-	offset=smax/2-div
+if reg.powerSafe == "1" then
+	color(0)
+else
+	color(0x2b2b2b)
 end
-set(1+offset,h-4,lang.shell)
-color(0x0000ff)
-fill(1,h-3,smax,1," ")
-offset=0
-slen=len(lang.sleep)
-if slen <= smax-1 then
-	div=slen/2
-	offset=smax/2-div
-end
-set(1+offset,h-3,lang.sleep)
-color(0xb40000)
-fill(1,h-2,smax,1," ")
-offset=0
-slen=len(lang.shutdown)
-if slen <= smax-1 then
-	div=slen/2
-	offset=smax/2-div
-end
-set(1+offset,h-2,lang.shutdown)
-color(0xffb400)
-fill(1,h-1,smax,1," ")
-offset=0
-slen=len(lang.reboot)
-if slen <= smax-1 then
-	div=slen/2
-	offset=smax/2-div
-end
-set(1+offset,h-1,lang.reboot)
+fcolor(maincolor)
+set(26,h-14,"⣷")
+fcolor(0x101010)
+set(27,h-14,"⣄")
+fill(27,h-13,1,13,"⣿")
 return smax,data
+end
+
+system.taskbarList={}
+
+function system.taskbar(_,_,x,y,click)
+clr=gpu.getBackground()
+fclr=gpu.getForeground()
+color(0x0069ff)
+fcolor(0xffffff)
+fill(1,h,w,1," ")
+set(1,h,"⡯")
+--if x == 1 and y == h and sleep ~= 1 and click == 0 then
+--	smax,data=system.drawMenu()
+--elseif x == 1 and y == h and sleep ~= 1 and click == 1 and system.menu == 0 then
+--	pos=tools.conMenu(1,h-1,{lang.about})
+--	if pos == 1 then
+--		tools.error("Coming soon.")
+--	end
+--end
+color(clr)
+fcolor(fclr)
+end
+
+function system.taskbarTime()
+clr=gpu.getBackground()
+fclr=gpu.getForeground()
+color(0x0069ff)
+fcolor(0xffffff)
+time=time+1
+if reg.taskbarShowSeconds == "1" then
+	set(w-8,h,os.date('%H:%M:%S',time))
+else
+	set(w-5,h,os.date('%H:%M',time))
+end
+color(clr)
+fcolor(fclr)
 end
 
 function system.lock(syscolor)
 local txt=""
-w,h=gpu.getResolution()
 slen=len(reg.username)
 if slen > 9 then
 	xw=slen-9
@@ -177,14 +211,11 @@ while true do
 end
 end
 
-function system.background(syscolor)
-comp={}
-w,h=gpu.getResolution()
-color(0x0069ff)
-fcolor(0xffffff)
-fill(1,h,w,1," ")
-set(1,h,"⡯")
+function system.background(syscolor,sysfcolor)
+--event.listen("touch",system.taskbar)
+system.taskbar()
 color(syscolor)
+fcolor(sysfcolor)
 fill(1,1,w,h-1," ")
 term.setCursor(1,1)
 end
@@ -207,7 +238,7 @@ while i ~= #filesname do
 	end
 	
 	filename=fs.name(filesname[i])
-	p=fs.concat(path, filesname[i])
+	p=fs.concat(path,filesname[i])
 
 	if filesname[i]:find(".lnk",1,true) ~= nil then
 		lnk={}
@@ -217,7 +248,7 @@ while i ~= #filesname do
 			table.insert(lnk, var) 
 		end
 		file:close()
-		if fs.exists(lnk[1]) == true then
+		if fs.exists(lnk[1] or "Null") == true then
 			if fs.exists(lnk[1].."/appname/"..reg.lang) == true then
 				local file=io.open(lnk[1].."/appname/"..reg.lang,"r")
 				for var in file:lines() do 
@@ -231,8 +262,11 @@ while i ~= #filesname do
 			slen=len(appname[1])
 			if slen > 10 then
 				slen=10
+				temp=unicode.sub(appname[1],1,9).."…"
+			else
+				temp=appname[1]
 			end
-			set(wf+8-slen/2,hf,unicode.sub(appname[1],1,slen))
+			set(wf+8-slen/2,hf,temp)
 			if fs.exists(lnk[1].."/icon.spic") == true then
 				local file=io.open(lnk[1].."/icon.spic","r")
 				local data={}
@@ -245,14 +279,28 @@ while i ~= #filesname do
 				icons.app(wi,hi)
 			end
 		else
-			tools.error("Path not exists: "..lnk[1],2)
+			lnk[1]="Null"
+			tools.error({"Path not exists: "..lnk[1]},2)
+			color(syscolor)
+			icons.error(wi,hi)
+			slen=len(filename)
+			if slen > 10 then
+				slen=9
+				temp=unicode.sub(filename,1,slen).."…"
+			else
+				temp=filename
+			end
+			set(wf+8-slen/2,hf,temp)
 		end
 	else
 		slen=len(filename)
 		if slen > 10 then
 			slen=10
+			temp=unicode.sub(filename,1,9).."…"
+		else
+			temp=filename
 		end
-		set(wf+8-slen/2,hf,unicode.sub(filename,1,slen))
+		set(wf+8-slen/2,hf,temp)
 		if fs.isDirectory(p) ~= false then
 			icons.folder(wi,hi)
 		elseif filesname[i]:find(".lua",1,true) ~= nil then
@@ -271,8 +319,8 @@ while i ~= #filesname do
 	end
 	color(syscolor)
 	fcolor(sysfcolor)
-	if hf+7 > h and wf+11 > w then
-		system.error(lang.manyFiles,syscolor)
+	if hf+7 > h then
+		system.error(lang.manyFiles,syscolor,sysfcolor)
 	end
 end
 end
@@ -367,8 +415,11 @@ if pos ~= 0 then
 		slen=len(appname[1])
 		if slen > 10 then
 			slen=10
+			temp=unicode.sub(appname[1],1,9).."…"
+		else
+			temp=appname[1]
 		end
-		set(wf+8-slen/2,hf,unicode.sub(appname[1],1,slen))
+		set(wf+8-slen/2,hf,temp)
 		if fs.exists(lnk[1].."/icon.spic") == true then
 			local file=io.open(lnk[1].."/icon.spic","r")
 			data={}
@@ -384,8 +435,11 @@ if pos ~= 0 then
 		slen=len(filename)
 		if slen > 10 then
 			slen=10
+			temp=unicode.sub(filename,1,9).."…"
+		else
+			temp=filename
 		end
-		set(wf+8-slen/2,hf,unicode.sub(filename,1,slen))
+		set(wf+8-slen/2,hf,temp)
 		if fs.isDirectory(path.."/"..filename) ~= false then
 			icons.folder(wi,hi)
 		elseif filename:find(".lua",1,true) ~= nil then
@@ -413,55 +467,58 @@ else
 end
 fcolor(0xffffff)
 fill(1,1,w,h," ")
-term.setCursor(1,4)
+term.setCursor(1,3)
 print(reason)
-_,y=term.getCursor()
-slen=len(lang.bsodExit)
-set(w/2-slen/2+1,y+1,lang.bsodExit)
 color(0xffffff)
 if reg.powerSafe == "1" then
 	fcolor(0)
 else
 	fcolor(0x0000ff)
 end
-slen=len(lang.bsod)
-set(w/2-slen/2+1,2,lang.bsod)
+slen=len(" "..lang.bsod.." ")
+set(w/2-slen/2+1,1," "..lang.bsod.." ")
+slen=len(" "..lang.bsodExit.." ")
+set(w/2-slen/2+1,h," "..lang.bsodExit.." ")
+computer.beep("...")
 event.pull("touch")
 end
 
-function system.error(msg,syscolor)
+function system.error(msg,syscolor,sysfcolor)
 color(0xFF0000)
 fcolor(0xffffff)
 slen=len(msg)
 set(w-slen+1,h-1,msg)
 color(syscolor)
+fcolor(sysfcolor)
 end
 
 function system.createWindow(filename,path,folder)
 max=12
+maxh=10
 slen1=len(slang.cancel)
 tlen=slen1+7
-slen=len(filename)
-if slen+2 > max then
-	max=slen+2
-end
+fslen=len(filename)
 if tlen+2 > max then
 	max=tlen+2
 end
 cw=math.floor(w/2-max/2)
-ch=math.floor(h/2-6)
+ch=math.floor(h/2-5)
 bw=math.floor(w/2-tlen/2-1)
+_,_,temp1=gpu.get(cw,ch)
+_,_,temp2=gpu.get(cw+max,ch)
+_,_,temp3=gpu.get(cw,ch+maxh-1)
+data=picture.screenshot(cw,ch,max+1,maxh+1)
+color(secondcolor)
+fcolor(mainfcolor)
+fill(cw,ch,max,10," ")
 wi=w/2-4
-color(0)
-fill(cw+1,ch+1,max,13," ")
-color(0xffffff)
-fill(cw,ch,max,13," ")
-fcolor(0)
-color(0xffffff)
-set(w/2-slen/2,ch+6,filename)
-set(cw+1,ch+8,slang.name)
-tools.btn(bw+2,ch+11,"OK")
-tools.btn(bw+7,ch+11,slang.cancel)
+if fslen > 10 then
+	set(w/2-5,ch+6,unicode.sub(filename,1,9).."…")
+else
+	set(w/2-fslen/2,ch+6,filename)
+end
+tools.btn(bw+1,ch+8,"OK")
+tools.btn(bw+6,ch+8,slang.cancel)
 if folder == true or folder == 1 then
 	icons.folder(wi,ch+1)
 elseif fs.isDirectory(path.."/"..filename) ~= false then
@@ -480,23 +537,48 @@ else
 	icons.unkFile(wi,ch+1)
 end
 temp=""
+fcolor(secondcolor)
+color(temp1)
+set(cw,ch,"⣾")
+color(temp2)
+set(cw+max-1,ch,"⣷")
+color(temp3)
+set(cw,ch+maxh-1,"⢿")
+color(0x101010)
+set(cw+max-1,ch+maxh-1,"⡿")
+fcolor(0x101010)
+_,_,temp=gpu.get(cw+max-1,ch)
+color(temp)
+set(cw+max,ch,"⣄")
+fill(cw+max,ch+1,1,maxh-1,"⣿")
+text=""
+for i=1,max-2 do
+	text=text.."⠛"
+end
+picture.adaptiveText(cw+1,ch+maxh,"⠙"..text.."⠋",0x101010)
+temp=filename
 while true do
-	color(0xe0e0e0)
-	fcolor(0)
-	fill(cw+1,ch+9,max-2,1," ")
-	set(cw+1,ch+9,temp)
 	_,_,x,y=event.pull("touch")
-	if x >= bw+6 and x <= bw+slen1+7 and y == ch+11 then
+	if x >= bw+6 and x <= bw+slen1+7 and y == ch+8 then
 		temp=nil
 		break
-	elseif x >= bw+1 and x <= bw+4 and y == ch+11 then
+	elseif x >= bw+1 and x <= bw+4 and y == ch+8 then
 		break
-	elseif x >= cw+1 and x <= cw+max-2 and y == ch+9 then
-		temp=tools.input()
+	elseif x >= math.floor(w/2-fslen/2) and x <= math.floor(w/2+fslen/2) and y == ch+6 then
+		temp=tools.input(w/2-5,ch+6,10,"0",filename,"1")
+		if temp ~= "" then
+			filename=temp
+			fslen=len(temp)
+		end
+		color(secondcolor)
+		fcolor(mainfcolor)
+		fill(w/2-5,ch+6,10,1," ")
+		if fslen > 10 then
+			set(w/2-5,ch+6,unicode.sub(filename,1,9).."…")
+		else
+			set(w/2-fslen/2,ch+6,filename)
+		end
 	end
-end
-if temp == "" then
-	temp=filename
 end
 return temp
 end

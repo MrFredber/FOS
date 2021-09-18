@@ -6,11 +6,14 @@ local fcolor=gpu.setForeground
 local set=gpu.set
 
 function icons.unkFile(x,y)
-color(0)
+color(0x101010)
 fcolor(0xffffff)
 set(x,y,"⠀⢠⣶⠟⠛⢶⡄⠀")
+color(0x252525)
 set(x,y+1,"⠀⠈⠁⠀⢀⣼⠇⠀")
+color(0x404040)
 set(x,y+2,"⠀⠀⠀⢰⡟⠁⠀⠀")
+color(0x505050)
 set(x,y+3,"⠀⠀⠀⠰⠆⠀⠀⠀")
 end
 
@@ -44,27 +47,29 @@ set(x,y+3,"  .lua  ")
 end
 
 function icons.lang(x,y)
-fcolor(0x0000ff)
+fcolor(0x0094ff)
 set(x+6,y,"⣶⡄")
+fcolor(0x0000ff)
 set(x,y+3,"⠘⠿    ⠿⠃")
 fcolor(0x00ff00)
 set(x,y,"⢠⣶")
-color(0x0000ff)
+color(0x0094ff)
 set(x+2,y,"⣿⣿⡟⣿")
+color(0x0062ff)
 set(x,y+1,"⣿⣿⣿⠟⠋ ⡀ ")
+color(0x0040ff)
 set(x,y+2," ⠉⠿⣆⣠⠈  ")
+color(0x0000ff)
 set(x+2,y+3," ⠛⠁ ")
 end
 
 function icons.txt(x,y)
-color(0xffffff)
 fcolor(0)
-set(x,y,"abcdefgh")
-set(x,y+1,"ijklmnop")
-set(x,y+2,"qrstuvwx")
-color(0x727272)
-fcolor(0xffffff)
-set(x,y+3,"  .txt  ")
+color(0xffffff)
+set(x+1,y,"⠸⠇⠸⠇⠸⠇")
+set(x+1,y+1,"⠰⠶⠶⠶⠶⠆")
+set(x+1,y+2,"⠰⠶⠶⠶⠶⠆")
+set(x+1,y+3,"⠰⠶⠶⠶⠶⠆")
 end
 
 function icons.cfg(x,y)
@@ -80,9 +85,20 @@ function icons.app(x,y)
 color(0x0094ff)
 fcolor(0xffffff)
 set(x,y,"⠀⠀⠀⠀⠀⠀⠀⠀")
+color(0x0062ff)
 set(x,y+1,"⢰⣉⡆⡤⢄⢠⠤⡀")
+color(0x0040ff)
 set(x,y+2,"⠸⠀⠇⡧⠜⢸⠤⠃")
+color(0x0000ff)
 set(x,y+3,"⠀⠀⠀⠁⠀⠈⠀⠀")
+end
+
+function icons.error(x,y)
+fcolor(0xff0000)
+set(x,y,"⢠⡶⢿⣿⣿⡿⢶⡄")
+set(x,y+1,"⣿⣷⣄⠙⠋⣠⣾⣿")
+set(x,y+2,"⣿⡿⠋⣠⣄⠙⢿⣿")
+set(x,y+3,"⠘⠷⣾⣿⣿⣷⠾⠃")
 end
 
 function icons.pic(x,y)
