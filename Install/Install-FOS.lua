@@ -388,6 +388,8 @@ local files={
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/system.lua /lib/fos/system.lua",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/finder.lua /lib/fos/finder.lua",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/icons.lua /lib/fos/icons.lua",
+	"https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/tools.lua /lib/fos/tools.lua",
+	"https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/picture.lua /lib/fos/picture.lua",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/icon.spic /fos/apps/settings.app/icon.spic",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/modules/1_System/main.lua /fos/apps/settings.app/modules/1_System/main.lua",
 	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/modules/3_Personalization/main.lua /fos/apps/settings.app/modules/3_Personalization/main.lua",
@@ -546,7 +548,7 @@ else
 		reg.timeZone=7
 		reg.desktopColor=0x2b2b2b
 		reg.darkMode="0"
-		reg.contrastColor=0xd95be6
+		reg.contrastColor=0x0094ff
 	else
 		reg={}
 		file=io.open("/fos/system/registry","r")
