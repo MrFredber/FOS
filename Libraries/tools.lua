@@ -4,6 +4,7 @@ local gpu=r("component").gpu
 local unicode=r("unicode")
 local term=r("term")
 local event=r("event")
+local fs=r("filesystem")
 local picture=r("/fos/picture")
 local fill=gpu.fill
 local color=gpu.setBackground
@@ -13,18 +14,20 @@ local len=unicode.len
 local data,reg={},{}
 local maincolor,secondcolor,mainfcolor,secondfcolor,contrastColor,file
 local w,h=gpu.getResolution()
-file=io.open("/fos/system/registry","r")
-for var in file:lines() do
-if var:find("=") ~= nil then
-	check=var:find("=")
-	arg=unicode.sub(var,1,check-1)
-	var=unicode.sub(var,check+1)
-	reg[arg]=var
-else
-	table.insert(reg,var)
+if fs.exists("/fos/system/registry") then
+	file=io.open("/fos/system/registry","r")
+	for var in file:lines() do
+	if var:find("=") ~= nil then
+		check=var:find("=")
+		arg=unicode.sub(var,1,check-1)
+		var=unicode.sub(var,check+1)
+		reg[arg]=var
+	else
+		table.insert(reg,var)
+	end
+	end
+	file:close()
 end
-end
-file:close()
 if reg.darkMode == "1" or reg.powerSafe == "1" then
 	maincolor=0x202020
 	secondcolor=0x404040
