@@ -362,6 +362,7 @@ end
 if installtype == 3 then
 	fs.remove("/fos")
 	fs.remove("/lib/fos")
+	dir("/lib/fos")
 end
 
 dir("/FOS/desktop")
