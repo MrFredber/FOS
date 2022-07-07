@@ -11,73 +11,81 @@ local finder=r("fos/finder")
 local tools=r("fos/tools")
 local event=r("event")
 local len=unicode.len
-local files,reg,lang,appnames,sizes={},{},{},{},{}
+local files,user,lang,nlang={},{},{},{}
 local scrollY,first=0,1
 function module.init(registry,language)
 scrollY=0
 first=1
-reg=registry
+user=registry
 lang=language
-module.name=lang.AppsName.." (not functioning yet)"
-if reg.powerSafe == "1" then
+module.name=lang.AppsName.." (yet useless)"
+secondfcolor=0x808080
+if user.powerSafe then
 	maincolor=0
-	secondcolor=0x404040
+	secondcolor=0x303030
+	thirdcolor=0x404040
 	mainfcolor=0xffffff
-	secondfcolor=0xbbbbbb
-elseif reg.darkMode == "1" then
+elseif user.darkMode then
 	maincolor=0x202020
-	secondcolor=0x404040
+	secondcolor=0x303030
+	thirdcolor=0x404040
 	mainfcolor=0xffffff
-	secondfcolor=0xbbbbbb
 else
 	maincolor=0xdddddd
-	secondcolor=0xffffff
+	secondcolor=0xeeeeee
+	thirdcolor=0xffffff
 	mainfcolor=0
-	secondfcolor=0x707070
 end
 screenh=h-4
+file=io.open("/fos/lang/names/"..user.lang,"r")
+data={}
+for var in file:lines() do
+	table.insert(data,var)
+end
+file:close()
+nlang=finder.unserialize(data)
 end
 
 function module.draw(x,y)
-if first == 1 then
-	color(maincolor)
-	fcolor(mainfcolor)
-	fill(x,y-1,w,h-y+1," ")
-	appnames={}
+--if first == 1 then
+--	color(maincolor)
+--	fcolor(mainfcolor)
+--	fill(x,y-1,w,h-y+1," ")
+--	appnames={}
 	files=finder.files("/fos/apps")
-	for i=1,#files do
-		set(x,y,"Loading ("..i.."/"..#files..")")
-		appname={}
-		if fs.exists("/fos/apps/"..files[i].."appname/"..reg.lang) then
-			file=io.open("/fos/apps/"..files[i].."appname/"..reg.lang)
-			for var in file:lines() do table.insert(appname,var) end
-			file:close()
-		else
-			appname={files[i]}
-		end
-		table.insert(appnames,appname[1])
-		result=finder.findAll("/fos/apps/"..files[i])
-		temp=0
-		for i=1,#result do
-			temp1=fs.size(result[i])
-			temp=temp+temp1
-		end
-		table.insert(sizes,finder.verbalSize(temp))
-	end
-	first=0
-end
+--	for i=1,#files do
+--		set(x,y,"Loading ("..i.."/"..#files..")")
+--		appname={}
+--		if fs.exists("/fos/apps/"..files[i].."appname/"..user.lang) then
+--			file=io.open("/fos/apps/"..files[i].."appname/"..user.lang)
+--			for var in file:lines() do table.insert(appname,var) end
+--			file:close()
+--		else
+--			appname={files[i]}
+--		end
+--		table.insert(appnames,appname[1])
+--		result=finder.findAll("/fos/apps/"..files[i])
+--		temp=0
+--		for i=1,#result do
+--			temp1=fs.size(result[i])
+--			temp=temp+temp1
+--		end
+--		table.insert(sizes,finder.verbalSize(temp))
+--	end
+--	first=0
+--end
 color(maincolor)
 fcolor(mainfcolor)
 fill(x,y-1,w,h-y+1," ")
 set(x,y,module.name)
 color(secondcolor)
-for i=1,#appnames do
+for i=1,#files do
 	color(secondcolor)
 	fcolor(mainfcolor)
 	fill(x,y+i+i+i+scrollY,w-x,1," ")
-	rightmax=len(sizes[i])+1
-	set(x+1,y+i+i+i+scrollY,appnames[i])
-	set(w-(2+rightmax),y+i+i+i+scrollY,sizes[i].." >")
+	rightmax=0
+	set(x+1,y+i+i+i+scrollY,nlang["/fos/apps/"..unicode.lower(files[i])] or unicode.sub(files[i],1,-1))
+	set(w-(2+rightmax),y+i+i+i+scrollY,">")
 	color(maincolor)
 	fcolor(secondcolor)
 	fill(x+1,y-1+i+i+i+scrollY,w-x-1,1,"⣶")

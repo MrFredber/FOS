@@ -1,3 +1,65 @@
+----22070700 (pre b2)----
+
+-Now the versions of the system are a number
+-The file structure of the system has been redesigned
+-Added user system
+-The configuration system has been changed
+-Added new login screen
+-Shortcuts can now point to files and folders
+-Now the labels are highlighted with a separate symbol in the lower right part of the icon
+-Now all the clocks are automatically removed when you exit the OpenOS shell or the BSOD/RSOD appears
+-The structure of .lang packages has been changed
+-Changed the design of the BSOD
+-Now tools.wrap() is able to work with lines where there is a line break and tabulation
+-Now RSOD set the maximum resolution when appears
+-In the FOS menu "To Shell" is renamed to "To OpenOS Shell".
+-Now the color of the file selection is determined by the selected contrasting color
+-Now files are opening by double-clicking
+-Rewrote the Explorer application
+-Added names to system folders that change depending on the currently selected language
+-Now the path in the Explorer application is shown as folder names, not the full path
+ It is also shown as buttons
+-Now the icons in the grid are centered
+-Some screen resolutions will now show more icons in line
+-Redrawn user icon
+ It is now in the icons library
+-Now a different image format is used for application icons
+-Added a partial support for transparency in pictures
+-Now all actions with pictures in the picture library occur in uncompressed format
+-Added the function of converting a compressed image to an uncompressed one
+-Added serialization function in the finder library
+-Most icons have been redrawn... again :)
+-Now the system can determine the type of file that has Unicode characters in the name
+-Now you can put "<gray>" anywhere in the context menu
+-Changed the system installation process
+-Added OOBE
+-Changed minimum requirements
+-Added removal of extra spaces at the beginning in tools.input
+-Added a screensaver, which is currently used only in the installer and in OOBE
+-Changed the color of the taskbar to the system theme
+-Changed the color palette of dark and light themes in the system and in applications
+-Changed background colors in the tools library
+-Now the switch (tools.lvr) does not change color depending on the theme
+POOR IMPROVEMENT: ICON .LUA NOW TAKES 2 TIMES LONGER TO DRAW. In the future, the icon rendering will be optimized (I hope). But it's beautiful)
+-Increased the FOS menu call button
+ And also it is highlighted when pressed
+-Added display of used memory in the taskbar
+-Redesigned the field for creating and renaming a file or folder
+-The element deletion field has been redesigned
+-Removed bootmgr, foslink and "RAM test"
+
+Settings:
+
+-Added the "About the system" section in the "System" module (but there is no sense from it yet)
+-Fixed abnormal behavior when changing personalization
+-Removed unnecessary drawing of elements
+-Removed application size calculation in the "Applications" module
+-Some changes in both localizations
+
+b1: (The original changelog has been lost)
+
+
+
 a7:
 
 -The process of taking a screenshot (picture.screenshot) has been accelerated

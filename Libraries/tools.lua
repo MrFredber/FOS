@@ -12,71 +12,64 @@ local fcolor=gpu.setForeground
 local set=gpu.set
 local len=unicode.len
 local data,reg={},{}
+local user=user or {}
 local maincolor,secondcolor,mainfcolor,secondfcolor,contrastColor,file
 local w,h=gpu.getResolution()
-if fs.exists("/fos/system/registry") then
-	file=io.open("/fos/system/registry","r")
-	for var in file:lines() do
-	if var:find("=") ~= nil then
-		check=var:find("=")
-		arg=unicode.sub(var,1,check-1)
-		var=unicode.sub(var,check+1)
-		reg[arg]=var
-	else
-		table.insert(reg,var)
+if user.name == nil or user.notlogged == true then
+	if fs.exists("/fos/system/generalSettings.cfg") then
+		if fs.exists("/lib/fos/finder.lua") then
+			local finder=r("/fos/finder")
+			file=io.open("/fos/system/generalSettings.cfg","r")
+			for var in file:lines() do
+				table.insert(reg,var)
+			end
+			file:close()
+			user=finder.unserialize(reg)
+		end
 	end
-	end
-	file:close()
 end
-if reg.darkMode == "1" or reg.powerSafe == "1" then
-	maincolor=0x202020
-	secondcolor=0x404040
-	mainfcolor=0xffffff
-	secondfcolor=0xbbbbbb
-else
-	maincolor=0xdddddd
-	secondcolor=0xffffff
-	mainfcolor=0
-	secondfcolor=0x707070
-end
-contrastColor=tonumber(reg.contrastColor) or 0x0094ff
 
-function tools.update(registry)
-reg=registry
-if reg.darkMode == "1" or reg.powerSafe == "1" then
-	maincolor=0x202020
-	secondcolor=0x404040
+local function colorupd()
+secondfcolor=0x808080
+if user.powerSafe then
+	maincolor=0
+	secondcolor=0x303030
+	thirdcolor=0x404040
 	mainfcolor=0xffffff
-	secondfcolor=0xbbbbbb
+elseif user.darkMode then
+	maincolor=0x202020
+	secondcolor=0x303030
+	thirdcolor=0x404040
+	mainfcolor=0xffffff
 else
 	maincolor=0xdddddd
-	secondcolor=0xffffff
+	secondcolor=0xeeeeee
+	thirdcolor=0xffffff
 	mainfcolor=0
-	secondfcolor=0x707070
 end
-contrastColor=tonumber(reg.contrastColor) or 0x0094ff
+contrastColor=user.contrastColor or 0x0094ff
+end
+colorupd()
+
+function tools.update(fuser)
+user=fuser
+colorupd()
 end
 
 function tools.bar(x,y,width,procent)
-fcolor(0x777777)
+fcolor(0x808080)
 fill(x,y,width,1,"⠒")
-fcolor(0x00bf00)
-a=width/100
-b=a*procent
-c=math.floor(b)
+fcolor(contrastColor)
+c=math.floor((width/100)*procent)
 fill(x,y,c,1,"⠒")
-fcolor(0xffffff)
 end
 
 function tools.fullbar(x,y,width,procent)
-fcolor(0x777777)
+fcolor(0x808080)
 fill(x,y,width,1,"⣿")
-fcolor(0x00bf00)
-a=width/100
-b=a*procent
-c=math.floor(b)
-fill(x,y,c,1, "⣿")
-fcolor(0xffffff)
+fcolor(contrastColor)
+c=math.floor((width/100)*procent)
+fill(x,y,c,1,"⣿")
 end
 
 function tools.btn(x,y,t)
@@ -104,43 +97,27 @@ fclr=gpu.getForeground()
 if a == "1" or a == true then
 	fcolor(contrastColor)
 	set(x,y,"⢾")
-	if reg.darkMode == "1" or reg.powerSafe == "1" then
-		fcolor(0xffffff)
-	else
-		fcolor(0x202020)
-	end
+	fcolor(0xffffff)
 	set(x+3,y,"⡷")
 	color(contrastColor)
 	set(x+1,y," ⢾")
 elseif b == "1" or b == true then
 	fcolor(contrastColor)
 	set(x,y,"⢾")
-	fcolor(maincolor)
+	fcolor(0x808080)
 	set(x+3,y,"⡷")
-	if reg.darkMode == "1" or reg.powerSafe == "1" then
-		fcolor(0xffffff)
-	else
-		fcolor(0x202020)
-	end
+	fcolor(0xffffff)
 	color(contrastColor)
 	set(x+1,y,"⢾")
-	color(maincolor)
+	color(0x808080)
 	set(x+2,y,"⡷")
 else
-	if reg.darkMode == "1" or reg.powerSafe == "1" then
-		fcolor(0xffffff)
-	else
-		fcolor(0x202020)
-	end
+	fcolor(0xffffff)
 	set(x,y,"⢾")
-	fcolor(maincolor)
+	fcolor(0x808080)
 	set(x+3,y,"⡷")
-	color(maincolor)
-	if reg.darkMode == "1" or reg.powerSafe == "1" then
-		fcolor(0xffffff)
-	else
-		fcolor(0x202020)
-	end
+	color(0x808080)
+	fcolor(0xffffff)
 	set(x+1,y,"⡷ ")
 end
 color(clr)
@@ -160,7 +137,8 @@ end
 blink=1
 clr=gpu.getBackground()
 fclr=gpu.getForeground()
-color(maincolor)
+color(thirdcolor)
+fcolor(mainfcolor)
 while true do
 	local tip,_,a,b,c=event.pull(0.5)
 	if tip == "key_down" then
@@ -194,9 +172,7 @@ while true do
 		end
 		blink=1
 	elseif tip == "touch" then
-		if a >= x and a <= x+width-1 and b == y then
-
-		else
+		if not (a >= x and a <= x+width-1 and b == y) then
 			break
 		end
 	end
@@ -233,6 +209,11 @@ while true do
 		blink=1
 	end
 end
+temp=unicode.sub(line,1,1)
+while temp == " " do
+	line=unicode.sub(line,2)
+	temp=unicode.sub(line,1,1)
+end
 color(clr)
 fcolor(fclr)
 return line
@@ -241,10 +222,12 @@ end
 function tools.conMenu(x,y,args)
 i=1
 max=0
+temp={}
 while i-1 ~= #args do
 	if args[i]:find("<gray>") ~= nil then
-		temp=unicode.sub(args[i],7)
-		slen=len(temp)
+		args[i]=args[i]:gsub("<gray>","")
+		slen=len(args[i])
+		temp[i]=true
 	else
 		slen=len(args[i])
 	end
@@ -264,26 +247,25 @@ _,_,temp1=gpu.get(x,y)
 _,_,temp2=gpu.get(x+max-1,y)
 _,_,temp3=gpu.get(x,y+#args-1)
 data=picture.screenshot(x,y,max+1,#args+1)
-color(secondcolor)
+color(thirdcolor)
 fcolor(mainfcolor)
 fill(x,y,max,#args," ")
 i=1
 while i-1 ~= #args do
 	if args[i]:find("|") ~= nil then
-		fcolor(maincolor)
+		fcolor(0x808080)
 		fill(x,y+i-1,max,1,"⠤")
 		fcolor(mainfcolor)
-	elseif args[i]:find("<gray>") ~= nil then
-		fcolor(secondfcolor)
-		temp=unicode.sub(args[i],7)
-		set(x+1,y+i-1,temp)
+	elseif temp[i] then
+		fcolor(0x808080)
+		set(x+1,y+i-1,args[i])
 		fcolor(mainfcolor)
 	else
 		set(x+1,y+i-1,args[i])
 	end
 	i=i+1
 end
-fcolor(secondcolor)
+fcolor(thirdcolor)
 if #args == 1 then
 	color(temp1)
 	set(x,y,"⢾")
@@ -442,21 +424,43 @@ if a == "1" or a == true then
 	fcolor(contrastColor)
 	set(x,y,"●")
 else
-	fcolor(maincolor)
+	fcolor(0x808080)
 	set(x,y,"●")
 end
 fcolor(fclr)
 end
 
 function tools.wrap(text,width)
+text=text:gsub("\n","◙")
+text=text:gsub("\t","  ")
 slen=len(text)
 temp={}
+check=text:find("◙")
+while check ~= nil do
+	if check > width then
+		txt=unicode.sub(text,1,width)
+		table.insert(temp,txt)
+		text=unicode.sub(text,width+1)
+		slen=len(text)
+		check=text:find("◙")
+	else
+		txt=unicode.sub(text,1,check-1)
+		table.insert(temp,txt)
+		text=unicode.sub(text,check+1)
+		slen=len(text)
+		check=text:find("◙")
+	end
+end
 if slen > width then
 	txt=unicode.sub(text,width+1)
 	table.insert(temp,unicode.sub(text,1,width))
 	while true do
 		newslen=len(txt)
-		if newslen > width then
+		check=txt:find("◙")
+		if check ~= nil and check < width then
+			table.insert(temp,unicode.sub(txt,1,check-1))
+			txt=unicode.sub(txt,check+1)
+		elseif newslen > width then
 			table.insert(temp,unicode.sub(txt,1,width))
 			txt=unicode.sub(txt,width+1)
 		else
@@ -467,19 +471,24 @@ if slen > width then
 else
 	table.insert(temp,text)
 end
+for i=1,#temp do
+	if temp[i] == "" then
+		table.remove(temp,i)
+	end
+end
 return temp
 end
 
 function tools.tblprint(o)
 if type(o) == 'table' then
-   local s='{ '
-   for k,v in pairs(o) do
-      if type(k) ~= 'number' then k='"'..k..'"' end
-      s=s..'['..k..'] = '..tools.tblprint(v)..','
-   end
-   return s..'} '
+	local s='{'
+	for k,v in pairs(o) do
+		if type(k) ~= 'number' then k='"'..k..'"' end
+		s=s..'['..k..']='..tools.tblprint(v)..','
+	end
+	return s..'}'
 else
-   return tostring(o)
+	return tostring(o)
 end
 end
 return tools
