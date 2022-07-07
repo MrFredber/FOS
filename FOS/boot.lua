@@ -33,28 +33,7 @@ local y=1
 local uptime=computer.uptime
 local pull=computer.pullSignal
 local last_sleep=uptime()
-local function status(msg)
-if gpu then
-gpu.set(1,y,msg)
-if y == h then
-gpu.copy(1,2,w,h-1,0,-1)
-gpu.fill(1,h,w,1," ")
-else
-y=y+1
-end
-end
-if uptime()-last_sleep > 1 then
-local signal=table.pack(pull(0))
-if signal.n > 0 then
-computer.pushSignal(table.unpack(signal,1,signal.n))
-end
-last_sleep=uptime()
-end
-end
-gpu.fill(w/2-2,h/2-5,2,9,"⣿")
-gpu.fill(w/2,h/2-5,4,2,"⣿")
-gpu.fill(w/2,h/2-1,3,2,"⣿")
-gpu.set(w/2-6,h/2+5,"Loading OpenOS")
+gpu.set(w/2-6,h/2,"Loading OpenOS")
 local function dofile(file)
 local program,reason=raw_loadfile(file)
 if program then
@@ -108,13 +87,14 @@ _G.runlevel=1
 local r=require
 local tr=r("term")
 local pc=r("computer")
+local finder=r("fos/finder")
 local g=r("component").gpu
 local io=r("io")
 local os=r("os")
 local c,a,reg={},{},{}
 local s=g.set
 local z="/fos/system/"
-local file,b,f,c,rs,e,time,timer
+local file,b,f,c,rs,e
 local function at()
 local f=io.open(z.."auto.cfg","r")
 for v in f:lines() do table.insert(a,v) end
@@ -128,21 +108,26 @@ i=i+1
 end
 end
 local function rg()
-f=io.open(z.."registry","r")
+data={}
+f=io.open(z.."generalSettings.cfg","r")
 for v in f:lines() do
-if v:find("=") ~= nil then
-c=v:find("=")
-b=unicode.sub(v,1,c-1)
-v=unicode.sub(v,c+1)
-reg[b]=v
-else
-table.insert(reg,v)
-end
+table.insert(data,v)
 end
 f:close()
+reg=finder.unserialize(data)
 end
+
 pcall(rg)
-if g.setResolution(tonumber(reg.width),tonumber(reg.height)) then w,h=tonumber(reg.width),tonumber(reg.height) else w,h=g.getResolution() end
+nw,nh=g.maxResolution()
+reg.width=reg.width or nw
+reg.height=reg.height or nh
+if reg.width > nw or reg.height > nh then
+	g.setResolution(nw,nh)
+	w,h=nw,nh
+else
+	g.setResolution(reg.width,reg.height)
+	w,h=reg.width,reg.height
+end
 pcall(at)
 local fl=g.fill
 tr.clear()
@@ -152,32 +137,19 @@ fl(w/2,h/2-1,3,2,"⣿")
 s(w/2-5,h/2+5,"Starting FOS")
 local cl=g.setBackground
 local fc=g.setForeground
-function taskbarTime()
-clr=gpu.getBackground()
-fclr=gpu.getForeground()
-cl(0x0069ff)
-fc(0xffffff)
-time=time+1
-if reg.taskbarShowSeconds == "1" then
-	s(w-8,h,os.date('%H:%M:%S',time))
-else
-	s(w-5,h,os.date('%H:%M',time))
-end
-cl(clr)
-fc(fclr)
-end
 local fs=r("filesystem")
-if fs.exists(z.."auto.cfg") == false then
-cl(0xffffff)
-fc(0)
-fl(w/2-9,h/2,18,3," ")
-s(w/2-8,h/2+1,"Repairing FOS...")
-f=io.open(z.."auto.cfg","w")
-f:write("")
-f:close()
+if not fs.exists(z.."auto.cfg") or not fs.exists(z.."generalSettings.cfg") then
+	os.execute("/fos/oobe.lua repair")
 end
 local function d(e)
-r("event").cancel(timer)
+w,h=g.maxResolution()
+g.setResolution(w,h)
+if fs.exists("/tmp/timerid") then
+	file=io.open("/tmp/timerid","r")
+	r("event").cancel(tonumber(file:read("*all")))
+	file:close()
+	fs.remove("/tmp/timerid")
+end
 cl(0xb40000)
 fc(0xffffff)
 fl(1,1,w,h," ")
@@ -203,14 +175,8 @@ else
 pc.shutdown(true)
 end
 end
-local timeCorrection=reg.timeZone*3600
-temp=io.open("/tmp/time","w")
-temp:close()
-temp=fs.lastModified("/tmp/time")
-time=tonumber(string.sub(temp,1,-4))+timeCorrection
 rs,e=loadfile("/fos/fos.lua")
 if rs then
-timer=r("event").timer(1,taskbarTime,math.huge)
 rs,e=xpcall(rs,debug.traceback,...)
 if not rs then
 if type(e) ~= "table" then
