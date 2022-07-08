@@ -1,3 +1,8 @@
+----22070900----
+
+-The installer has been completely rewritten
+-Now all files will download faster (because now a custom downloader is used)
+
 ----22070700 (pre b2)----
 
 -Now the versions of the system are a number

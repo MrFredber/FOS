@@ -1,574 +1,412 @@
 local r=require
 local c=r("component")
-local gpu=c.gpu
 local os=r("os")
+local gpu=c.gpu
+local file,reason,result,response
 if gpu.maxDepth() == 1 then
-print("Screen/GPU does not support touches.")
-os.exit()
+	print("FOS cannot run on this PC: Screen/GPU does not support touches.")
+	os.exit()
 end
+if not c.isAvailable("internet") then
+	print("FOS Installer requires an internet card to run.")
+	os.exit()
+end
+local internet=r("internet")
 local fs=r("filesystem")
-local unicode=r("unicode")
-local len=unicode.len
-local term=r("term")
+local dir=fs.makeDirectory
+local lang={}
+local branch="https://raw.githubusercontent.com/MrFredber/FOS/Dev/"
+dir("/FOS/install")
+print("Downloading necessary libraries... (1/3)")
+os.execute("wget -f -q "..branch.."Libraries/tools.lua /FOS/install/tools.lua")
+--print("FOS Installer cannot continue.")
+--os.exit()
+local tools=r("/FOS/install/tools")
+
+local function download(url,filename)
+	result,response=pcall(internet.request,url)
+	if result then
+		file,reason=io.open(filename,"w")
+		if file then
+			for chunk in response do
+				file:write(chunk)
+			end
+			file:close()
+		else
+			tools.error({(lang.downloadError or "An error occurred while downloading the file \"%s\":"):format(filename),"",(lang.fsError or "Failed opening file for writing: %s"):format(tostring(reason))},2)
+		end
+	else
+		tools.error({(lang.downloadError or "An error occurred while downloading the file \"%s\":"):format(filename),"",(lang.requestError or "HTTP request failed: %s"):format(response)},2)
+	end
+end
+
+print("Downloading necessary libraries... (2/3)")
+download(branch.."Libraries/finder.lua","/FOS/install/finder.lua")
+print("Downloading necessary libraries... (3/3)")
+download(branch.."Libraries/icons.lua","/FOS/install/icons.lua")
+print("Launching FOS Installer...")
+
 local io=r("io")
-local w,h=gpu.getResolution();
+local unicode=r("unicode")
+local finder=r("/FOS/install/finder")
+local icons=r("/FOS/install/icons")
+local event=r("event")
+local thread=r("thread")
+local comp=r("computer")
 local fill=gpu.fill
 local color=gpu.setBackground
 local fcolor=gpu.setForeground
 local set=gpu.set
-local event=r("event")
-local dir=fs.makeDirectory
-local langchoise=""
-dir("/lib/fos")
-os.execute("wget -f https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/tools.lua /lib/fos/tools.lua")
-os.execute("wget -f https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/picture.lua /lib/fos/picture.lua")
-local tools=r("fos/tools")
-term.clear()
+local len=unicode.len
+local lang,gensett,files,total,totalnames={},{},{},{},{}
+local mitview,langview,maincolor,secondcolor,mainfcolor,secondfcolor,contrastColor,file,slen,pass,i,wait,work,file=0,1
+local colors={0xff0000,0xff2400,0xff4900,0xff6d00,0xff9200,0xffb600,0xffdb00,0xffff00,0xdbff00,0xb6ff00,0x92ff00,0x6dff00,0x49ff00,0x24ff00,0x00ff00,0x00ff24,0x00ff49,0x00ff6d,0x00ff92,0x00ffb6,0x00ffdb,0x00ffff,0x00dbff,0x00b6ff,0x0092ff,0x006dff,0x0049ff,0x0024ff,0x0000ff,0x2400ff,0x4900ff,0x6d00ff,0x9200ff,0xb600ff,0xdb00ff,0xff00ff,0xff00db,0xff00b6,0xff0092,0xff006d,0xff0049,0xff0024}
+local xw,yw,xc,yc=1,math.floor(h/3),1,1
+local w,h=gpu.maxResolution()
+local mit=tools.wrap("MIT License\n \nCopyright (c) 2021 Mr.Fredber\n \nPermission is hereby granted,free of charge,to any person obtaining a copy of this software and associated documentation files (the \"Software\"),to deal in the Software without restriction,including without limitation the rights to use,copy,modify,merge,publish,distribute,sublicense,and/or sell copies of the Software,and to permit persons to whom the Software is furnished to do so,subject to the following conditions:\n \nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n \nTHE SOFTWARE IS PROVIDED \"AS IS\",WITHOUT WARRANTY OF ANY KIND,EXPRESS OR IMPLIED,INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,DAMAGES OR OTHER LIABILITY,WHETHER IN AN ACTION OF CONTRACT,TORT OR OTHERWISE,ARISING FROM,OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.",42)
+local mitlimit=#mit-15
+local adsett,allLangs=false,true
 
-local function reset()
-color(0x2b2b2b)
-fill(1,1,w,h," ")
-color(0xffffff)
-fcolor(0)
-fill(1,1,w,1," ")
-set(2,1,"FOS Installer")
-color(0)
-fcolor(0xffffff)
-end
-
-reset()
-xw=math.floor(w/2-12)
-hw=math.floor(h/2-3)
-fill(xw+1,hw+1,26,8," ")
-color(0xffffff)
-fcolor(0)
-fill(xw,hw,26,8," ")
-set(xw+10,hw+2,"Choose language")
-set(xw+10,hw+3,"Выберите язык")
-tools.btn(xw+3,hw+6,"English")
-tools.btn(xw+14,hw+6,"Русский")
-fcolor(0x0094ff)
-set(xw+7,hw+1,"⣶⡄")
-fcolor(0x0000ff)
-set(xw+1,hw+4,"⠘⠿    ⠿⠃")
-fcolor(0x00ff00)
-set(xw+1,hw+1,"⢠⣶")
-color(0x0094ff)
-set(xw+3,hw+1,"⣿⣿⡟⣿")
-color(0x0062ff)
-set(xw+1,hw+2,"⣿⣿⣿⠟⠋ ⡀ ")
-color(0x0040ff)
-set(xw+1,hw+3," ⠉⠿⣆⣠⠈  ")
-color(0x0000ff)
-set(xw+3,hw+4," ⠛⠁ ")
-color(0xb40000)
-fcolor(0xffffff)
-set(xw+23,hw," X ")
-while true do
-	_,_,x,y=event.pull("touch")
-	if x >= xw+3 and x <= xw+10 and y == hw+6 then
-		langchoise="english.lang"
-		break
-	elseif x >= xw+14 and x <= xw+22 and y == hw+6 then
-		langchoise="russian.lang"
-		break
-	elseif x >= xw+23 and x <= xw+26 and y == hw then
-		langchoise=nil
-		break
+if fs.exists("/fos/system/generalSettings.cfg") then
+	file=io.open("/fos/system/generalSettings.cfg","r")
+	data={}
+	for var in file:lines() do
+		table.insert(data,var)
 	end
-end
-
-if langchoise == nil then
-	color(0)
-	fcolor(0xffffff)
-	term.clear()
-	print("If system isn't installed on this PC, you can delete /lib/fos directory.")
-	os.exit()
+	file:close()
+	gensett=finder.unserialize(data)
 else
-	os.execute("wget -fq https://raw.githubusercontent.com/MrFredber/FOS/master/Install/"..langchoise.." /tmp/lang")
-end
-local lang={}
-local file=io.open("/tmp/lang","r")
-for var in file:lines() do
-	check=var:find("=")
-	if check ~= nil then
-		arg=unicode.sub(var,1,check-1)
-		var=unicode.sub(var,check+1)
-		lang[arg]=var
-	else
-		table.insert(lang,var)
-	end
-end
-file:close()
-
-reset()
-xw=math.floor(w/2-37)
-hw=math.floor(h/2-10)
-fill(xw+1,hw+1,75,23," ")
-color(0xffffff)
-fcolor(0)
-fill(xw,hw,75,23," ")
-set(xw+1,hw,lang.license)
-slen=len(lang.licenseMsg)
-set(w/2-slen/2,hw+22,lang.licenseMsg)
-slen=len(lang.accept)
-tools.btn(w/2-slen/2-1,hw+21,lang.accept)
-color(0xe0e0e0)
-fill(xw,hw+1,75,19," ")
-set(xw,hw+1,"Copyright (C) 2021 Mr.Fredber")
-set(xw,hw+3,"Permission is hereby granted, free of charge, to any person obtaining a")
-set(xw,hw+4,"copy of this software and associated documentation files (the 'Software'),")
-set(xw,hw+5,"to deal in the Software without restriction, including without limitation")
-set(xw,hw+6,"the rights to use, copy, modify, merge, publish, distribute, sublicense,")
-set(xw,hw+7,"and/or sell copies of the Software, and to permit persons to whom the")
-set(xw,hw+8,"Software is furnished to do so, subject to the following conditions:")
-set(xw,hw+10,"The above copyright notice and this permission notice shall be")
-set(xw,hw+11,"included in all copies or substantial portions of the Software.")
-set(xw,hw+13,"THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR")
-set(xw,hw+14,"IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,")
-set(xw,hw+15,"FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL")
-set(xw,hw+16,"THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER")
-set(xw,hw+17,"LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING")
-set(xw,hw+18,"FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER")
-set(xw,hw+19,"DEALINGS IN THE SOFTWARE.")
-while true do
-	local _,_,x,y=event.pull("touch")
-	if x >= math.floor(w/2-slen/2-1) and x <= math.floor(w/2+slen/2) and y == hw+21 then
-		break
-	end
+	gensett={lang="",pcName="",timeZone=3,powerSafe=false,contrastColor=0x0094ff,width=w,height=h,ver="",notLogged=true,darkMode=false}
 end
 
-reset()
-function typeDraw()
-hw=math.floor(h/2-7)
-xw=math.floor(w/2-37)
-fill(xw+1,hw+1,75,17," ")
-color(0xffffff)
-fcolor(0)
-fill(xw,hw,75,17," ")
-set(xw+1,hw,lang.installType)
-set(xw+10,hw+2,lang.typeUpgrade)
-set(xw+10,hw+7,lang.typeInstall)
-set(xw+10,hw+12,lang.typeWipe)
-fcolor(0x727272)
-set(xw+10,hw+3,lang.typeUpgradeMsg1)
-set(xw+10,hw+4,lang.typeUpgradeMsg2)
-set(xw+10,hw+8,lang.typeInstallMsg1)
-set(xw+10,hw+9,lang.typeInstallMsg2)
-set(xw+10,hw+13,lang.typeWipeMsg1)
-set(xw+10,hw+14,lang.typeWipeMsg2)
-fcolor(0x00bec1)
-set(xw+1,hw+2,"⠛⠛⠛⠛⠛⠛⠛⠛")
-fcolor(0x0094ff)
-set(xw+1,hw+3,"⠀⠀⠀⢸⡇⠀⠀⠀")
-set(xw+1,hw+4,"⠀⠀⠙⢿⡿⠋⠀⠀")
-fcolor(0xb200ff)
-set(xw+1,hw+5,"⣤⣤⣤⣤⣤⣤⣤⣤")
-fcolor(0x4cff00)
-set(xw+4,hw+2,"⠛⠛")
-set(xw+7,hw+2,"⠛")
-set(xw+4,hw+5,"⣤⣤")
-set(xw+7,hw+5,"⣤")
-fcolor(0x0094ff)
-set(xw+1,hw+7,"⠀⠀⠀⢸⡇⠀⠀⠀")
-set(xw+1,hw+8,"⠀⠀⠀⢸⡇⠀⠀⠀")
-set(xw+1,hw+9,"⠀⠀⠙⢿⡿⠋⠀⠀")
-fcolor(0xb200ff)
-set(xw+1,hw+10,"⣤⣤⣤⣤⣤⣤⣤⣤")
-fcolor(0x4cff00)
-set(xw+4,hw+10,"⣤⣤")
-set(xw+7,hw+10,"⣤")
+secondfcolor=0x808080
+local function adrefresh()
+if gensett.powerSafe then
+	maincolor=0
+	secondcolor=0x303030
+	thirdcolor=0x404040
+	mainfcolor=0xffffff
+elseif gensett.darkMode then
+	maincolor=0x202020
+	secondcolor=0x303030
+	thirdcolor=0x404040
+	mainfcolor=0xffffff
+else
+	maincolor=0xdddddd
+	secondcolor=0xeeeeee
+	thirdcolor=0xffffff
+	mainfcolor=0
+end
+end
+adrefresh()
+contrastColor=gensett.contrastColor or 0x0094ff
+
+local x,y=math.floor(w/2-37),math.floor(h/2-10)
+local halfx=math.floor((x+26+x+75)/2)
+gpu.setResolution(w,h)
+
+local function main()
+color(maincolor)
+fill(1,1,w,h," ")
+fcolor(mainfcolor)
+set(x+71,y-1,"•••")
+color(secondcolor)
+fill(x,y,76,23," ")
+color(maincolor)
 fcolor(0xff0000)
-set(xw+1,hw+12,"⢠⡶⢿⣿⣿⡿⢶⡄")
-set(xw+1,hw+13,"⣿⣷⣄⠙⠋⣠⣾⣿")
-set(xw+1,hw+14,"⣿⡿⠋⣠⣄⠙⢿⣿")
-set(xw+1,hw+15,"⠘⠷⣾⣿⣿⣷⠾⠃")
-installtype=0
-end
-function typeConfirm()
-max=len(lang.typeConfirm)+2
-cw=math.floor(w/2-max/2)
-ch=math.floor(h/2-2)
-reset()
-fill(cw+1,ch+1,max,6," ")
-color(0xffffff)
-fcolor(0)
-fill(cw,ch,max,6," ")
-set(cw+1,ch+1,lang.typeConfirm)
-temp={"typeUpgrade","typeInstall","typeWipe"}
-slen=len(lang[temp[installtype]] or "Null")
-set(w/2-slen/2,ch+2,lang[temp[installtype]] or "Null")
-slen1=len(lang.yes)
-slen2=len(lang.no)
-tlen=w/2-(slen1+slen2+5)/2
-tools.btn(tlen,ch+4,lang.yes)
-tools.btn(tlen+slen1+3,ch+4,lang.no)
-while true do
-	_,_,x,y=event.pull("touch")
-	if x >= tlen and x <= tlen+1+slen1 and y == ch+4 then
-		typeconfirmed=1
-		break
-	elseif x >= tlen+slen1+3 and x <= tlen+slen1+slen2+4 and y == ch+4 then
-		typeconfirmed=0
-		color(0)
-		typeDraw()
-		break
-	end
-end
-end
-typeDraw()
-while true do
-	_,_,x,y=event.pull("touch")
-	if x >= xw+1 and x <= xw+73 and y >= hw+2 and y <= hw+5 then
-		installtype=1
-		typeConfirm()
-		if typeconfirmed == 1 then break end
-	elseif x >= xw+1 and x <= xw+73 and y >= hw+7 and y <= hw+10 then
-		installtype=2
-		typeConfirm()
-		if typeconfirmed == 1 then break end
-	elseif x >= xw+1 and x <= xw+73 and y >= hw+12 and y <= hw+15 then
-		installtype=3
-		typeConfirm()
-		if typeconfirmed == 1 then break end
-	end
+set(x+28,y-1,"DEV BRANCH INSTALLER")
+fcolor(secondcolor)
+set(x,y,"⣾")
+set(x+75,y,"⣷")
+set(x,y+22,"⢿")
+set(x+75,y+22,"⡿")
 end
 
-if installtype == 2 or installtype == 3 then
-	reg={["username"]="User",["passwordProtection"]="0"}
-	i=1
-	temp={"user","username","password","passwordLvr"}
-	max=0
-	while i-1 ~= 4 do
-		slen=len(lang[temp[i]])
-		if i == 4 then
-			slen=slen+5
-		end
-		if slen > max then
-			max=slen
-		end
-		i=i+1
-	end
-	userclr=0x0094ff
-	reset()
-	xw=math.floor(w/2-max/2-1)
-	hw=math.floor(h/2-7)
-	
-	function userdraw()
-	color(0)
-	fcolor(0xffffff)
-	fill(xw+1,hw+1,max+2,16," ")
-	color(0xffffff)
-	fcolor(0)
-	fill(xw,hw,max+2,16," ")
-	set(xw,hw,lang.user)
-	set(xw+1,hw+6,lang.username)
-	set(xw+1,hw+9,lang.passwordLvr)
-	btnlen=len(lang.next)
-	tools.btn(w/2-btnlen/2-1,hw+14,lang.next)
-	tools.lvr(xw+max-3,hw+9,reg.passwordProtection)
-	if reg.passwordProtection == "1" then
-		set(xw+1,hw+11,lang.password)
-	end
-	fcolor(userclr)
-	set(w/2-3,hw+1,"⢠⡶⢿⡿⢶⡄")
-	set(w/2-3,hw+2,"⣿⣇⣸⣇⣸⣿")
-	set(w/2-3,hw+3,"⠘⠿⣮⣵⠿⠃")
-	set(w/2-3,hw+4,"⣀⣤⣿⣿⣤⣀")
-	color(0xe0e0e0)
-	fcolor(0)
-	fill(xw+1,hw+7,max,1," ")
-	set(xw+1,hw+7,reg.username)
-	if reg.passwordProtection == "1" then
-		fill(xw+1,hw+12,max,1," ")
-		slen=len(reg.password or "")
-		fill(xw+1,hw+12,slen,1,"*")
-	end
-	end
-	userdraw()
-	
-	function userInput(s)
-	color(0xffffff)
-	fcolor(0)
-	term.setCursor(1,h)
-	fill(1,h,w,1," ")
-	if s == true then
-		text=term.read({},false,"","*")
+local function mainfill()
+color(maincolor)
+if adsett then
+	fcolor(secondcolor)
+	set(x+70,y-1,"⣾	  ⣷")
+	color(secondcolor)
+	fcolor(mainfcolor)
+	set(x+71,y-1,"•••")
+else
+	fcolor(mainfcolor)
+	set(x+70,y-1," ••• ")
+end
+color(maincolor)
+if open ~= 0 then
+	fcolor(mainfcolor)
+	set(x+2,y-1,"◂")
+else
+	set(x+2,y-1," ")
+end
+color(secondcolor)
+fill(x,y+1,76,21," ")
+end
+
+local function additional()
+fcolor(mainfcolor)
+color(secondcolor)
+slen=len(lang.additional or "Additional settings")
+set(halfx-slen/2,y+1,lang.additional or "Additional settings")
+set(x+28,y+3,lang.powerSafe or "Power Saving Mode")
+if gensett.powerSafe then
+	fcolor(secondfcolor)
+end
+set(x+28,y+5,lang.darkMode or "Dark Theme")
+tools.lvr(x+69,y+3,gensett.powerSafe)
+tools.lvr(x+69,y+5,gensett.darkMode)
+icons.cfg(x+9,y+10)
+end
+
+local function first()
+color(secondcolor)
+fcolor(mainfcolor)
+slen=len(lang.langChoose or "Choose language")
+set(halfx-slen/2,y+1,lang.langChoose or "Choose language")
+langs={[1]="English",[2]="Русский",code={[1]="english.lang",[2]="russian.lang"}}
+langy=math.ceil(h/2-(#langs/2))
+for i=1,#langs do
+	set(x+28,y+2+i+(i-1),langs[i])
+	if i == langview then
+		tools.radioBtn(x+73,y+2+i+(i-1),true)
 	else
-		text=term.read({},false)
-	end
-	text=unicode.sub(text,1,-2)
-	color(0x2b2b2b)
-	fill(1,h,w,1," ")
-	return text
-	end
-	
-	while true do
-		_,_,x,y=event.pull("touch")
-		if x >= xw+max-5 and x <= xw+max and y == hw+9 then
-			if reg.passwordProtection == "1" then
-				reg.passwordProtection="0"
-			else
-				reg.passwordProtection="1"
-			end
-			userdraw()
-		elseif x >= xw+1 and x <= xw+max and y == hw+7 then
-			reg.username=userInput()
-			userdraw()
-		elseif x >= xw+1 and x <= xw+max and y == hw+12 then
-			reg.password=userInput(true)
-			userdraw()
-		elseif x >= math.floor(w/2-btnlen/2-1) and x <= math.floor(w/2+btnlen/2) and y == hw+14 then
-			break
-		end
+		tools.radioBtn(x+73,y+2+i+(i-1),false)
 	end
 end
+slen=len(lang.next or "Next")
+tools.btn(x+72-slen,y+21,lang.next or "Next")
+icons.lang(x+9,y+10)
+end
 
-reset()
-temp="1"
-slen=len(lang.other)
-max=slen+5
-xw=math.floor(w/2-max/2-1)
-hw=math.floor(h/2-2)
+local function second()
+color(thirdcolor)
+fcolor(mainfcolor)
+fill(x+28,y+3,46,17," ")
+for i=1,15 do
+	set(x+30,y+3+i,mit[i+mitview])
+end
+color(secondcolor)
+slen=len(lang.licence)
+set(halfx-slen/2,y+1,lang.licence)
+slen=len(lang.accept)
+tools.btn(x+72-slen,y+21,lang.accept)
+icons.txt(x+10,y+10)
+color(secondcolor)
+fcolor(thirdcolor)
+set(x+28,y+3,"⣾")
+set(x+73,y+3,"⣷")
+set(x+28,y+19,"⢿")
+set(x+73,y+19,"⡿")
+end
 
-function download()
+local function third()
+fcolor(mainfcolor)
+slen=len(lang.components)
+set(halfx-slen/2,y+1,lang.components)
+set(x+28,y+3,lang.allLangs)
+tools.lvr(x+69,y+3,allLangs)
+icons.cfg(x+9,y+10)
+slen=len(lang.next)
+tools.btn(x+72-slen,y+21,lang.next)
+end
+
+local function waiting()
+while true do
+xw=xw+xc
+yw=yw+yc
+i=i+1
+if i > 42 then i=1 end
+color(colors[i])
+set(xw,yw," ")
+if xw == 1 or xw == w then xc=-xc end
+if yw == 1 or yw == h then yc=-yc end
+os.sleep(0.1)
+end
+end
+
+local function working()
+download(branch.."Install/files.cfg","/fos/install/files")
+file=io.open("/fos/install/files","r")
+data={}
+for var in file:lines() do
+	table.insert(data,var)
+end
+file:close()
+files=finder.unserialize(data)
+for i=1,#files.paths.main do
+	total[i]=files.paths.main[i]
+	totalnames[i]=files.names.main[i]
+end
+if allLangs then
+	for i=1,#files.paths.langs.russian do
+		total[#total+i]=files.paths.langs.russian[#total+i]
+		totalnames[#total+i]=files.names.langs.russian[#total+i]
+	end
+	for i=1,#files.paths.langs.english do
+		total[#total+i]=files.paths.langs.english[#total+i]
+		totalnames[#total+i]=files.names.langs.english[#total+i]
+	end
+else
+	for i=1,#files.paths.langs[sub(gensett.lang,1,-6)] do
+		total[#total+i]=files.paths.langs[sub(gensett.lang,1,-6)][#total+i]
+		totalnames[#total+i]=files.names.langs.[sub(gensett.lang,1,-6)][#total+i]
+	end
+end
+owo=100/#total
+color(secondcolor)
+fcolor(mainfcolor)
+fill(3,h-4,w-4,4," ")
+tools.bar(5,h-2,w-8,0)
+for i=1,#total do
+	set(5,h-3,totalnames[i])
+	download(branch..total[i],totalnames[i])
+	color(secondcolor)
+	fcolor(mainfcolor)
+	fill(3,h-4,w-4,4," ")
+	tools.bar(5,h-2,w-8,i*owo)
+end
+fs.rename("/fos/install/finder.lua","/lib/fos/finder.lua")
+fs.rename("/fos/install/icons.lua","/lib/fos/icons.lua")
+fs.rename("/fos/install/tools.lua","/lib/fos/tools.lua")
+file=io.open("/fos/System/generalSettings.cfg","w")
+gensett.ver=files.version
+data=finder.serialize(gensett)
+file=io.open("/fos/system/generalSettings.cfg","w")
+for i=1,#data do
+	file:write(data[i])
+	if i ~= #data then
+		file:write("\n")
+	end
+end
+file:close()
+file=io.open("/fos/system/auto.cfg","w")
+file:write("/fos/oobe.lua")
+file:close()
+end
+
+local function four()
 color(0)
 fcolor(0xffffff)
-fill(xw+1,hw+1,max+2,5," ")
-color(0xffffff)
-fcolor(0)
-fill(xw,hw,max+2,5," ")
-set(xw+1,hw+1,lang.other)
-tools.lvr(xw+max-3,hw+1,temp)
-slen=len(lang.install)
-tools.btn(w/2-slen/2-1,hw+3,lang.install)
-end
-download()
-
-while true do
-	_,_,x,y=event.pull("touch")
-	if x >= xw+max-5 and x <= xw+max and y == hw+1 then
-		if temp == "1" then
-			temp="0"
-		else
-			temp="1"
-		end
-		download()
-	elseif x >= math.floor(w/2-slen/2-1) and x <= math.floor(w/2+slen/2) and y == hw+3 then
-		break
-	end
-end
-
-if installtype == 3 then
-	fs.remove("/fos")
-	fs.remove("/lib/fos")
-	dir("/lib/fos")
-end
-
-dir("/FOS/desktop")
-dir("/FOS/apps/Settings.app/appname")
-dir("/FOS/apps/Settings.app/lang")
-dir("/FOS/apps/Settings.app/modules/1_System")
-dir("/FOS/apps/Settings.app/modules/3_Personalization")
-dir("/FOS/apps/Settings.app/modules/4_Apps")
-dir("/FOS/apps/Settings.app/modules/6_DateAndLang")
-dir("/FOS/apps/Explorer.app/appname")
-dir("/FOS/lang/fos")
-dir("/FOS/lang/shared")
-dir("/FOS/system")
-
-reset()
-term.setCursor(1,1)
-tools.fullbar(1,h,w,1)
-local files={
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/fos.lua /fos/fos.lua",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/boot.lua /lib/core/boot.lua",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/foslink.lua /home/fos",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/bootmgr.lua /fos/bootmgr.lua",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/system.lua /lib/fos/system.lua",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/finder.lua /lib/fos/finder.lua",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/icons.lua /lib/fos/icons.lua",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/tools.lua /lib/fos/tools.lua",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Libraries/picture.lua /lib/fos/picture.lua",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/icon.spic /fos/apps/settings.app/icon.spic",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/modules/1_System/main.lua /fos/apps/settings.app/modules/1_System/main.lua",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/modules/3_Personalization/main.lua /fos/apps/settings.app/modules/3_Personalization/main.lua",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/modules/4_Apps/main.lua /fos/apps/settings.app/modules/4_Apps/main.lua",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/modules/6_DateAndLang/main.lua /fos/apps/settings.app/modules/6_DateAndLang/main.lua",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/main.lua /fos/apps/settings.app/main.lua",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Explorer.app/icon.spic /fos/apps/explorer.app/icon.spic",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Explorer.app/main.lua /fos/apps/explorer.app/main.lua",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Language/fos/english.lang /fos/lang/fos/english.lang",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Language/fos/russian.lang /fos/lang/fos/russian.lang",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Language/shared/english.lang /fos/lang/shared/english.lang",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Language/shared/russian.lang /fos/lang/shared/russian.lang",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/lang/english.lang /fos/apps/settings.app/lang/english.lang",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/lang/russian.lang /fos/apps/settings.app/lang/russian.lang",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/appname/english.lang /fos/apps/settings.app/appname/english.lang",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/appname/russian.lang /fos/apps/settings.app/appname/russian.lang",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Explorer.app/appname/english.lang /fos/apps/explorer.app/appname/english.lang",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Explorer.app/appname/russian.lang /fos/apps/explorer.app/appname/russian.lang"}
-local other={
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/FOS/RAM%20test.lua /fos/desktop/'RAM test.lua'",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/icon.pic /fos/apps/settings.app/icon.pic",
-	"https://raw.githubusercontent.com/MrFredber/FOS/master/Applications/Settings.app/icon.bmp /fos/apps/settings.app/icon.bmp"}
-
-i=1
-ibar=0
-percent=100/#files
-color(0x2b2b2b)
-while i-1 ~= #files do
-	fcolor(0xffffff)
-	temp=files[i]:find(" ")
-	set(1,h-1,files[i]:sub(temp+1))
-	tools.fullbar(1,h,w,percent*ibar)
-	color(0x2b2b2b)
-	os.execute("wget -fq "..files[i])
-	fill(1,h-1,w,2," ")
-	ibar=ibar+1
-	i=i+1
-end
-if temp == "1" then
-	i=1
-	ibar=0
-	percent=100/#other
-	color(0x2b2b2b)
-	while i-1 ~= #other do
-		fcolor(0xffffff)
-		temp=other[i]:find(" ")
-		set(1,h-1,other[i]:sub(temp+1))
-		tools.fullbar(1,h,w,percent*ibar)
-		color(0x2b2b2b)
-		os.execute("wget -fq "..other[i])
-		fill(1,h-1,w,2," ")
-		ibar=ibar+1
-		i=i+1
-	end
-end
-fcolor(0xffffff)
-color(0x0094ff)
-slen=len(lang.last)
 fill(1,1,w,h," ")
-set(w/2-slen/2,h/2,lang.last)
+set(w/2-(len(lang.final)/2),h/2,lang.final)
+color(colors[1])
+set(xw,yw," ")
+i=1
+wait=thread.create(waiting)
+work=thread.create(working)
+thread.waitForAny({wait,work})
+wait:kill()
+comp.shutdown(true)
+end
 
-file=io.open("/fos/desktop/Settings.lnk","w")
-file:write("/fos/apps/settings.app")
-file:close()
-file=io.open("/fos/desktop/Explorer.lnk","w")
-file:write("/fos/apps/explorer.app")
-file:close()
-function standart()
-if reg.passwordProtection == "1" and reg.password == nil then
-	reg.passwordProtection="0"
-	reg.password="0"
-end
-w,h=gpu.maxResolution()
-reg.width=tostring(w)
-reg.height=tostring(h)
-reg.userColor="0x0094ff"
-reg.powerSafe="0"
-reg.ver="b1"
-reg.lang=langchoise
-reg.gpu=tostring(gpu.maxDepth())
-reg.dataType="%d.%m.%Y %H:%M:%S"
-reg.contrastColorHeaders="1"
-reg.taskbarShowSeconds="1"
-reg.timeZone=7
-reg.desktopColor=0x2b2b2b
-reg.darkMode="0"
-reg.contrastColor=0xd95be6
-file=io.open("/fos/system/auto.cfg","w")
-file:write("")
-file:close()
-end
-function userError()
-tools.error("File 'user.cfg' not exists or corrupted",2)
-reg.username="User"
-reg.userColor="0x0094ff"
-reg.passwordProtection="0"
-reg.password="0"
-end
-function usertransform()
-reg.username=usr[1]
-reg.userColor=usr[2]
-reg.passwordProtection=usr[3]
-if usr[3] == "1" then
-	reg.password=usr[4]
-end
-end
-function compError()
-tools.error("File 'comp.cfg' not exists or corrupted",2)
-reg.w,h=gpu.maxResolution()
-reg.width=tostring(w)
-reg.height=tostring(h)
-reg.powerSafe="0"
-end
-function comptransform()
-reg.powerSafe=cmp[1]
-temp=cmp[2]:find(",")
-reg.width=tonumber(cmp[2]:sub(1,temp-1))
-reg.height=tonumber(cmp[2]:sub(temp+1))
-end
-if installtype == 2 or installtype == 3 then
-	standart()
-else
-	temp=fs.exists("/fos/system/registry")
-	if not temp then
-		reg={}
-		user=fs.exists("/fos/system/user.cfg")
-		if not user then
-			userError()
+open=0
+lastopen=0
+refresh=false
+main()
+first()
+while true do
+tip,_,mx,my,click=event.pull()
+if tip == "touch" or tip == "scroll" then
+	if mx >= x+71 and mx <= x+74 and my == y-1 then
+		if adsett then
+			adsett=false
 		else
-			file=io.open("/fos/system/user.cfg","r")
-			usr={}
-			for var in file:lines() do table.insert(usr,var) end
-			status=pcall(usertransform)
-			if not status then
-				userError()
+			adsett=true
+		end
+		refresh=true
+	elseif adsett then
+		if mx >= x+26 and mx <= x+73 and my == y+3 then
+			if gensett.powerSafe then
+				gensett.powerSafe=false
+			else
+				gensett.powerSafe=true
+			end
+			adrefresh()
+			main()
+			additional()
+		elseif mx >= x+26 and mx <= x+73 and my == y+5 then
+			if gensett.darkMode then
+				gensett.darkMode=false
+			else
+				gensett.darkMode=true
+			end
+			adrefresh()
+			main()
+			additional()
+		end
+	elseif open == 0 then
+		if mx >= x+72-slen and mx <= x+73 and my == y+21 and tip == "touch" then
+			download(branch.."Install/"..gensett.lang,"/FOS/install/lang")
+			file=io.open("/fos/install/lang","r")
+			data={}
+			for var in file:lines() do
+				table.insert(data,var)
+			end
+			file:close()
+			lang=finder.unserialize(data)
+			open=1
+		else
+			for i=1,#langs do
+				if mx >= x+28 and mx <= x+73 and my == y+2+i+(i-1) and langview ~= i then
+					langview=i
+					gensett.lang=langs.code[i]
+					refresh=true
+				end
 			end
 		end
-		comp=fs.exists("/fos/system/comp.cfg")
-		if not comp then
-			compError()
+	elseif open ~= 0 and mx == x+2 and my == y-1 and tip == "touch" then
+		if open > 0 then
+			open=open-1
 		else
-			file=io.open("/fos/system/comp.cfg","r")
-			cmp={}
-			for var in file:lines() do table.insert(cmp,var) end
-			status=pcall(comptransform)
-			if not status then
-				compError()
+			open=open+1
+		end
+	elseif open == 1 then
+		if mx >= x+72-slen and mx <= x+73 and my == y+21 and tip == "touch" then
+			open=2
+		elseif mx >= x+28 and mx <= x+73 and my >= y+3 and my <= y+19 and tip == "scroll" then
+			if click == 1 then
+				if mitview > 0 then
+					mitview=mitview-click
+				end
+			else
+				if mitview < mitlimit then
+					mitview=mitview-click
+				end
 			end
+			refresh=true		
 		end
-		reg.ver="b1"
-		reg.gpu=tostring(gpu.maxDepth())
-		reg.lang=langchoise
-		reg.dataType="%d.%m.%Y %H:%M:%S"
-		reg.contrastColorHeaders="1"
-		reg.taskbarShowSeconds="1"
-		reg.timeZone=7
-		reg.desktopColor=0x2b2b2b
-		reg.darkMode="0"
-		reg.contrastColor=0x0094ff
-	else
-		reg={}
-		file=io.open("/fos/system/registry","r")
-		for var in file:lines() do
-		if var:find("=") ~= nil then
-			check=var:find("=")
-			arg=unicode.sub(var,1,check-1)
-			var=unicode.sub(var,check+1)
-			reg[arg]=var
-		else
-			table.insert(reg,var)
+	elseif open == 2 then
+		if mx >= x+26 and mx <= x+73 and my == y+3 then
+			if allLangs then
+				allLangs=false
+			else
+				allLangs=true
+			end
+			color(secondcolor)
+			tools.lvr(x+69,y+3,_,"1")
+			os.sleep(0.1)
+			refresh=true
+		elseif mx >= x+72-slen and mx <= x+73 and my == y+21 and tip == "touch" then
+			open=3
 		end
+	end
+	if lastopen ~= open or refresh then
+		refresh=false
+		lastopen=open
+		mainfill()
+		if adsett then
+			additional()
+		elseif open == 0 then
+			first()
+		elseif open == 1 then
+			second()
+		elseif open == 2 then
+			third()
+		elseif open == 3 then
+			four()
 		end
-		file:close()
-		reg.ver="b1"
 	end
 end
-file=io.open("/fos/system/registry","w")
-for k in pairs(reg) do
-	file:write(k.."="..reg[k].."\n")
 end
-file:close()
-r("computer").shutdown(true)
