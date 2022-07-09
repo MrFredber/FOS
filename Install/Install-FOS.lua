@@ -35,10 +35,10 @@ local function download(url,filename)
 			end
 			file:close()
 		else
-			tools.error({(lang.downloadError or "An error occurred while downloading the file \"%s\":"):format(filename),"",(lang.fsError or "Failed opening file for writing: %s"):format(tostring(reason))},2)
+			tools.error({(lang.downloadError or "An error occurred while downloading the file \"%s\":"):format(filename),(lang.fsError or "Failed opening file for writing: ")..tostring(reason)},2)
 		end
 	else
-		tools.error({(lang.downloadError or "An error occurred while downloading the file \"%s\":"):format(filename),"",(lang.requestError or "HTTP request failed: %s"):format(response)},2)
+		tools.error({(lang.downloadError or "An error occurred while downloading the file \"%s\":"):format(filename),(lang.requestError or "HTTP request failed: ")..response},2)
 	end
 end
 
@@ -60,11 +60,12 @@ local color=gpu.setBackground
 local fcolor=gpu.setForeground
 local set=gpu.set
 local len=unicode.len
+local sub=unicode.sub
 local lang,gensett,files,total,totalnames={},{},{},{},{}
 local mitview,langview,maincolor,secondcolor,mainfcolor,secondfcolor,contrastColor,file,slen,pass,i,wait,work,file=0,1
 local colors={0xff0000,0xff2400,0xff4900,0xff6d00,0xff9200,0xffb600,0xffdb00,0xffff00,0xdbff00,0xb6ff00,0x92ff00,0x6dff00,0x49ff00,0x24ff00,0x00ff00,0x00ff24,0x00ff49,0x00ff6d,0x00ff92,0x00ffb6,0x00ffdb,0x00ffff,0x00dbff,0x00b6ff,0x0092ff,0x006dff,0x0049ff,0x0024ff,0x0000ff,0x2400ff,0x4900ff,0x6d00ff,0x9200ff,0xb600ff,0xdb00ff,0xff00ff,0xff00db,0xff00b6,0xff0092,0xff006d,0xff0049,0xff0024}
-local xw,yw,xc,yc=1,math.floor(h/3),1,1
 local w,h=gpu.maxResolution()
+local xw,yw,xc,yc=1,math.floor(h/3),1,1
 local mit=tools.wrap("MIT License\n \nCopyright (c) 2021 Mr.Fredber\n \nPermission is hereby granted,free of charge,to any person obtaining a copy of this software and associated documentation files (the \"Software\"),to deal in the Software without restriction,including without limitation the rights to use,copy,modify,merge,publish,distribute,sublicense,and/or sell copies of the Software,and to permit persons to whom the Software is furnished to do so,subject to the following conditions:\n \nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n \nTHE SOFTWARE IS PROVIDED \"AS IS\",WITHOUT WARRANTY OF ANY KIND,EXPRESS OR IMPLIED,INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,DAMAGES OR OTHER LIABILITY,WHETHER IN AN ACTION OF CONTRACT,TORT OR OTHERWISE,ARISING FROM,OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.",42)
 local mitlimit=#mit-15
 local adsett,allLangs=false,true
@@ -255,17 +256,17 @@ for i=1,#files.paths.main do
 end
 if allLangs then
 	for i=1,#files.paths.langs.russian do
-		total[#total+i]=files.paths.langs.russian[#total+i]
-		totalnames[#total+i]=files.names.langs.russian[#total+i]
+		total[#total+i]=files.paths.langs["russian.lang"][i]
+		totalnames[#total+i]=files.names.langs["russian.lang"][i]
 	end
 	for i=1,#files.paths.langs.english do
-		total[#total+i]=files.paths.langs.english[#total+i]
-		totalnames[#total+i]=files.names.langs.english[#total+i]
+		total[#total+i]=files.paths.langs["english.lang"][i]
+		totalnames[#total+i]=files.names.langs["english.lang"][i]
 	end
 else
-	for i=1,#files.paths.langs[sub(gensett.lang,1,-6)] do
-		total[#total+i]=files.paths.langs[sub(gensett.lang,1,-6)][#total+i]
-		totalnames[#total+i]=files.names.langs[sub(gensett.lang,1,-6)][#total+i]
+	for i=1,#files.paths.langs[gensett.lang] do
+		total[#total+i]=files.paths.langs[gensett.lang][i]
+		totalnames[#total+i]=files.names.langs[gensett.lang][i]
 	end
 end
 owo=100/#total
@@ -274,14 +275,15 @@ fcolor(mainfcolor)
 fill(3,h-4,w-4,4," ")
 tools.bar(5,h-2,w-8,0)
 for i=1,#total do
+	fcolor(mainfcolor)
 	set(5,h-3,totalnames[i])
 	download(branch..total[i],totalnames[i])
 	color(secondcolor)
-	fcolor(mainfcolor)
 	fill(3,h-4,w-4,4," ")
 	tools.bar(5,h-2,w-8,i*owo)
 end
-file=io.open("/fos/System/generalSettings.cfg","w")
+fcolor(mainfcolor)
+set(5,h-3,lang.reboot or "Preparing for first reboot...")
 gensett.ver=files.version
 data=finder.serialize(gensett)
 file=io.open("/fos/system/generalSettings.cfg","w")
@@ -306,9 +308,12 @@ color(colors[1])
 set(xw,yw," ")
 i=1
 wait=thread.create(waiting)
-work=thread.create(working)
-thread.waitForAny({wait,work})
+status,reason=pcall(working)
 wait:kill()
+if not status then
+	tools.error({lang.workingError or "Internal error while installing FOS:",reason},2)
+end
+fs.remove("/fos/install")
 comp.shutdown(true)
 end
 

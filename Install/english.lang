@@ -1,6 +1,6 @@
 {downloadError="An error occurred while downloading the file \"%s\":",
-fsError="Failed opening file for writing: %s",
-requestError="HTTP request failed: %s",
+fsError="Failed opening file for writing: ",
+requestError="HTTP request failed: ",
 additional="Additional settings",
 powerSafe="Power Saving Mode",
 darkMode="Dark Theme",
@@ -10,4 +10,6 @@ licence="License agreement",
 accept="Accept",
 components="Select additional components",
 allLangs="All language packs",
-final="Installing FOS"}
+final="Installing FOS",
+workingError="Internal error while installing FOS:",
+reboot="Preparing for first reboot..."}
