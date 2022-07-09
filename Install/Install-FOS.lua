@@ -256,11 +256,12 @@ for i=1,#files.paths.main do
 end
 temp=#total
 if allLangs then
-	for i=1,#files.paths.langs.russian do
+	for i=1,#files.paths.langs["russian.lang"] do
 		total[temp+i]=files.paths.langs["russian.lang"][i]
 		totalnames[temp+i]=files.names.langs["russian.lang"][i]
 	end
-	for i=1,#files.paths.langs.english do
+	temp=#total
+	for i=1,#files.paths.langs["english.lang"] do
 		total[temp+i]=files.paths.langs["english.lang"][i]
 		totalnames[temp+i]=files.names.langs["english.lang"][i]
 	end

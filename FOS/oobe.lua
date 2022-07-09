@@ -18,6 +18,7 @@ local color=gpu.setBackground
 local fcolor=gpu.setForeground
 local set=gpu.set
 local len=unicode.len
+local dir=fs.makeDirectory
 local reg,user,lang,gensett={},{},{},{}
 local langview,maincolor,secondcolor,mainfcolor,secondfcolor,contrastColor,file,slen,pass,i,wait,work,file=0
 local colors={0xff0000,0xff2400,0xff4900,0xff6d00,0xff9200,0xffb600,0xffdb00,0xffff00,0xdbff00,0xb6ff00,0x92ff00,0x6dff00,0x49ff00,0x24ff00,0x00ff00,0x00ff24,0x00ff49,0x00ff6d,0x00ff92,0x00ffb6,0x00ffdb,0x00ffff,0x00dbff,0x00b6ff,0x0092ff,0x006dff,0x0049ff,0x0024ff,0x0000ff,0x2400ff,0x4900ff,0x6d00ff,0x9200ff,0xb600ff,0xdb00ff,0xff00ff,0xff00db,0xff00b6,0xff0092,0xff006d,0xff0049,0xff0024}
@@ -259,8 +260,8 @@ end
 end
 
 local function working()
-fs.makeDirectory("/.trashcan/"..user.name.."/")
-fs.makeDirectory("/FOS/Users/"..user.name.."/Desktop")
+dir("/.trashcan/"..user.name.."/")
+dir("/FOS/Users/"..user.name.."/Desktop")
 file=io.open("/fos/system/generalSettings.cfg","w")
 temp=finder.serialize(gensett)
 for i=1,#temp do
@@ -276,8 +277,7 @@ file:close()
 file=io.open("/fos/users/"..user.name.."/desktop/Explorer.lnk","w")
 file:write("/fos/apps/explorer.app/")
 file:close()
-fs.makeDirectory("/FOS/Users/"..user.name.."/AppData")
-fs.makeDirectory("/FOS/Users/"..user.name.."/Trash")
+dir("/FOS/Users/"..user.name.."/AppData")
 file=io.open("/fos/users/"..user.name.."/settings.cfg","w")
 user.name=nil
 user.desktopColor=0x2b2b2b
@@ -298,6 +298,9 @@ for i=1,#temp do
 		file:write("\n")
 	end
 end
+file:close()
+file=io.open("/fos/system/auto.cfg","w")
+file:write("")
 file:close()
 end
 
