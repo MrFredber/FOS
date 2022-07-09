@@ -310,9 +310,11 @@ color(colors[1])
 set(xw,yw," ")
 i=1
 wait=thread.create(waiting)
-work=thread.create(working)
-thread.waitForAny({wait,work})
+status,reason=xpcall(working,debug.traceback)
 wait:kill()
+if not status then
+	tools.error({lang.workingError,reason},2)
+end
 os.exit()
 end
 

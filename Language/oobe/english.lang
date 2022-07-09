@@ -17,4 +17,5 @@ pcHead="Let's name this device",
 pcDescription="Make it yours with a unique name that's easy to recognize when connecting to it from other devices.",
 skip="Skip",
 pcName="Device name",
-final="Getting things ready for you."}
+final="Getting things ready for you.",
+workingError="Internal error while setting up a PC:"}

@@ -254,19 +254,20 @@ for i=1,#files.paths.main do
 	total[i]=files.paths.main[i]
 	totalnames[i]=files.names.main[i]
 end
+temp=#total
 if allLangs then
 	for i=1,#files.paths.langs.russian do
-		total[#total+i]=files.paths.langs["russian.lang"][i]
-		totalnames[#total+i]=files.names.langs["russian.lang"][i]
+		total[temp+i]=files.paths.langs["russian.lang"][i]
+		totalnames[temp+i]=files.names.langs["russian.lang"][i]
 	end
 	for i=1,#files.paths.langs.english do
-		total[#total+i]=files.paths.langs["english.lang"][i]
-		totalnames[#total+i]=files.names.langs["english.lang"][i]
+		total[temp+i]=files.paths.langs["english.lang"][i]
+		totalnames[temp+i]=files.names.langs["english.lang"][i]
 	end
 else
 	for i=1,#files.paths.langs[gensett.lang] do
-		total[#total+i]=files.paths.langs[gensett.lang][i]
-		totalnames[#total+i]=files.names.langs[gensett.lang][i]
+		total[temp+i]=files.paths.langs[gensett.lang][i]
+		totalnames[temp+i]=files.names.langs[gensett.lang][i]
 	end
 end
 owo=100/#total
@@ -308,7 +309,7 @@ color(colors[1])
 set(xw,yw," ")
 i=1
 wait=thread.create(waiting)
-status,reason=pcall(working)
+status,reason=xpcall(working,debug.traceback)
 wait:kill()
 if not status then
 	tools.error({lang.workingError or "Internal error while installing FOS:",reason},2)
