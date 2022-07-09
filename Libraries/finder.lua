@@ -29,22 +29,26 @@ if fs.exists("/fos/system/generalSettings.cfg") then
 	user=finder.unserialize(reg)
 end
 reg={}
-file=io.open("/fos/lang/shared/"..(user.lang or "english.lang"),"r")
-for var in file:lines() do
-	table.insert(reg,var)
+if fs.exists("/fos/lang/shared/"..(user.lang or "english.lang")) then
+	file=io.open("/fos/lang/shared/"..(user.lang or "english.lang"),"r")
+	for var in file:lines() do
+		table.insert(reg,var)
+	end
+	file:close()
+	slang=finder.unserialize(reg)
 end
-file:close()
-slang=finder.unserialize(reg)
 
 function finder.update(fuser)
 user=fuser
-slang={}
-file=io.open("/fos/lang/shared/"..user.lang,"r")
-for var in file:lines() do
-	table.insert(data,var)
+if fs.exists("/fos/lang/shared/"..user.lang) then
+	slang={}
+	file=io.open("/fos/lang/shared/"..user.lang,"r")
+	for var in file:lines() do
+		table.insert(data,var)
+	end
+	file:close()
+	slang=finder.unserialize(data)
 end
-file:close()
-slang=finder.unserialize(data)
 end
 
 function finder.files(path)

@@ -20,7 +20,7 @@ FOS - это графическая система для системы OpenOS 
 
 Чтобы установить Дев версию FOS, вы можете использовать эту команду:
 
-	wget -f https://raw.githubusercontent.com/MrFredber/FOS/Dev/Install/Install-FOS.lua /FOS/install/Install-FOS.lua && /FOS/install/Install-FOS.lua
+	mkdir /FOS/install/ && wget -f https://raw.githubusercontent.com/MrFredber/FOS/Dev/Install/Install-FOS.lua /FOS/install/Install-FOS.lua && /FOS/install/Install-FOS.lua
 
 ## Известные проблемы
 

@@ -12,6 +12,7 @@ FOS is a GUI system for mod OpenComputers, inspired by MineOS and Windows 11. Cr
 ![](https://raw.githubusercontent.com/MrFredber/FOS/Dev/Readme%20files/english1.png)
 
 ## Minimal Requirements
+
 	Graphic Card (Tier 3)
 	1x Memory (Tier 2.5)
 
@@ -19,7 +20,7 @@ FOS is a GUI system for mod OpenComputers, inspired by MineOS and Windows 11. Cr
 
 To install Dev version of FOS, you can use this command:
 
-	wget -f https://raw.githubusercontent.com/MrFredber/FOS/Dev/Install/Install-FOS.lua /FOS/install/Install-FOS.lua && /FOS/install/Install-FOS.lua
+	mkdir /FOS/install/ && wget -f https://raw.githubusercontent.com/MrFredber/FOS/Dev/Install/Install-FOS.lua /FOS/install/Install-FOS.lua && /FOS/install/Install-FOS.lua
 
 ## Known issues
 

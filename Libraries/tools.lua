@@ -17,15 +17,13 @@ local maincolor,secondcolor,mainfcolor,secondfcolor,contrastColor,file
 local w,h=gpu.getResolution()
 if user.name == nil or user.notlogged == true then
 	if fs.exists("/fos/system/generalSettings.cfg") then
-		if fs.exists("/lib/fos/finder.lua") then
-			local finder=r("/fos/finder")
-			file=io.open("/fos/system/generalSettings.cfg","r")
-			for var in file:lines() do
-				table.insert(reg,var)
-			end
-			file:close()
-			user=finder.unserialize(reg)
+		local finder=r("/fos/finder")
+		file=io.open("/fos/system/generalSettings.cfg","r")
+		for var in file:lines() do
+			table.insert(reg,var)
 		end
+		file:close()
+		user=finder.unserialize(reg)
 	end
 end
 

@@ -16,12 +16,14 @@ local fs=r("filesystem")
 local dir=fs.makeDirectory
 local lang={}
 local branch="https://raw.githubusercontent.com/MrFredber/FOS/Dev/"
-dir("/FOS/install")
-print("Downloading necessary libraries... (1/3)")
-os.execute("wget -f -q "..branch.."Libraries/tools.lua /FOS/install/tools.lua")
+dir("/lib/fos")
+print("Downloading necessary libraries... (1/4)")
+os.execute("wget -f -q "..branch.."Libraries/picture.lua /lib/fos/picture.lua")
+print("Downloading necessary libraries... (2/4)")
+os.execute("wget -f -q "..branch.."Libraries/tools.lua /lib/fos/tools.lua")
 --print("FOS Installer cannot continue.")
 --os.exit()
-local tools=r("/FOS/install/tools")
+local tools=r("fos/tools")
 
 local function download(url,filename)
 	result,response=pcall(internet.request,url)
@@ -40,16 +42,16 @@ local function download(url,filename)
 	end
 end
 
-print("Downloading necessary libraries... (2/3)")
-download(branch.."Libraries/finder.lua","/FOS/install/finder.lua")
-print("Downloading necessary libraries... (3/3)")
-download(branch.."Libraries/icons.lua","/FOS/install/icons.lua")
+print("Downloading necessary libraries... (3/4)")
+download(branch.."Libraries/finder.lua","/lib/fos/finder.lua")
+print("Downloading necessary libraries... (4/4)")
+download(branch.."Libraries/icons.lua","/lib/fos/icons.lua")
 print("Launching FOS Installer...")
 
 local io=r("io")
 local unicode=r("unicode")
-local finder=r("/FOS/install/finder")
-local icons=r("/FOS/install/icons")
+local finder=r("fos/finder")
+local icons=r("fos/icons")
 local event=r("event")
 local thread=r("thread")
 local comp=r("computer")
@@ -227,6 +229,18 @@ end
 end
 
 local function working()
+dir("/FOS/Apps/Settings.app/modules/1_System/")
+dir("/FOS/Apps/Settings.app/modules/3_Personalization/")
+dir("/FOS/Apps/Settings.app/modules/4_Apps/")
+dir("/FOS/Apps/Settings.app/modules/6_DateAndLang/")
+dir("/FOS/Apps/Settings.app/lang")
+dir("/FOS/Apps/Explorer.app/")
+dir("/FOS/Lang/fos/")
+dir("/FOS/Lang/names/")
+dir("/FOS/Lang/oobe/")
+dir("/FOS/Lang/shared/")
+dir("/FOS/System")
+dir("/FOS/Users")
 download(branch.."Install/files.cfg","/fos/install/files")
 file=io.open("/fos/install/files","r")
 data={}
@@ -251,7 +265,7 @@ if allLangs then
 else
 	for i=1,#files.paths.langs[sub(gensett.lang,1,-6)] do
 		total[#total+i]=files.paths.langs[sub(gensett.lang,1,-6)][#total+i]
-		totalnames[#total+i]=files.names.langs.[sub(gensett.lang,1,-6)][#total+i]
+		totalnames[#total+i]=files.names.langs[sub(gensett.lang,1,-6)][#total+i]
 	end
 end
 owo=100/#total
@@ -267,9 +281,6 @@ for i=1,#total do
 	fill(3,h-4,w-4,4," ")
 	tools.bar(5,h-2,w-8,i*owo)
 end
-fs.rename("/fos/install/finder.lua","/lib/fos/finder.lua")
-fs.rename("/fos/install/icons.lua","/lib/fos/icons.lua")
-fs.rename("/fos/install/tools.lua","/lib/fos/tools.lua")
 file=io.open("/fos/System/generalSettings.cfg","w")
 gensett.ver=files.version
 data=finder.serialize(gensett)
