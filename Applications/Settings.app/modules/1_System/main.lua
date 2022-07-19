@@ -45,6 +45,7 @@ for var in file:lines() do
 end
 file:close()
 gensett=finder.unserialize(gensett)
+var=nil
 end
 
 local function menu()
@@ -269,6 +270,7 @@ for i=1,#temp do
 	end
 end
 file:close()
+temp=nil
 end
 
 return module

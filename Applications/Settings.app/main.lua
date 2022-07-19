@@ -12,7 +12,7 @@ local color=gpu.setBackground
 local fcolor=gpu.setForeground
 local set=gpu.set
 local user,lang,slang,nlang,corrupted={},{},{},{},{}
-local file,maincolor,secondcolor,mainfcolor,secondfcolor,moduleh
+local file,maincolor,secondcolor,mainfcolor,secondfcolor,moduleh,name,oldname
 local function update()
 w,h,user,_,slang,nlang=system.init()
 secondfcolor=0x808080
@@ -40,6 +40,7 @@ end
 file:close()
 lang=finder.unserialize(lang)
 tools.update(user)
+var=nil
 end
 
 update()
@@ -75,8 +76,12 @@ end
 end
 
 local function runModule(name,user,lang)
+if oldname then
+	package.loaded[oldname]=nil
+end
 module=r(name)
 module.init(user,lang)
+oldname=name
 end
 
 modules=finder.files("/fos/apps/settings.app/modules")
@@ -163,6 +168,7 @@ end
 if rightpanel == 0 and oldrightpanel == 1 and lastopen == open then
 	oldrightpanel=0
 	picture.draw(1,2,data)
+	data=nil
 end
 screenh=h-4
 hlimit=-(moduleh-screenh-2)
@@ -226,6 +232,7 @@ while true do
 				if erroroccured == 0 then
 					module.save()
 				end
+				package.loaded[oldname]=nil
 				os.exit()
 			elseif (x >= 1 and x <= 3 and y == 1) or (x > 26) and w < 65 then
 				if rightpanel == 1 then
@@ -309,6 +316,7 @@ while true do
 				if erroroccured == 0 then
 					module.save()
 				end
+				package.loaded[oldname]=nil
 				os.exit()
 			elseif x >= 1 and x <= 3 and y == 1 and w < 65 then
 				if rightpanel == 1 then

@@ -55,6 +55,7 @@ for i=1,#temp do
 	end
 end
 file:close()
+temp=nil
 end
 
 local function menu()

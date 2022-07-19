@@ -44,6 +44,7 @@ for var in file:lines() do
 end
 file:close()
 nlang=finder.unserialize(data)
+data,var=nil,nil
 end
 
 function module.draw(x,y)

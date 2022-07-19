@@ -30,7 +30,7 @@ return user
 end
 
 function system.init(notLogged)
-data={}
+user,lang,slang,nlang,data={},{},{},{},{}
 if notLogged == true then
 	file=io.open("/fos/system/generalSettings.cfg","r")
 	for var in file:lines() do
@@ -44,7 +44,6 @@ else
 	end
 	file:close()
 end
-user={}
 user=finder.unserialize(data)
 if notLogged ~= true then
 	user.name=users[open].name
@@ -52,12 +51,7 @@ if notLogged ~= true then
 end
 w,h=gpu.getResolution()
 secondfcolor=0x808080
-if user.powerSafe then
-	maincolor=0
-	secondcolor=0x303030
-	thirdcolor=0x404040
-	mainfcolor=0xffffff
-elseif user.darkMode then
+if user.powerSafe or user.darkMode then
 	maincolor=0x202020
 	secondcolor=0x303030
 	thirdcolor=0x404040
@@ -94,8 +88,26 @@ for var in file:lines() do
 end
 file:close()
 nlang=finder.unserialize(data)
+data,var=nil,nil
 tools.update(user)
 return w,h,user,lang,slang,nlang
+end
+
+local function clock()
+clr=gpu.getBackground()
+fclr=gpu.getForeground()
+free=computer.freeMemory()
+color(maincolor)
+fcolor(mainfcolor)
+set(5,h,finder.verbalSize(full-free).."/"..finder.verbalSize(full).." (free "..finder.verbalSize(free)..")")
+time=time+1
+if user.taskbarShowSeconds then
+	set(w-8,h,os.date('%H:%M:%S',time))
+else
+	set(w-5,h,os.date('%H:%M',time))
+end
+color(clr)
+fcolor(fclr)
 end
 
 local function logintime()
@@ -115,6 +127,16 @@ fill(1,h,w,1," ")
 fcolor(0x0094ff)
 set(1,h," ⡯ ")
 fcolor(mainfcolor)
+if fs.exists("/tmp/timerid") ~= true then
+	temp=io.open("/tmp/time","w")
+	temp:close()
+	temp=fs.lastModified("/tmp/time")
+	time=tonumber(sub(temp,1,-4))+timeCorrection
+	timerid=event.timer(1,clock,math.huge)
+	file=io.open("/tmp/timerid","w")
+	file:write(timerid)
+	file:close()
+end
 if user.taskbarShowSeconds then
 	set(w-8,h,os.date('%H:%M:%S',time))
 else
@@ -185,6 +207,7 @@ for i=1,#tmp do
 		file:close()
 		data=finder.unserialize(data)
 		users[i].data=data
+		data=nil
 	else
 		users[i].data={userColor=0x0094ff}
 	end
@@ -291,22 +314,6 @@ icons.user(2,h-13,userColor)
 return smax,data
 end
 
-local function clock()
-clr=gpu.getBackground()
-fclr=gpu.getForeground()
-free=computer.freeMemory()
-color(maincolor)
-fcolor(mainfcolor)
-set(5,h,finder.verbalSize(full-free).."/"..finder.verbalSize(full).." (free "..finder.verbalSize(free)..")")
-time=time+1
-if user.taskbarShowSeconds then
-	set(w-8,h,os.date('%H:%M:%S',time))
-else
-	set(w-5,h,os.date('%H:%M',time))
-end
-color(clr)
-fcolor(fclr)
-end
 
 local function inputField(temp,tmp)
 _,_,temp1=gpu.get(w/2-12,h-5)
@@ -625,22 +632,17 @@ while true do
 	end
 end
 offset=math.floor((w-1-temp)/2)
-temp=io.open("/tmp/time","w")
-temp:close()
-temp=fs.lastModified("/tmp/time")
-time=tonumber(sub(temp,1,-4))+timeCorrection
-if fs.exists("/tmp/timerid") ~= true then
-	timerid=event.timer(1,clock,math.huge)
-	file=io.open("/tmp/timerid","w")
-	file:write(timerid)
-	file:close()
-end
 local data=finder.files(path)
-color(0x2b2b2b)
+if user.powerSafe then
+	color(0)
+else
+	color(0x2b2b2b)
+end
 fcolor(0xffffff)
 fill(1,1,w,h," ")
 system.taskbarDraw()
 local obl=system.objects(2+offset,2,path,data)
+data=nil
 return obl
 end
 

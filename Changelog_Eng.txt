@@ -1,3 +1,21 @@
+----22072000----
+
+-Fixed a bug of ignoring the power saving mode on the desktop
+-Now, after changing the file, the configuration is reloaded
+-Added reset of the "icon cache" in the right places in the system and in Explorer
+-Reduced the number of memory leaks in the system and in the Explorer
+
+Explorer:
+
+-Fixed a graphical element selection bug (I just forgot to move the bugfix from the desktop)
+-Now, just like in the main system, the configuration is rebooted after each launch of something
+-Now the clock in the taskbar is restored after the appearance of the BSOD
+
+Settings:
+
+-Fixed massive memory leak
+-Now, after editing the module, you do not need to restart the PC to see the changes
+
 ----22070900----
 
 -The installer has been completely rewritten

@@ -15,10 +15,7 @@ local lang,slang,nlang,user={},{},{},{}
 local file,sysfcolor,syscolor
 
 local function fosLoad()
-lang={}
-slang={}
-nlang={}
-user={}
+user,lang,slang,nlang={},{},{},{}
 w,h,user,lang,slang,nlang=system.init()
 end
 
@@ -106,6 +103,7 @@ if y ~= h and menu == 0 and open ~= 0 then
 			    	system.bsod(obl.fullNames[open],reason)
 				end
 			end
+			system.drawChooseReset()
 			fosLoad()
 			draw(path)
 		else
@@ -125,6 +123,7 @@ if y ~= h and menu == 0 and open ~= 0 then
 			    	system.bsod(obl.fullNames[open],reason)
 				end
 			end
+			system.drawChooseReset()
 			fosLoad()
 			draw(path)
 	else
@@ -141,6 +140,7 @@ if y ~= h and menu == 0 and open ~= 0 then
 		    	system.bsod(obl.fullNames[open],reason)
 			end
 		end
+		system.drawChooseReset()
 		fosLoad()
 		draw(path)
 	end
@@ -164,6 +164,7 @@ elseif y ~= h and sleep ~= 1 and click == 1 and skipCon == 1 then
 	pos=tools.conMenu(x,y,{slang.conEdit,"|","<gray>"..slang.conCopy,"<gray>"..slang.conPaste,"<gray>"..slang.conCut,"|",slang.conCreate,slang.conCreateDir,slang.conDelete,slang.conRename,"|","<gray>"..slang.conProp})
 	if pos == 1 then
 		os.execute("edit '"..obl.paths[choose].."'")
+		fosLoad()
 		draw(path)
 	elseif pos == 10 then
 		temp=system.rename(obl.fullNames[choose])
@@ -277,6 +278,7 @@ elseif sleep == 1 then
 	screen.turnOn()
 elseif menu == 1 and delay ~= 1 then
 	picture.draw(1,h-14,data)
+	data=nil
 	color(maincolor)
 	fcolor(0x0094ff)
 	set(1,h," ⡯ ")

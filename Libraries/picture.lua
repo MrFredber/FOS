@@ -57,6 +57,7 @@ for i=1,data.width do
 	data.fcolor[1][i]=fclr or temp
 end
 picture.draw(x,y,data)
+data=nil
 end
 
 --function picture.draw(x,y,data)

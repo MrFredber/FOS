@@ -301,6 +301,7 @@ if tx >= x and tx <= x+max and ty >= y and ty <= y+#args then
 	end
 end
 picture.draw(x,y,data)
+data=nil
 return pos
 end
 
@@ -412,6 +413,7 @@ while true do
 	end
 end
 picture.draw(w/2-width/2,h/2-maxh/2,data)
+data=nil
 color(clr)
 fcolor(fclr)
 end

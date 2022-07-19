@@ -22,29 +22,8 @@ local args={...}
 local tabs={slen={},see={},full={},offset=0,last=0}
 
 local function expLoad()
-lang={}
-slang={}
-nlang={}
-user=system.getUserSettings()
-file=io.open("/fos/lang/fos/"..user.lang,"r")
-for var in file:lines() do
-	table.insert(lang,var)
-end
-file:close()
-lang=finder.unserialize(lang)
-file=io.open("/fos/lang/shared/"..user.lang,"r")
-for var in file:lines() do
-	table.insert(slang,var)
-end
-file:close()
-slang=finder.unserialize(slang)
-file=io.open("/fos/lang/names/"..user.lang,"r")
-data={}
-for var in file:lines() do
-	table.insert(data,var)
-end
-file:close()
-nlang=finder.unserialize(data)
+user,lang,slang,nlang={},{},{},{}
+w,h,user,lang,slang,nlang=system.init()
 for k in pairs(nlang) do
 	nlang[k:gsub("#user#",user.path)]=nlang[k]
 end
@@ -182,7 +161,7 @@ for i=1,#obl.x do
 			choose=0
 			lastchoose=0
 			open=i
-		else
+		elseif lastchoose ~= i then
 			choose=i
 			if lastchoose ~= choose and lastchoose ~= 0 and not ignoreLastChoose then
 				system.drawChoose(obl,lastchoose,true)
@@ -219,7 +198,10 @@ if y ~= h and open ~= 0 then
 			    	system.bsod(obl.fullNames[open],reason)
 				end
 			end
+			system.drawChooseReset()
+			expLoad()
 			draw(path)
+			system.taskbarDraw()
 		else
 			tools.error({"The main script of the \""..obl.names[open].."\" application does not exist!"},2)
 		end
@@ -227,6 +209,7 @@ if y ~= h and open ~= 0 then
 		path=obl.paths[open]
 		table.insert(tabs.full,obl.fullNames[open])
 		table.insert(tabs.slen,len(obl.fullNames[open]))
+		system.drawChooseReset()
 		draw()
 	else
 		local result,reason=loadfile(obl.paths[open])
@@ -242,12 +225,16 @@ if y ~= h and open ~= 0 then
 		    	system.bsod(obl.fullNames[open],reason)
 			end
 		end
+		system.drawChooseReset()
+		expLoad()
 		draw(path)
+		system.taskbarDraw()
 	end
 elseif y ~= h and click == 1 and skipCon == 1 then
 	pos=tools.conMenu(x,y,{slang.conEdit,"|","<gray>"..slang.conCopy,"<gray>"..slang.conPaste,"<gray>"..slang.conCut,"|",slang.conCreate,slang.conCreateDir,slang.conDelete,slang.conRename,"|","<gray>"..slang.conProp})
 	if pos == 1 then
 		os.execute("edit '"..obl.paths[choose].."'")
+		expLoad()
 		draw()
 	elseif pos == 10 then
 		temp=system.rename(obl.fullNames[choose])
