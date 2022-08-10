@@ -13,7 +13,7 @@ local set=gpu.set
 local len=unicode.len
 local data,reg={},{}
 local user=user or {}
-local maincolor,secondcolor,mainfcolor,secondfcolor,contrastColor,file
+local maincolor,secondcolor,mainfcolor,secondfcolor,contrastColor,file,reasonY,hlimit
 local w,h=gpu.getResolution()
 if user.name == nil or user.notlogged == true then
 	if fs.exists("/fos/system/generalSettings.cfg") then
@@ -479,16 +479,79 @@ end
 return temp
 end
 
-function tools.tblprint(o)
+local tab=0
+
+local function tables(o)
 if type(o) == 'table' then
-	local s='{'
+	local s='{\n'
+	tab=tab+1
 	for k,v in pairs(o) do
 		if type(k) ~= 'number' then k='"'..k..'"' end
-		s=s..'['..k..']='..tools.tblprint(v)..','
+		for i=1,tab do
+			s=s.."\t"
+		end
+		s=s..'['..k..'] = '..tables(v)..','.."\n"
+	end
+	tab=tab-1
+	for i=1,tab do
+		s=s.."\t"
 	end
 	return s..'}'
 else
-	return tostring(o)
+	if type(o) == "string" then
+		return "\""..o.."\""
+	else
+		return tostring(o)
+	end
 end
 end
+
+local function reasonDraw(reason)
+fill(1,2,w,h-2," ")
+for i=1,#reason+reasonY do
+	if i+3 == h then
+		break
+	end
+	set(1,2+i,reason[i-reasonY])
+end
+end
+
+function tools.tblprint(o)
+reasonY,hlimit=0,0
+local text=tools.wrap(tables(o),w)
+if #text > h-4 then
+	can=#text-h+4
+	hlimit=-can
+end
+local temp=picture.screenshot(1,1,w,h)
+color(0x404040)
+fcolor(0xffffff)
+fill(1,1,w,1," ")
+fill(1,h,w,1," ")
+set(3,1,"Inside of table:")
+set(3,1,"Tap anywhere to continue...")
+color(0x202020)
+fill(1,2,w,h-2," ")
+reasonDraw(text)
+while true do
+	tip,_,x,y,click=event.pull()
+	if tip == "scroll" then
+		if click == 1 then
+			if reasonY < 0 then
+				reasonY=reasonY+click
+				reasonDraw(text)
+			end
+		else
+			if reasonY > hlimit then
+				reasonY=reasonY+click
+				reasonDraw(text)
+			end
+		end
+	elseif tip == "touch" then
+		break
+	end
+end
+picture.draw(1,1,temp)
+end
+
 return tools

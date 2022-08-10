@@ -4,6 +4,8 @@ local fill=gpu.fill
 local color=gpu.setBackground
 local fcolor=gpu.setForeground
 local set=gpu.set
+local get=gpu.get
+local copy=gpu.copy
 
 function icons.unkFile(x,y)
 fcolor(0x404040)
@@ -171,5 +173,27 @@ fill(x+3,y,2,4," ")
 set(x+1,y+1," ⢸⡇⢸⡇ ")
 set(x+3,y+2,"⠐⠂")
 end
+
+function icons.copy(x,y,data,a)
+copy(data.x[a]+1,data.y[a],8,4,x-data.x[a]-1,y-data.y[a])
+end
+
+--function icons.unkFileCopy(x,y,data,a)
+--fcolor(0x404040)
+--_,_,clr=get(x,y)
+--color(clr)
+--set(x,y,"⣾")
+--_,_,clr=get(x+7,y)
+--color(clr)
+--set(x+7,y,"⣷")
+--_,_,clr=get(x,y+3)
+--color(clr)
+--set(x,y+3,"⢿")
+--_,_,clr=get(x+7,y+3)
+--color(clr)
+--set(x+7,y+3,"⡿")
+--copy(data.x[a]+2,data.y[a],6,4,x-data.x[a]-1,y-data.y[a])
+--copy(data.x[a]+1,data.y[a]+1,8,2,x-data.x[a]-1,y-data.y[a])
+--end
 
 return icons

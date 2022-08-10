@@ -291,6 +291,8 @@ user.powerSafe=gensett.powerSafe
 user.timeZone=3
 user.contrastColorHeaders=false
 user.contrastColor=0x0094ff
+user.useXOffset=true
+user.useYOffset=false
 temp=finder.serialize(user)
 for i=1,#temp do
 	file:write(temp[i])

@@ -20,7 +20,7 @@ local set=gpu.set
 local len=unicode.len
 local sub=unicode.sub
 local users,lang,slang,user,nlang,choosebfr={},{},{},{},{},{}
-local time,w,h,file,data,open,timerid,path,slen,ext,tmpext,tmppath
+local time,w,h,file,data,open,timerid,path,slen,ext,tmpext,tmppath,desktopColor
 local reasonY,hlimit=0,0
 local incorrect,enter,first=false,false,true
 local full=computer.totalMemory()
@@ -61,6 +61,11 @@ else
 	secondcolor=0xeeeeee
 	thirdcolor=0xffffff
 	mainfcolor=0
+end
+if user.powerSafe then
+	desktopColor=0
+else
+	desktopColor=0x2b2b2b
 end
 timeCorrection=user.timeZone*3600
 temp=io.open("/tmp/time","w")
@@ -114,7 +119,7 @@ local function logintime()
 time=time+1
 clr=gpu.getBackground()
 fclr=gpu.getForeground()
-color(0x2b2b2b)
+color(desktopColor)
 fcolor(0xffffff)
 set(w/2-2,h/2-5,os.date('%H:%M',time))
 color(clr)
@@ -146,18 +151,18 @@ end
 
 local function logindraw()
 if open == 0 then
-	color(0x2b2b2b)
+	color(desktopColor)
 	fcolor(0xffffff)
 	fill(1,1,w,h," ")
 	set(w/2-2,h/2-5,os.date('%H:%M',time))
 	for i=1,#users do
-		color(0x2b2b2b)
+		color(desktopColor)
 		fcolor(0xffffff)
 		set(users[i].x+8-(len(users[i].name)/2),users[i].y+6,users[i].name)
 		icons.user(users[i].x+4,users[i].y+1,users[i].data.userColor)
 	end
 else
-	color(0x2b2b2b)
+	color(desktopColor)
 	fcolor(0xffffff)
 	fill(1,1,w,h," ")
 	set(w/2-2,h/2-5,os.date('%H:%M',time))
@@ -181,7 +186,7 @@ user.path="/fos/users/"..users[open].name.."/"
 incorrect=false
 event.cancel(timerid)
 fs.remove("/tmp/timerid")
-color(0x2b2b2b)
+color(desktopColor)
 fcolor(0xffffff)
 fill(1,1,w,h," ")
 temp=lang.welcome:format(users[open].name)
@@ -189,7 +194,7 @@ set(w/2-(len(temp)/2),h/2,temp)
 end
 
 function system.login()
-color(0x2b2b2b)
+color(desktopColor)
 fill(1,1,w,h," ")
 set(w/2-(len(lang.prepare)/2),h/2,lang.prepare)
 open=0
@@ -265,7 +270,7 @@ else
 	user=users[1].data
 	user.name=users[1].name
 	user.path="/fos/users/"..users[1].name.."/"
-	color(0x2b2b2b)
+	color(desktopColor)
 	fcolor(0xffffff)
 	fill(1,1,w,h," ")
 	temp=lang.welcome:format(user.name)
@@ -354,7 +359,8 @@ if temp == "" then temp=nil end
 return temp
 end
 
-function system.deleteConfirm(obl,a)
+function system.deleteConfirm(obl,page,a)
+current=obl.pages[page]
 if w/3 > 27 then
 	width=math.floor(w/3)
 else
@@ -371,7 +377,7 @@ fcolor(mainfcolor)
 fill(x,h/2-5,width,12," ")
 set(x+2,h/2-5,slang.deleteHeader)
 set(x+width-5,h/2-5,"  x  ")
-set((x+x+14)/2-(len(obl.names[a])/2),h/2+2,obl.names[a])
+set((x+x+14)/2-(len(current.names[a])/2),h/2+2,current.names[a])
 for i=1,#text do
 	set(x+14,h/2-4+i,text[i])
 end
@@ -381,21 +387,27 @@ fcolor(0x808080)
 set(x+width-6-slen-slen1,h/2+5,slang.yes)
 wi,hi=x+3,h/2-3
 tools.btn(x+width-4-slen,h/2+5,slang.no)
-if fs.isDirectory(obl.paths[a]) ~= false then
-	icons.folder(wi,hi)
-elseif obl.exts[a] == ".lua" then
-	icons.lua(wi,hi)
-elseif obl.exts[a] == ".lang" then
-	icons.lang(wi,hi)
-elseif obl.exts[a] == ".cfg" then
-	icons.cfg(wi,hi)
-elseif obl.exts[a] == ".txt" then
-	icons.txt(wi,hi)
-elseif obl.exts[a] == ".spic" or obl.exts[a] == ".pic" then
-	icons.pic(wi,hi)
-else
-	icons.unkFile(wi,hi)
-end
+if obl.appIconCache[current.icons[a]] then
+		picture.draw(wi,hi,obl.appIconCache[current.icons[a]])
+	elseif current.icons[a] == "folder" then
+		icons.folder(wi,hi)
+	elseif current.icons[a] == "app" then
+		icons.app(wi,hi)
+	elseif current.icons[a] == "lua" then
+		icons.lua(wi,hi)
+	elseif current.icons[a] == "lang" then
+		icons.lang(wi,hi)
+	elseif current.icons[a] == "cfg" then
+		icons.cfg(wi,hi)
+	elseif current.icons[a] == "txt" then
+		icons.txt(wi,hi)
+	elseif current.icons[a] == "pic" then
+		icons.pic(wi,hi)
+	elseif current.icons[a] == "error" then
+		icons.error(wi,hi)
+	elseif current.icons[a] == "unkFile" then
+		icons.unkFile(wi,hi)
+	end
 fcolor(thirdcolor)
 color(temp1)
 set(x,h/2-5,"⣾")
@@ -420,183 +432,303 @@ end
 return delchoose
 end
 
-function system.objects(x,y,path,files)
+function system.createPages(x,y,maxw,maxh,path,files,useXOffset,useYOffset)
 path=path:lower()
-local wi,hi,wf,hf=x+1,y,x,y+5
-local data={x={},y={},paths={},exts={},tmpexts={},names={},notExists={},fullNames={}}
-for i=1,#files do
-	notExists=false
-	if wf+9 >= w then
-		wi,wf,hi,hf=x+1,x,hi+7,hf+7
-	end
-	table.insert(data.x,wf)
-	table.insert(data.y,hi)
-	tmp=fs.name(files[i])
-	ext=finder.ext(tmp)
-	tmppath=nil
-	tmpext=nil
-	if ext == ".lnk" then
-		file=io.open(path..files[i],"r")
-		temp={}
-		for var in file:lines() do
-		table.insert(temp,var)
-		end
-		file:close()
-		if fs.exists(temp[1] or "null") then
-			tmppath=temp[1]:lower()
-			tmp=fs.name(temp[1])
-			tmpext=finder.ext(tmp)
-		else
-			notExists=true
-		end
-	end
-	if tmppath ~= nil then
-		table.insert(data.paths,tmppath)
+local wi,hi,wf,hf
+local data={totalfiles=0,maxfiles=0,linemax=0,rowmax=0,appIconCache={},pages={}}
+temp=x
+i=0
+while temp+9 < maxw do
+	temp=temp+11
+	i=i+1
+end
+data.linemax=i
+temp=y
+i=0
+while temp+4 < maxh do
+	temp=temp+7
+	i=i+1
+end
+data.rowmax=i
+if useXOffset then
+	local offset=math.floor((maxw-(data.linemax*10+data.linemax-1))/2-1)
+	x=x+offset
+end
+if useYOffset then
+	local offset=math.floor((maxh-(data.rowmax*6+data.rowmax-1))/2-1)
+	y=y+offset
+end
+data.maxfiles=data.linemax*i
+data.totalfiles=#files
+totalPages=math.ceil(data.totalfiles/data.maxfiles)
+if totalPages > 1 then
+	lastPage=data.totalfiles-(data.maxfiles*(totalPages-1))
+else
+	lastPage=data.totalfiles
+end
+for pageI=1,totalPages do
+	wi,hi,wf,hf=x+1,y,x,y+5
+	startPoint=(data.maxfiles*(pageI-1))+1
+	dataI=0
+	if pageI == totalPages then
+		endPoint=startPoint+lastPage-1
 	else
-		table.insert(data.paths,path..files[i])
+		endPoint=data.maxfiles*pageI
 	end
-	if tmpext ~= nil then
-		data.tmpexts[i]=tmpext
-	end
-	if ext ~= nil then
-		data.exts[i]=ext
-	end
-	if nlang[tmppath] ~= nil then
-		tmp=nlang[tmppath]
-	elseif nlang[path..files[i]:lower()] ~= nil then
-		tmp=nlang[path..files[i]:lower()]
-	end
-	slen=len(tmp)
-	table.insert(data.fullNames,tmp)
-	if slen > 10 then
-		slen=10
-		tmp=sub(tmp,1,9).."…"
-	end
-	if notExists then
-		fcolor(0xff0000)
-	end
-	picture.adaptiveText(wf+((10-slen)/2),hf,tmp)
-	if notExists then
-		icons.error(wi,hi)
-	elseif tmppath ~= nil then
-		if tmpext == ".app" then
-			if fs.exists(tmppath.."icon.pic") then
-				icn={}
-				file=io.open(tmppath.."icon.pic")
-				for var in file:lines() do
-					table.insert(icn,var)
-				end
-				file:close()
-				icn=finder.unserialize(icn)
-				icn=picture.decompress(icn)
-				picture.draw(wi,hi,icn)
-			else
-				icons.app(wi,hi)
-			end
-		elseif fs.isDirectory(tmppath) ~= false then
-			icons.folder(wi,hi)
-		elseif tmpext == ".lua" then
-			icons.lua(wi,hi)
-		elseif tmpext == ".lang" then
-			icons.lang(wi,hi)
-		elseif tmpext == ".cfg" then
-			icons.cfg(wi,hi)
-		elseif tmpext == ".txt" then
-			icons.txt(wi,hi)
-		elseif tmpext == ".spic" or tmpext == ".pic" then
-			icons.pic(wi,hi)
-		else
-			icons.unkFile(wi,hi)
+	data.pages[pageI]={}
+	data.pages[pageI].x={}
+	data.pages[pageI].y={}
+	data.pages[pageI].paths={}
+	data.pages[pageI].exts={}
+	data.pages[pageI].tmpexts={}
+	data.pages[pageI].names={}
+	data.pages[pageI].notExists={}
+	data.pages[pageI].fullNames={}
+	data.pages[pageI].icons={}
+	data.pages[pageI].iconsCache={}
+	for i=startPoint,endPoint do
+		dataI=dataI+1
+		notExists=false
+		if wf+9 >= w then
+			wi,wf,hi,hf=x+1,x,hi+7,hf+7
 		end
-	else
-		if ext == ".app" then
-			if fs.exists(path..files[i].."icon.pic") then
-				icn={}
-				file=io.open(path..files[i].."icon.pic")
-				for var in file:lines() do
-					table.insert(icn,var)
-				end
-				file:close()
-				icn=finder.unserialize(icn)
-				icn=picture.decompress(icn)
-				picture.draw(wi,hi,icn)
-			else
-				icons.app(wi,hi)
+		data.pages[pageI].x[dataI]=wf
+		data.pages[pageI].y[dataI]=hi
+		tmp=fs.name(files[i])
+		ext=finder.ext(tmp)
+		tmppath=nil
+		tmpext=nil
+		if ext == ".lnk" then
+			file=io.open(path..files[i],"r")
+			temp={}
+			for var in file:lines() do
+			table.insert(temp,var)
 			end
-		elseif fs.isDirectory(path..files[i]) ~= false then
-			icons.folder(wi,hi)
-		elseif ext == ".lua" then
-			icons.lua(wi,hi)
-		elseif ext == ".lang" then
-			icons.lang(wi,hi)
-		elseif ext == ".cfg" then
-			icons.cfg(wi,hi)
-		elseif ext == ".txt" then
-			icons.txt(wi,hi)
-		elseif ext == ".spic" or ext == ".pic" then
-			icons.pic(wi,hi)
-		else
-			icons.unkFile(wi,hi)
+			file:close()
+			if fs.exists(temp[1] or "null") then
+				tmppath=temp[1]:lower()
+				tmp=fs.name(temp[1])
+				tmpext=finder.ext(tmp)
+			else
+				notExists=true
+			end
 		end
+		if tmppath ~= nil then
+			data.pages[pageI].paths[dataI]=tmppath
+		else
+			data.pages[pageI].paths[dataI]=path..files[i]
+		end
+		if tmpext ~= nil then
+			data.pages[pageI].tmpexts[dataI]=tmpext
+		end
+		if ext ~= nil then
+			data.pages[pageI].exts[dataI]=ext
+		end
+		if nlang[tmppath] ~= nil then
+			tmp=nlang[tmppath]
+		elseif nlang[path..files[i]:lower()] ~= nil then
+			tmp=nlang[path..files[i]:lower()]
+		end
+		slen=len(tmp)
+		table.insert(data.pages[pageI].fullNames,tmp)
+		if slen > 10 then
+			slen=10
+			tmp=sub(tmp,1,9).."…"
+		end
+		if notExists then
+			data.pages[pageI].icons[dataI]="error"
+		elseif tmppath ~= nil then
+			if tmpext == ".app" and data.appIconCache[data.pages[pageI].paths[dataI]] == nil then
+				if fs.exists(tmppath.."icon.pic") then
+					icn={}
+					file=io.open(tmppath.."icon.pic")
+					for var in file:lines() do
+						table.insert(icn,var)
+					end
+					file:close()
+					data.appIconCache[data.pages[pageI].paths[dataI]]=finder.unserialize(icn)
+					data.pages[pageI].icons[dataI]=data.pages[pageI].paths[dataI]
+				else
+					data.pages[pageI].icons[dataI]="app"
+				end
+			elseif fs.isDirectory(tmppath) ~= false then
+				data.pages[pageI].icons[dataI]="folder"
+			elseif tmpext == ".lua" then
+				data.pages[pageI].icons[dataI]="lua"
+			elseif tmpext == ".lang" then
+				data.pages[pageI].icons[dataI]="lang"
+			elseif tmpext == ".cfg" then
+				data.pages[pageI].icons[dataI]="cfg"
+			elseif tmpext == ".txt" then
+				data.pages[pageI].icons[dataI]="txt"
+			elseif tmpext == ".spic" or tmpext == ".pic" then
+				data.pages[pageI].icons[dataI]="pic"
+			else
+				data.pages[pageI].icons[dataI]="unkFile"
+			end
+		else
+			if ext == ".app" then
+				if fs.exists(path..files[i].."icon.pic") then
+					icn={}
+					file=io.open(path..files[i].."icon.pic")
+					for var in file:lines() do
+						table.insert(icn,var)
+					end
+					file:close()
+					data.appIconCache[data.pages[pageI].paths[dataI]]=finder.unserialize(icn)
+					data.pages[pageI].icons[dataI]=data.pages[pageI].paths[dataI]
+				else
+					data.pages[pageI].icons[dataI]="app"
+				end
+			elseif fs.isDirectory(path..files[i]) ~= false then
+				data.pages[pageI].icons[dataI]="folder"
+			elseif ext == ".lua" then
+				data.pages[pageI].icons[dataI]="lua"
+			elseif ext == ".lang" then
+				data.pages[pageI].icons[dataI]="lang"
+			elseif ext == ".cfg" then
+				data.pages[pageI].icons[dataI]="cfg"
+			elseif ext == ".txt" then
+				data.pages[pageI].icons[dataI]="txt"
+			elseif ext == ".spic" or ext == ".pic" then
+				data.pages[pageI].icons[dataI]="pic"
+			else
+				data.pages[pageI].icons[dataI]="unkFile"
+			end
+		end
+		if data.pages[pageI].iconsCache[data.pages[pageI].icons[dataI]] == nil then
+			data.pages[pageI].iconsCache[data.pages[pageI].icons[dataI]]=dataI
+		end
+		data.pages[pageI].names[dataI]=tmp
+		data.pages[pageI].notExists[dataI]=notExists
+		wi,wf=wi+11,wf+11
 	end
-	if ext == ".lnk" then
-		color(0xffffff)
-		fcolor(0)
-		set(wi+7,hi+3,"<")
-	end
-	table.insert(data.names,tmp)
-	table.insert(data.notExists,notExists)
-	wi,wf=wi+11,wf+11
 end
 return data
+end
+
+function system.drawPage(user,data,page,backColor)
+backColor=backColor or desktopColor
+if data.totalfiles == 0 then
+	fcolor(0x808080)
+	set(w/2-(len(slang.dirEmpty)/2)+1,h/2,slang.dirEmpty)
+else
+	current=data.pages[page]
+	for i=1,#current.x do
+		wi,hi=current.x[i]+1,current.y[i]
+		if data.appIconCache[current.icons[i]] then
+			picture.draw(wi,hi,data.appIconCache[current.icons[i]])
+		elseif current.icons[i] == "folder" then
+			if current.iconsCache["folder"] ~= i then
+				icons.copy(wi,hi,current,current.iconsCache["folder"])
+			else
+				icons.folder(wi,hi)
+			end
+		elseif current.icons[i] == "app" then
+			if current.iconsCache["app"] ~= i then
+				icons.copy(wi,hi,current,current.iconsCache["app"])
+			else
+				icons.app(wi,hi)
+			end
+		elseif current.icons[i] == "lua" then
+			if current.iconsCache["lua"] ~= i then
+				icons.copy(wi,hi,current,current.iconsCache["lua"])
+			else
+				icons.lua(wi,hi)
+			end
+		elseif current.icons[i] == "lang" then
+			if current.iconsCache["lang"] ~= i then
+				icons.copy(wi,hi,current,current.iconsCache["lang"])
+			else
+				icons.lang(wi,hi)
+			end
+		elseif current.icons[i] == "cfg" then
+			if current.iconsCache["cfg"] ~= i then
+				icons.copy(wi,hi,current,current.iconsCache["cfg"])
+			else
+				icons.cfg(wi,hi)
+			end
+		elseif current.icons[i] == "txt" then
+			if current.iconsCache["txt"] ~= i then
+				icons.copy(wi,hi,current,current.iconsCache["txt"])
+			else
+				icons.txt(wi,hi)
+			end
+		elseif current.icons[i] == "pic" then
+			if current.iconsCache["pic"] ~= i then
+				icons.copy(wi,hi,current,current.iconsCache["pic"])
+			else
+				icons.pic(wi,hi)
+			end
+		elseif current.icons[i] == "error" then
+			if current.iconsCache["error"] ~= i then
+				icons.copy(wi,hi,current,current.iconsCache["error"])
+			else
+				icons.error(wi,hi)
+			end
+		elseif current.icons[i] == "unkFile" then
+			if current.iconsCache["unkFile"] ~= i then
+				icons.copy(wi,hi,current,current.iconsCache["unkFile"])
+			else
+				icons.unkFile(wi,hi)
+			end
+		end
+		if current.exts[i] == ".lnk" then
+			color(0xffffff)
+			fcolor(0)
+			set(wi+7,hi+3,"<")
+		end
+		slen=len(current.names[i])
+		if true == false then
+			picture.adaptiveText(current.x[i]+(-slen+10)/2,current.y[i]+5,current.names[i])
+		else
+			color(backColor)
+			fcolor(0xffffff)
+			set(current.x[i]+(-slen+10)/2,current.y[i]+5,current.names[i])
+		end
+	end
+end
 end
 
 function system.drawChooseReset()
 	choosebfr={}
 end
 
-function system.drawChoose(obl,a,restore)
+function system.drawChoose(obl,page,a,backColor,restore)
+backColor=backColor or desktopColor
+current=obl.pages[page]
 if restore then
-	picture.draw(obl.x[a],obl.y[a]-1,choosebfr[a])
+	picture.draw(current.x[a],current.y[a]-1,choosebfr[a])
 else
-	choosebfr[a]=picture.screenshot(obl.x[a],obl.y[a]-1,10,8)
+	choosebfr[a]=picture.screenshot(current.x[a],current.y[a]-1,10,8)
 	color(user.contrastColor)
-	fill(obl.x[a],obl.y[a],10,6," ")
-	if obl.notExists[a] then
-		icons.error(obl.x[a]+1,obl.y[a])
-	elseif (obl.tmpexts[a] or obl.exts[a]) == ".app" then
-		if fs.exists(obl.paths[a].."icon.pic") then
-			icn={}
-			file=io.open(obl.paths[a].."icon.pic")
-			for var in file:lines() do
-				table.insert(icn,var)
-			end
-			file:close()
-			icn=finder.unserialize(icn)
-			icn=picture.decompress(icn)
-			picture.draw(obl.x[a]+1,obl.y[a],icn)
-		else
-			icons.app(obl.x[a]+1,obl.y[a])
-		end
-	elseif fs.isDirectory(obl.paths[a]) ~= false then
-		icons.folder(obl.x[a]+1,obl.y[a])
-	elseif (obl.tmpexts[a] or obl.exts[a]) == ".lua" then
-		icons.lua(obl.x[a]+1,obl.y[a])
-	elseif (obl.tmpexts[a] or obl.exts[a]) == ".lang" then
-		icons.lang(obl.x[a]+1,obl.y[a])
-	elseif (obl.tmpexts[a] or obl.exts[a]) == ".cfg" then
-		icons.cfg(obl.x[a]+1,obl.y[a])
-	elseif (obl.tmpexts[a] or obl.exts[a]) == ".txt" then
-		icons.txt(obl.x[a]+1,obl.y[a])
-	elseif ((obl.tmpexts[a] or obl.exts[a]) == ".spic") or (obl.tmpexts[a] or obl.exts[a]) == ".pic" then
-		icons.pic(obl.x[a]+1,obl.y[a])
-	else
-		icons.unkFile(obl.x[a]+1,obl.y[a])
+	fill(current.x[a],current.y[a],10,6," ")
+	wi,hi=current.x[a]+1,current.y[a]
+	if obl.appIconCache[current.icons[a]] then
+		picture.draw(wi,hi,obl.appIconCache[current.icons[a]])
+	elseif current.icons[a] == "folder" then
+		icons.folder(wi,hi)
+	elseif current.icons[a] == "app" then
+		icons.app(wi,hi)
+	elseif current.icons[a] == "lua" then
+		icons.lua(wi,hi)
+	elseif current.icons[a] == "lang" then
+		icons.lang(wi,hi)
+	elseif current.icons[a] == "cfg" then
+		icons.cfg(wi,hi)
+	elseif current.icons[a] == "txt" then
+		icons.txt(wi,hi)
+	elseif current.icons[a] == "pic" then
+		icons.pic(wi,hi)
+	elseif current.icons[a] == "error" then
+		icons.error(wi,hi)
+	elseif current.icons[a] == "unkFile" then
+		icons.unkFile(wi,hi)
 	end
-	if obl.exts[a] == ".lnk" then
+	if current.exts[a] == ".lnk" then
 		color(0xffffff)
 		fcolor(0)
-		set(obl.x[a]+8,obl.y[a]+3,"<")
+		set(wi+7,hi+3,"<")
 	end
 	color(user.contrastColor)
 	local _,gg=picture.HEXtoRGB(user.contrastColor)
@@ -605,45 +737,24 @@ else
 	else
 		fcolor(0)
 	end
-	slen=len(obl.names[a])
+	slen=len(current.names[a])
 	if slen > 10 then
 		slen=10
-		tmp=sub(obl.names[a],1,9).."…"
+		tmp=sub(current.names[a],1,9).."…"
 	else
-		tmp=obl.names[a]
+		tmp=current.names[a]
 	end
-	if obl.notExists[a] then
-		fcolor(0xff0000)
-	end
-	set(obl.x[a]+((10-slen)/2),obl.y[a]+5,tmp)
-	picture.adaptiveText(obl.x[a],obl.y[a]-1,"⣠⣤⣤⣤⣤⣤⣤⣤⣤⣄",user.contrastColor)
-	picture.adaptiveText(obl.x[a],obl.y[a]+6,"⠙⠛⠛⠛⠛⠛⠛⠛⠛⠋",user.contrastColor)
-end
-end
-
-function system.drawDesktop(path)
-temp=2
-while true do
-	if temp+9 >= w then
-		temp=temp-2
-		break
+	set(current.x[a]+((10-slen)/2),current.y[a]+5,tmp)
+	if true == false then
+		picture.adaptiveText(current.x[a],current.y[a]-1,"⣠⣤⣤⣤⣤⣤⣤⣤⣤⣄",user.contrastColor)
+		picture.adaptiveText(current.x[a],current.y[a]+6,"⠙⠛⠛⠛⠛⠛⠛⠛⠛⠋",user.contrastColor)
 	else
-		temp=temp+11
+		color(backColor)
+		fcolor(user.contrastColor)
+		set(current.x[a],current.y[a]-1,"⣠⣤⣤⣤⣤⣤⣤⣤⣤⣄")
+		set(current.x[a],current.y[a]+6,"⠙⠛⠛⠛⠛⠛⠛⠛⠛⠋")
 	end
 end
-offset=math.floor((w-1-temp)/2)
-local data=finder.files(path)
-if user.powerSafe then
-	color(0)
-else
-	color(0x2b2b2b)
-end
-fcolor(0xffffff)
-fill(1,1,w,h," ")
-system.taskbarDraw()
-local obl=system.objects(2+offset,2,path,data)
-data=nil
-return obl
 end
 
 local function reasonDraw(reason)

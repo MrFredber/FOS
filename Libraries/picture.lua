@@ -49,7 +49,7 @@ local file,temp,tmp
 --end
 
 function picture.adaptiveText(x,y,text,fclr)
-data=picture.screenshot(x,y,len(text),1)
+data=picture.screenshot(x,y,len(text),1,true)
 for i=1,data.width do
 	data.txt[1][i]=unicode.sub(text,i,i)
 	temp=bit32.rshift(data.color[1][i],16)
@@ -95,47 +95,108 @@ end
 --end
 --end
 
-function picture.screenshot(x,y,width,height)
-local data={width=width,height=height,color={},fcolor={},txt={}}
-hi=1
-while hi ~= height+1 do
-	i=1
-	temp={txt={},c={},f={}}
-	while i ~= width+1 do
-		temp.txt[i],temp.f[i],temp.c[i]=gpu.get(x+i-1,y+hi-1)
-		i=i+1
+function picture.screenshot(x,y,width,height,raw)
+local data
+if raw then
+	data={width=width,height=height,color={},fcolor={},txt={}}
+	local hi=1
+	while hi ~= height+1 do
+		i=1
+		temp={txt={},c={},f={}}
+		while i ~= width+1 do
+			temp.txt[i],temp.f[i],temp.c[i]=gpu.get(x+i-1,y+hi-1)
+			i=i+1
+		end
+		data.color[hi]=temp.c
+		data.fcolor[hi]=temp.f
+		data.txt[hi]=temp.txt
+		hi=hi+1
 	end
-	data.color[hi]=temp.c
-	data.fcolor[hi]=temp.f
-	data.txt[hi]=temp.txt
-	hi=hi+1
+else
+	w,h=gpu.getResolution()
+	data={compressed=true,width=width,height=height,color={},fcolor={},txt={}}
+	local hi=1
+	local ti=1
+	local ci=1
+	while hi ~= height+1 do
+		local i=1
+		temp={txt={},f={},c={},stack={}}
+		while i ~= width+1 do
+			if ci == 1 then
+				temp.stack[ci],tfclr,tclr=gpu.get(x+i-1,y+hi-1)
+			end
+			if x+i < w+1 then
+				temp.stack[ci+1],fclr,clr=gpu.get(x+i,y+hi-1)
+			end
+			if tfclr ~= fclr or tclr ~= clr or i+1 > width then
+				table.remove(temp.stack,ci+1)
+				table.insert(temp.c,ti,ci)
+				table.insert(temp.c,ti+1,tclr)
+				table.insert(temp.f,ti,ci)
+				table.insert(temp.f,ti+1,tfclr)
+				table.insert(temp.txt,table.concat(temp.stack))
+				temp.stack={}
+				ci=0
+				ti=ti+2
+			end
+			ci=ci+1
+			i=i+1
+		end
+		data.color[hi]=temp.c
+		data.fcolor[hi]=temp.f
+		data.txt[hi]=temp.txt
+		hi=hi+1
+		ti=1
+		ci=1
+	end
 end
 return data
 end
 
 function picture.draw(x,y,data)
-for hi=1,data.height do
-temp={data.txt[hi][1]}--text buffer
-tmp=1
-	for i=1,data.width do
-		if data.color[hi][i] == data.color[hi][i+1] and data.fcolor[hi][i] == data.fcolor[hi][i+1] then
-			table.insert(temp,data.txt[hi][i+1])
-		else
-			if #temp == 0 then
-				temp=data.txt[hi][i]
+if data.compressed then
+	for hi=1,data.height do
+		local i=1
+		local ti=1
+		local ai=1
+		while i ~= data.width+1 do
+			if data.color[hi][ai+1] == "n" and data.fcolor[hi][ai+1] == "n" then
+			elseif data.color[hi][ai+1] == "n" then
+				picture.adaptiveText(x+i-1,y+hi-1,data.txt[hi][ti],data.fcolor[hi][ai+1])
 			else
-				temp=table.concat(temp,"")
+				color(data.color[hi][ai+1])
+				fcolor(data.fcolor[hi][ai+1])
+				set(x+i-1,y+hi-1,data.txt[hi][ti])
 			end
-			if data.color[hi][i] == "n" and data.fcolor[hi][i] == "n" then
-			elseif data.color[hi][i] == "n" then
-				picture.adaptiveText(x+tmp-1,y+hi-1,temp,data.fcolor[hi][i])
+			i=i+data.color[hi][ai]
+			ai=ai+2
+			ti=ti+1
+		end
+	end
+else
+	for hi=1,data.height do
+	temp={data.txt[hi][1]}--text buffer
+	tmp=1
+		for i=1,data.width do
+			if data.color[hi][i] == data.color[hi][i+1] and data.fcolor[hi][i] == data.fcolor[hi][i+1] then
+				table.insert(temp,data.txt[hi][i+1])
 			else
-				color(data.color[hi][i])
-				fcolor(data.fcolor[hi][i])
-				set(x+tmp-1,y+hi-1,temp)
+				if #temp == 0 then
+					temp=data.txt[hi][i]
+				else
+					temp=table.concat(temp,"")
+				end
+				if data.color[hi][i] == "n" and data.fcolor[hi][i] == "n" then
+				elseif data.color[hi][i] == "n" then
+					picture.adaptiveText(x+tmp-1,y+hi-1,temp,data.fcolor[hi][i])
+				else
+					color(data.color[hi][i])
+					fcolor(data.fcolor[hi][i])
+					set(x+tmp-1,y+hi-1,temp)
+				end
+				temp={data.txt[hi][i+1]}
+				tmp=i+1
 			end
-			temp={data.txt[hi][i+1]}
-			tmp=i+1
 		end
 	end
 end

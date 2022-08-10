@@ -23,4 +23,5 @@ k="К",
 m="М",
 items="Элементов",
 nameFile="Имя файла",
-nameFolder="Имя папки"}
+nameFolder="Имя папки",
+dirEmpty="Эта папка пуста."}

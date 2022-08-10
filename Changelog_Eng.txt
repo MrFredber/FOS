@@ -1,3 +1,21 @@
+----22081000----
+
+-Redesigned the items rendering system
+-Fixed system crash/Explorer, if all items (files and folders) do not fit on the screen
+-Added a system of "pages" of items on the screen, because of which the rendering does not begin immediately, but after the preparation of the workspace. Simply put, the time for calculating items after changing their number has been increased, but the time for drawing them has been reduced by 3-5 times
+-Now you can use the mouse wheel to scroll through items on the desktop and in the Explorer, if they do not fit on the screen all at once
+-Now you can turn on and off the centering of the field of items on two axes
+-Now picture.screenshot and picture.draw can handle both compressed and raw images
+-Now picture.screenshot takes a screenshot in compressed format by default
+-Now application icons are rendered directly, not after conversion to raw format
+-Now the application icons are loaded once, not every render
+-The delete dialog now shows all kinds of icons
+-Redesigned the tools.tblprint() function to a convenient table viewer
+-Now in empty folders shows string "This folder is empty."
+-Now the system and Explorer will handle fewer clicks if the folder is empty
+-The taskbar will not display its information in edit mode until I make my own editor
+-Power Saving Mode is now supported on the lock screen
+
 ----22072000----
 
 -Fixed a bug of ignoring the power saving mode on the desktop

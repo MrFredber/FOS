@@ -24,6 +24,8 @@ To install Dev version of FOS, you can use this command:
 
 ## Known issues
 
--System/Explorer crash if all the items (files and folders) do not fit on the screen
+	The FOS loader does not let you know if an error has occurred in the script that is in startup
+	The context menu should offer rational options (for example, do not suggest editing a folder)
+	The item deletion dialog does not delete shortcuts and folders on the desktop, and shortcuts in Explorer
 
 If you see a bug, create an issue in this repository.

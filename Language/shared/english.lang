@@ -23,4 +23,5 @@ k="K",
 m="M",
 items="Items",
 nameFile="File name",
-nameFolder="Folder name"}
+nameFolder="Folder name",
+dirEmpty="This folder is empty."}
