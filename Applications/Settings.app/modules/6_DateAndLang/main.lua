@@ -8,34 +8,36 @@ local set=gpu.set
 local unicode=r("unicode")
 local tools=r("fos/tools")
 local fs=r("filesystem")
+local finder=r("fos/finder")
 local os=r("os")
-local reg,lang,menustr={},{},{}
+local user,lang,menustr={},{},{}
 local menuopen,open,scrollY,x,y,maincolor,secondcolor,mainfcolor,secondfcolor,file,screenh,moduleh,hlimit,time,timeCorrection=1,0,0
 local len=unicode.len
-function module.init(registry,language)
+function module.init(usersett,language)
 menuopen=1
 scrollY=0
 langsuccess=nil
-reg=registry
+user=usersett
 lang=language
 module.name=lang.DateAndLangName
-if reg.powerSafe == "1" then
+secondfcolor=0x808080
+if user.powerSafe then
 	maincolor=0
-	secondcolor=0x404040
+	secondcolor=0x303030
+	thirdcolor=0x404040
 	mainfcolor=0xffffff
-	secondfcolor=0xbbbbbb
-elseif reg.darkMode == "1" then
+elseif user.darkMode then
 	maincolor=0x202020
-	secondcolor=0x404040
+	secondcolor=0x303030
+	thirdcolor=0x404040
 	mainfcolor=0xffffff
-	secondfcolor=0xbbbbbb
 else
 	maincolor=0xdddddd
-	secondcolor=0xffffff
+	secondcolor=0xeeeeee
+	thirdcolor=0xffffff
 	mainfcolor=0
-	secondfcolor=0x707070
 end
-contrastColor=tonumber(reg.contrastColor) or math.random(16777215)
+contrastColor=user.contrastColor or 0x0094ff
 screenh=h-4
 end
 
@@ -102,12 +104,12 @@ end
 local function time()
 rightmax=0
 maxh=1
-timeCorrection=reg.timeZone*3600
+timeCorrection=user.timeZone*3600
 temp=io.open("/tmp/time","w")
 temp:close()
 temp=fs.lastModified("/tmp/time")
 date=tonumber(string.sub(temp,1,-4))+timeCorrection
-date=os.date(reg.dataType,date)
+date=os.date(user.dataType,date)
 rightmax=len(date)
 rightmax=rightmax+1
 text=tools.wrap(lang.DateAndLangNow,w-x-(2+rightmax))
@@ -129,7 +131,7 @@ set(w-1,y+2+scrollY,"⣦")
 fill(x+1,y+3+maxh+scrollY,w-x-1,1,"⠿")
 set(x,y+3+maxh+scrollY,"⠻")
 set(w-1,y+3+maxh+scrollY,"⠟")
-rightmax=len(reg.dataType)+1
+rightmax=len(user.dataType)+1
 text=tools.wrap(lang.DateAndLangFormat,w-x-(2+rightmax))
 text1=tools.wrap(lang.taskbarSeconds,w-x-7)
 amaxh=1+#text+#text1
@@ -142,8 +144,8 @@ end
 for i=1,#text1 do
 	set(x+1,y+5+maxh+scrollY+#text+i,text1[i])
 end
-set(w-rightmax,y+5+maxh+scrollY+(#text/2),reg.dataType)
-tools.lvr(w-5,y+6+maxh+scrollY+#text+(#text1/2),reg.taskbarShowSeconds)
+set(w-rightmax,y+5+maxh+scrollY+(#text/2),user.dataType)
+tools.lvr(w-5,y+6+maxh+scrollY+#text+(#text1/2),user.taskbarShowSeconds)
 fcolor(maincolor)
 fill(x,y+5+maxh+scrollY+#text,w-x,1,"⠤")
 color(maincolor)
@@ -209,14 +211,14 @@ elseif type == "touch" then
 		menuopen=1
 	elseif open == 2 then
 		if cx >= w-(2+rightmax) and cx <= w-1 and cy == math.floor(y+(maxh/2)+2+scrollY) then
-			if reg.lang ~= "english.lang" then
-				reg.lang="english.lang"
+			if user.lang ~= "english.lang" then
+				user.lang="english.lang"
 				module.save()
 				os.exit()
 			end
 		elseif cx >= w-(2+rightmax) and cx <= w-1 and cy == math.floor(y+(maxh/2)+4+scrollY) then
-			if reg.lang ~= "russian.lang" then
-				reg.lang="russian.lang"
+			if user.lang ~= "russian.lang" then
+				user.lang="russian.lang"
 				module.save()
 				os.exit()
 			end
@@ -225,18 +227,18 @@ elseif type == "touch" then
 		end
 	elseif open == 1 then
 		if cx >= w-rightmax and cx <= w-2 and cy == math.floor(y+5+maxh+scrollY+(#text/2)) then
-			reg.dataType=tools.input(w-rightmax,y+5+maxh+scrollY+(#text/2),rightmax-1,"0",reg.dataType,"1")
+			user.dataType=tools.input(w-rightmax,y+5+maxh+scrollY+(#text/2),rightmax-1,"0",user.dataType,"1")
 		elseif cx >= w-5 and cx <= w-2 and cy == math.floor(y+6+maxh+scrollY+#text+(#text1/2)) then
 			toApp="noupdateui"
-			if reg.taskbarShowSeconds == "1" then
-				reg.taskbarShowSeconds="0"
+			if user.taskbarShowSeconds then
+				user.taskbarShowSeconds=false
 			else
-				reg.taskbarShowSeconds="1"
+				user.taskbarShowSeconds=true
 			end
 			color(secondcolor)
 			tools.lvr(w-5,y+6+maxh+scrollY+#text+(#text1/2),"0","1")
 			os.sleep(0.1)
-			tools.lvr(w-5,y+6+maxh+scrollY+#text+(#text1/2),reg.taskbarShowSeconds)
+			tools.lvr(w-5,y+6+maxh+scrollY+#text+(#text1/2),user.taskbarShowSeconds)
 		end
 	else
 		toApp="noupdateui"
@@ -246,11 +248,18 @@ return toApp
 end
 
 function module.save()
-file=io.open("/fos/system/registry","w")
-for k in pairs(reg) do
-	file:write(k.."="..reg[k].."\n")
+file=io.open(user.path.."settings.cfg","w")
+user.name=nil
+user.path=nil
+temp=finder.serialize(user)
+for i=1,#temp do
+	file:write(temp[i])
+	if i ~= #temp then
+		file:write("\n")
+	end
 end
 file:close()
+temp=nil
 end
 
 return module

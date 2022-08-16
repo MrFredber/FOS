@@ -9,31 +9,32 @@ local unicode=r("unicode")
 local io=r("io")
 local tools=r("fos/tools")
 local picture=r("fos/picture")
-local reg,lang,menustr,colors={},{},{},{}
+local user,lang,menustr,colors={},{},{},{}
 local menuopen,open,scrollY,x,y,maincolor,secondcolor,mainfcolor,secondfcolor,file,screenh,moduleh,hlimit=1,0,0
 local len=unicode.len
 
-function module.init(registry,language,a)
+function module.init(usersett,language,a)
 menuopen=1
 scrollY=0
-reg=registry
+user=usersett
 lang=language
 module.name=lang.PersonalizationName
-if reg.powerSafe == "1" then
+secondfcolor=0x808080
+if user.powerSafe then
 	maincolor=0
-	secondcolor=0x404040
+	secondcolor=0x303030
+	thirdcolor=0x404040
 	mainfcolor=0xffffff
-	secondfcolor=0xbbbbbb
-elseif reg.darkMode == "1" then
+elseif user.darkMode then
 	maincolor=0x202020
-	secondcolor=0x404040
+	secondcolor=0x303030
+	thirdcolor=0x404040
 	mainfcolor=0xffffff
-	secondfcolor=0xbbbbbb
 else
 	maincolor=0xdddddd
-	secondcolor=0xffffff
+	secondcolor=0xeeeeee
+	thirdcolor=0xffffff
 	mainfcolor=0
-	secondfcolor=0x707070
 end
 screenh=h-4
 if a == "colors" then
@@ -43,11 +44,18 @@ end
 end
 
 function module.save()
-file=io.open("/fos/system/registry","w")
-for k in pairs(reg) do
-	file:write(k.."="..reg[k].."\n")
+file=io.open(user.path.."settings.cfg","w")
+user.name=nil
+user.path=nil
+temp=finder.serialize(user)
+for i=1,#temp do
+	file:write(temp[i])
+	if i ~= #temp then
+		file:write("\n")
+	end
 end
 file:close()
+temp=nil
 end
 
 local function menu()
@@ -91,7 +99,7 @@ color(secondcolor)
 fill(x,y+3+scrollY,w-x,maxh," ")
 set(w-(2+rightmax),y+(maxh/2)+2+scrollY,lang.light)
 set(w-(2+rightmax),y+(maxh/2)+4+scrollY,lang.dark)
-if reg.darkMode == "1" then
+if user.darkMode then
 	tools.radioBtn(w-3,y+(maxh/2)+2+scrollY,"0")
 	tools.radioBtn(w-3,y+(maxh/2)+4+scrollY,"1")
 else
@@ -108,7 +116,7 @@ fcolor(secondcolor)
 fill(x+1,y+2+scrollY,w-x-1,1,"⣶")
 set(x,y+2+scrollY,"⣴")
 set(w-1,y+2+scrollY,"⣦")
-if reg.powerSafe == "1" then
+if user.powerSafe then
 	text=tools.wrap(lang.PersonalizationModeBlocked,w-x-2)
 	warncolor=0xb40000
 	amaxh=#text
@@ -130,7 +138,7 @@ color(maincolor)
 fill(x+1,y+4+maxh+amaxh+scrollY,w-x-1,1,"⠿")
 set(x,y+4+maxh+amaxh+scrollY,"⠻")
 set(w-1,y+4+maxh+amaxh+scrollY,"⠟")
-colors={"0xffb900","0xff8c00","0xff0000","0xe3008c","0xd95be6","0x0000ff","0x0094ff","0x00ff00","0x00cc6a"}
+colors={0xffb900,0xff8c00,0xff0000,0xe3008c,0xd95be6,0x0000ff,0x0094ff,0x00ff00,0x00cc6a}
 wc=x-3
 hc=y+9+maxh+amaxh+scrollY
 bmaxh=7
@@ -163,7 +171,7 @@ for i=1,#text1 do
 	set(x+1,hc+3+i+#text,text1[i])
 end
 tools.btn(w-arightmax,hc+3+(#text/2),lang.set)
-tools.lvr(w-5,hc+4+#text+(#text1/2),reg.contrastColorHeaders)
+tools.lvr(w-5,hc+4+#text+(#text1/2),user.contrastColorHeaders)
 fcolor(maincolor)
 fill(x,y+7+maxh+amaxh+scrollY,w-x,1,"⠤")
 --fill(x,hc+2,w-x,1,"⠤")
@@ -177,7 +185,7 @@ for i=1,#colors do
 		hc=hc+2
 	end
 	color(tonumber(colors[i]))
-	if tonumber(reg.contrastColor) == tonumber(colors[i]) then
+	if tonumber(user.contrastColor) == tonumber(colors[i]) then
 		local _,gg=picture.HEXtoRGB(colors[i])
 		if gg < 160 then
 			fcolor(0xffffff)
@@ -218,9 +226,9 @@ end
 hlimit=-(moduleh-screenh-2)
 end
 
-function module.press(type,cx,cy,click)
+function module.press(tip,cx,cy,click)
 local toApp,wtr=nil,nil
-if type == "scroll" then
+if tip == "scroll" then
 	toApp="noupdateui"
 	if click == 1 then
 		if scrollY < 0 then
@@ -233,7 +241,7 @@ if type == "scroll" then
 			scrollY=scrollY+click
 		end
 	end
-elseif type == "touch" then
+elseif tip == "touch" then
 	if menuopen == 1 then
 		open=0
 		for i=1,#menustr do
@@ -248,35 +256,39 @@ elseif type == "touch" then
 		menuopen=1
 	elseif open == 2 then
 		if cx >= w-(2+rightmax) and cx <= w-3 and cy == y+math.floor(maxh/2)+2+scrollY then
-			if reg.darkMode ~= "0" then
-				reg.darkMode="0"
+			if user.darkMode then
+				user.darkMode=false
 				toApp="reboot"
 				wtr="colors"
 			end
 		elseif cx >= w-(2+rightmax) and cx <= w-3 and cy == y+math.floor(maxh/2)+4+scrollY then
-			if reg.darkMode ~= "1" then
-				reg.darkMode="1"
+			if user.darkMode == false then
+				user.darkMode=true
 				toApp="reboot"
 				wtr="colors"
 			end
 		elseif cx >= w-5 and cx <= w-2 and cy == math.floor(hc+4+#text+(#text1/2)) then
 			toApp="noupdateui"
-			if reg.contrastColorHeaders == "1" then
-				reg.contrastColorHeaders="0"
+			if user.contrastColorHeaders then
+				user.contrastColorHeaders=false
 			else
-				reg.contrastColorHeaders="1"
+				user.contrastColorHeaders=true
 			end
 			color(secondcolor)
 			tools.lvr(w-5,hc+4+#text+(#text1/2),"0","1")
 			os.sleep(0.1)
-			tools.lvr(w-5,hc+4+#text+(#text1/2),reg.contrastColorHeaders)
+			tools.lvr(w-5,hc+4+#text+(#text1/2),user.contrastColorHeaders)
 		elseif cx >= w-arightmax and cx <= w-2 and cy == math.floor(hc+3+(#text/2)) then
-			temp=tools.input(w-arightmax,hc+3+(#text/2),arightmax-1,"0",reg.contrastColor,"1")
+			temp=tools.input(w-arightmax,hc+3+(#text/2),arightmax-1,"0",user.contrastColor,"1")
 			if tonumber(temp) == nil then
 				tools.error({lang.notNumber},1)
 				toApp="a"
 			else
-				reg.contrastColor=temp
+				if type(temp) == "number" then
+					user.contrastColor=temp
+				else
+					user.contrastColor=tonumber(temp)
+				end
 				toApp="reboot"
 				wtr="colors"
 			end
@@ -295,7 +307,7 @@ elseif type == "touch" then
 			end
 		end
 		if a ~= 0 then
-			reg.contrastColor=colors[a]
+			user.contrastColor=colors[a]
 			toApp="reboot"
 			wtr="colors"
 		else

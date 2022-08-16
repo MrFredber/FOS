@@ -1,28 +1,31 @@
-[English](https://github.com/MrFredber/FOS/blob/master/README.md) | Русский
+[English](https://github.com/MrFredber/FOS/blob/Dev/README.md) | Русский
 
-## Переход в Бету
+## О Дев Ветке
 
-Стабильная версия (b1) находится в этой ветке. Если тебе нужна свежая версия - перейди в [Дев](https://github.com/MrFredber/FOS/tree/Dev) ветку.
+Здесь находится нестабильная, но свежая и технологическая версия. Если вам нужна стабильная версия - возвращайтесь в [Основную](https://github.com/MrFredber/FOS) ветку.
 
 ## О системе
 
 FOS - это графическая система для системы OpenOS из мода OpenComputers, вдохновлённая MineOS и Windows 11. Создана программистом-самоучкой. Система имеет прекрасный визуал и малый размер.
 
-![](https://raw.githubusercontent.com/MrFredber/FOS/master/Readme%20files/russian2.png)
-![](https://raw.githubusercontent.com/MrFredber/FOS/master/Readme%20files/russian1.png)
+![](https://raw.githubusercontent.com/MrFredber/FOS/Dev/Readme%20files/russian2.png)
+![](https://raw.githubusercontent.com/MrFredber/FOS/Dev/Readme%20files/russian1.png)
 
 ## Минимальные требования
+
 	Видеокарта (3-ий уровень)
 	1x Память (Уровень 2.5)
 
 ## Как Установить
 
-Чтобы установить FOS, вы можете использовать Pastebin:
+Чтобы установить Дев версию FOS, вы можете использовать эту команду:
 
-	pastebin run RfFMMDDs
+	mkdir /FOS/install/ && wget -f https://raw.githubusercontent.com/MrFredber/FOS/Dev/Install/Install-FOS.lua /FOS/install/Install-FOS.lua && /FOS/install/Install-FOS.lua
 
-Или использовать эту команду:
+## Известные проблемы
 
-	wget -f https://raw.githubusercontent.com/MrFredber/FOS/master/Install/Install-FOS.lua /tmp/Install-FOS.lua && /tmp/Install-FOS.lua
+	Загрузчик FOS не даёт знать, если в скрипте, который находится в автозагрузке, произошла ошибка
+	Контекстное меню должно предлагать рациональные опции (например не предлагать редактировать папку)
+	Диалог удаления объекта не удаляет ярлыки и папки на рабочем столе, и ярлыки в Проводнике
 
 Если вы нашли баг, создайте Issue в этом репозитории.

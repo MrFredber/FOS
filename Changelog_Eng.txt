@@ -1,3 +1,106 @@
+----22081000----
+
+-Redesigned the items rendering system
+-Fixed system crash/Explorer, if all items (files and folders) do not fit on the screen
+-Added a system of "pages" of items on the screen, because of which the rendering does not begin immediately, but after the preparation of the workspace. Simply put, the time for calculating items after changing their number has been increased, but the time for drawing them has been reduced by 3-5 times
+-Now you can use the mouse wheel to scroll through items on the desktop and in the Explorer, if they do not fit on the screen all at once
+-Now you can turn on and off the centering of the field of items on two axes
+-Now picture.screenshot and picture.draw can handle both compressed and raw images
+-Now picture.screenshot takes a screenshot in compressed format by default
+-Now application icons are rendered directly, not after conversion to raw format
+-Now the application icons are loaded once, not every render
+-The delete dialog now shows all kinds of icons
+-Redesigned the tools.tblprint() function to a convenient table viewer
+-Now in empty folders shows string "This folder is empty."
+-Now the system and Explorer will handle fewer clicks if the folder is empty
+-The taskbar will not display its information in edit mode until I make my own editor
+-Power Saving Mode is now supported on the lock screen
+
+----22072000----
+
+-Fixed a bug of ignoring the power saving mode on the desktop
+-Now, after changing the file, the configuration is reloaded
+-Added reset of the "icon cache" in the right places in the system and in Explorer
+-Reduced the number of memory leaks in the system and in the Explorer
+
+Explorer:
+
+-Fixed a graphical element selection bug (I just forgot to move the bugfix from the desktop)
+-Now, just like in the main system, the configuration is rebooted after each launch of something
+-Now the clock in the taskbar is restored after the appearance of the BSOD
+
+Settings:
+
+-Fixed massive memory leak
+-Now, after editing the module, you do not need to restart the PC to see the changes
+
+----22070900----
+
+-The installer has been completely rewritten
+-Now all files will download faster (because now a custom downloader is used)
+
+----22070700 (pre b2)----
+
+-Now the versions of the system are a number
+-The file structure of the system has been redesigned
+-Added user system
+-The configuration system has been changed
+-Added new login screen
+-Shortcuts can now point to files and folders
+-Now the labels are highlighted with a separate symbol in the lower right part of the icon
+-Now all the clocks are automatically removed when you exit the OpenOS shell or the BSOD/RSOD appears
+-The structure of .lang packages has been changed
+-Changed the design of the BSOD
+-Now tools.wrap() is able to work with lines where there is a line break and tabulation
+-Now RSOD set the maximum resolution when appears
+-In the FOS menu "To Shell" is renamed to "To OpenOS Shell".
+-Now the color of the file selection is determined by the selected contrasting color
+-Now files are opening by double-clicking
+-Rewrote the Explorer application
+-Added names to system folders that change depending on the currently selected language
+-Now the path in the Explorer application is shown as folder names, not the full path
+ It is also shown as buttons
+-Now the icons in the grid are centered
+-Some screen resolutions will now show more icons in line
+-Redrawn user icon
+ It is now in the icons library
+-Now a different image format is used for application icons
+-Added a partial support for transparency in pictures
+-Now all actions with pictures in the picture library occur in uncompressed format
+-Added the function of converting a compressed image to an uncompressed one
+-Added serialization function in the finder library
+-Most icons have been redrawn... again :)
+-Now the system can determine the type of file that has Unicode characters in the name
+-Now you can put "<gray>" anywhere in the context menu
+-Changed the system installation process
+-Added OOBE
+-Changed minimum requirements
+-Added removal of extra spaces at the beginning in tools.input
+-Added a screensaver, which is currently used only in the installer and in OOBE
+-Changed the color of the taskbar to the system theme
+-Changed the color palette of dark and light themes in the system and in applications
+-Changed background colors in the tools library
+-Now the switch (tools.lvr) does not change color depending on the theme
+POOR IMPROVEMENT: ICON .LUA NOW TAKES 2 TIMES LONGER TO DRAW. In the future, the icon rendering will be optimized (I hope). But it's beautiful)
+-Increased the FOS menu call button
+ And also it is highlighted when pressed
+-Added display of used memory in the taskbar
+-Redesigned the field for creating and renaming a file or folder
+-The element deletion field has been redesigned
+-Removed bootmgr, foslink and "RAM test"
+
+Settings:
+
+-Added the "About the system" section in the "System" module (but there is no sense from it yet)
+-Fixed abnormal behavior when changing personalization
+-Removed unnecessary drawing of elements
+-Removed application size calculation in the "Applications" module
+-Some changes in both localizations
+
+b1: (The original changelog has been lost)
+
+
+
 a7:
 
 -The process of taking a screenshot (picture.screenshot) has been accelerated

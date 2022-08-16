@@ -1,0 +1,10 @@
+{["/fos/apps/explorer.app/"]="Explorer",
+["/fos/apps/settings.app/"]="Settings",
+["/"]="Root",
+["/fos/apps/"]="Applications",
+["/fos/users/"]="Users",
+["/fos/lang/"]="Languages",
+["/fos/system/"]="System",
+["#user#appdata/"]="Applications Data",
+["#user#desktop/"]="Desktop",
+["#user#trash/"]="Recycle Bin"}
