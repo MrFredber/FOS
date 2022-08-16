@@ -1,15 +1,15 @@
-[English](https://github.com/MrFredber/FOS/blob/Dev/README.md) | Русский
+[English](https://github.com/MrFredber/FOS/blob/master/README.md) | Русский
 
-## О Дев Ветке
+## О Основной Ветке
 
-Здесь находится нестабильная, но свежая и технологическая версия. Если вам нужна стабильная версия - возвращайтесь в [Основную](https://github.com/MrFredber/FOS) ветку.
+Стабильная версия (20081000) находится в этой ветке. Если тебе нужна свежая версия - перейди в [Дев](https://github.com/MrFredber/FOS/tree/Dev) ветку.
 
 ## О системе
 
 FOS - это графическая система для системы OpenOS из мода OpenComputers, вдохновлённая MineOS и Windows 11. Создана программистом-самоучкой. Система имеет прекрасный визуал и малый размер.
 
-![](https://raw.githubusercontent.com/MrFredber/FOS/Dev/Readme%20files/russian2.png)
-![](https://raw.githubusercontent.com/MrFredber/FOS/Dev/Readme%20files/russian1.png)
+![](https://raw.githubusercontent.com/MrFredber/FOS/master/Readme%20files/russian2.png)
+![](https://raw.githubusercontent.com/MrFredber/FOS/master/Readme%20files/russian1.png)
 
 ## Минимальные требования
 
@@ -18,14 +18,24 @@ FOS - это графическая система для системы OpenOS 
 
 ## Как Установить
 
-Чтобы установить Дев версию FOS, вы можете использовать эту команду:
+Чтобы установить Стабильную версию FOS, вы можете использовать эту команду:
 
-	mkdir /FOS/install/ && wget -f https://raw.githubusercontent.com/MrFredber/FOS/Dev/Install/Install-FOS.lua /FOS/install/Install-FOS.lua && /FOS/install/Install-FOS.lua
+	mkdir /FOS/install/ && wget -f https://raw.githubusercontent.com/MrFredber/FOS/master/Install/Install-FOS.lua /FOS/install/Install-FOS.lua && /FOS/install/Install-FOS.lua
 
 ## Известные проблемы
 
 	Загрузчик FOS не даёт знать, если в скрипте, который находится в автозагрузке, произошла ошибка
 	Контекстное меню должно предлагать рациональные опции (например не предлагать редактировать папку)
 	Диалог удаления объекта не удаляет ярлыки и папки на рабочем столе, и ярлыки в Проводнике
+
+## Планы на будущее
+
+	Переписать загрузчик
+	Сделать установку системы через дискету
+	Добавить выпадающий список в систему
+	Добавить настройку времени в OOBE
+	Изменить внешний вид приложения "Параметры" и добавить больше опций
+	Изменить внешний вид экрана входа в систему
+	Добавить вход в систему по отпечатку пальца
 
 Если вы нашли баг, создайте Issue в этом репозитории.
