@@ -1,6 +1,6 @@
 [English](https://github.com/MrFredber/FOS/blob/master/README.md) | Русский
 
-## О Основной Ветке
+## Об Основной Ветке
 
 Стабильная версия (20081000) находится в этой ветке. Если тебе нужна свежая версия - перейди в [Дев](https://github.com/MrFredber/FOS/tree/Dev) ветку.
 

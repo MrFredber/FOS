@@ -38,4 +38,4 @@ To install Stable version of FOS, you can use this command:
 	Change the appearance of the login screen
 	Add login by fingerprint
 
-If you see a bug, create an issue in this repository.
+If you see a bug, create an Issue in this repository.
