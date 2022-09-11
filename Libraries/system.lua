@@ -609,6 +609,7 @@ end
 
 function system.drawPage(user,data,page,backColor)
 backColor=backColor or desktopColor
+color(backColor)
 if data.totalfiles == 0 then
 	fcolor(0x808080)
 	set(w/2-(len(slang.dirEmpty)/2)+1,h/2,slang.dirEmpty)
