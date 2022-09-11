@@ -24,7 +24,6 @@ To install Dev version of FOS, you can use this command:
 
 ## Known issues
 
-	The FOS loader does not let you know if an error has occurred in the script that is in startup
 	The context menu should offer rational options (for example, do not suggest editing a folder)
 	The item deletion dialog does not delete shortcuts and folders on the desktop, and shortcuts in Explorer
 
