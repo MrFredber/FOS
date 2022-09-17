@@ -1,5 +1,5 @@
 local raw_loadfile=...
-_G._OSVERSION="FredberOS (OpenOS 1.7.5)"
+_G._OSVERSION="FredberOS (OpenOS 1.7.7)"
 local component=component
 local computer=computer
 local unicode=unicode

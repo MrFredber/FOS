@@ -1,5 +1,6 @@
 local icons={}
 local gpu=require("component").gpu
+local bit32=require("bit32")
 local fill=gpu.fill
 local color=gpu.setBackground
 local fcolor=gpu.setForeground

@@ -1,7 +1,9 @@
 local picture={}
-local gpu=require("component").gpu
+local r=require
+local gpu=r("component").gpu
 local w,h=gpu.getResolution()
-local unicode=require("unicode")
+local unicode=r("unicode")
+local bit32=r("bit32")
 local set=gpu.set
 local color=gpu.setBackground
 local fcolor=gpu.setForeground
