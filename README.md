@@ -2,7 +2,7 @@ English | [Русский](https://github.com/MrFredber/FOS/blob/master/Readme%2
 
 ## About Main Branch
 
-Stable version (22081000) is located in this branch. If you need a fresh version - move to [Dev](https://github.com/MrFredber/FOS/tree/Dev) branch.
+Stable version (22091700) is located in this branch. If you need a fresh version - move to [Dev](https://github.com/MrFredber/FOS/tree/Dev) branch.
 
 ## About system
 
@@ -24,7 +24,6 @@ To install Stable version of FOS, you can use this command:
 
 ## Known issues
 
-	The FOS loader does not let you know if an error has occurred in the script that is in startup
 	The context menu should offer rational options (for example, do not suggest editing a folder)
 	The item deletion dialog does not delete shortcuts and folders on the desktop, and shortcuts in Explorer
 

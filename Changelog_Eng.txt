@@ -1,3 +1,16 @@
+----22091700----
+
+-Support for OpenComputers 1.7.7
+
+----22091100----
+
+-The system loader has been rewritten:
+  New loader design
+  Now occurred errors are displayed in scripts that are in startup
+  Now loader have built in Russian language, which shows, if Russian language was chosen in generalSettings.cfg
+  New error screen that shown if error has occurred in the loader (YSOD)
+-Fixed a small graphical bug in the icon rendering in desktop and Explorer application
+
 ----22081000----
 
 -Redesigned the items rendering system
