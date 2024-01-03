@@ -1,7 +1,7 @@
 finder={}
 local fs=require("filesystem")
 local unicode=require("unicode")
-local slang,reg,user,file,a={},{},{}
+local slang,reg,user,filesname,file,a,temp,i,data,pos,ext={},{},{},{}
 
 function finder.unserialize(data)
 temp=""

@@ -19,27 +19,29 @@ scrollY=0
 user=usersett
 lang=language
 module.name=lang.PersonalizationName
-secondfcolor=0x808080
 if user.powerSafe then
 	maincolor=0
-	secondcolor=0x303030
-	thirdcolor=0x404040
+	secondcolor=0x2b2b2b
+	thirdcolor=0x424242
 	mainfcolor=0xffffff
+	secondfcolor=0xd5d5d5
 elseif user.darkMode then
 	maincolor=0x202020
-	secondcolor=0x303030
-	thirdcolor=0x404040
+	secondcolor=0x2b2b2b
+	thirdcolor=0x424242
 	mainfcolor=0xffffff
+	secondfcolor=0xaaaaaa
 else
 	maincolor=0xdddddd
 	secondcolor=0xeeeeee
 	thirdcolor=0xffffff
 	mainfcolor=0
+	secondfcolor=0x808080
 end
 screenh=h-4
 if a == "colors" then
 	menuopen=0
-	open=2
+	open=1
 end
 end
 
@@ -60,7 +62,7 @@ end
 
 local function menu()
 fill(x,y-1,w,h-y+1," ")
-menustr={"---",lang.colors,"---","---"}--Фон,Темы,Экран блокировки
+menustr={lang.colors}
 for i=1,#menustr do
 	color(secondcolor)
 	fcolor(mainfcolor)
@@ -138,7 +140,11 @@ color(maincolor)
 fill(x+1,y+4+maxh+amaxh+scrollY,w-x-1,1,"⠿")
 set(x,y+4+maxh+amaxh+scrollY,"⠻")
 set(w-1,y+4+maxh+amaxh+scrollY,"⠟")
-colors={0xffb900,0xff8c00,0xff0000,0xe3008c,0xd95be6,0x0000ff,0x0094ff,0x00ff00,0x00cc6a}
+colors={0xffb900,0xff8c00,0xff6d40,--yellow
+0xFF3D3D,0xff0000,--red
+0xe3008c,0xff00a0,0xff79fc,0xff92fd,0xd95be6,0x9B49FF,--purple
+0x5165FF,0x0000ff,0x3a56ff,0x0094ff,0x00b6bf,--blue
+0x00cc6a,0x00ff00}--green
 wc=x-3
 hc=y+9+maxh+amaxh+scrollY
 bmaxh=7
@@ -213,7 +219,7 @@ color(maincolor)
 fcolor(mainfcolor)
 if menuopen == 1 then
 	menu()
-elseif open == 2 then
+elseif open == 1 then
 	colorsMenuDraw()
 end
 color(maincolor)
@@ -254,7 +260,7 @@ elseif tip == "touch" then
 	elseif menuopen == 0 and cx >= x and cx <= x+len(module.name) and cy == y then
 		scrollY=0
 		menuopen=1
-	elseif open == 2 then
+	elseif open == 1 then
 		if cx >= w-(2+rightmax) and cx <= w-3 and cy == y+math.floor(maxh/2)+2+scrollY then
 			if user.darkMode then
 				user.darkMode=false

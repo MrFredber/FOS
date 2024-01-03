@@ -13,7 +13,7 @@ local set=gpu.set
 local len=unicode.len
 local data,reg={},{}
 local user=user or {}
-local maincolor,secondcolor,mainfcolor,secondfcolor,contrastColor,file,reasonY,hlimit
+local maincolor,secondcolor,mainfcolor,secondfcolor,contrastColor,file,reasonY,hlimit,temp,i
 local w,h=gpu.getResolution()
 if user.name == nil or user.notlogged == true then
 	if fs.exists("/fos/system/generalSettings.cfg") then
@@ -28,26 +28,23 @@ if user.name == nil or user.notlogged == true then
 end
 
 local function colorupd()
-secondfcolor=0x808080
-if user.powerSafe then
-	maincolor=0
-	secondcolor=0x303030
-	thirdcolor=0x404040
-	mainfcolor=0xffffff
-elseif user.darkMode then
+if user.darkMode or user.powerSafe then
 	maincolor=0x202020
-	secondcolor=0x303030
-	thirdcolor=0x404040
+	secondcolor=0x2b2b2b
+	thirdcolor=0x424242
 	mainfcolor=0xffffff
+	secondfcolor=0xaaaaaa
 else
 	maincolor=0xdddddd
 	secondcolor=0xeeeeee
 	thirdcolor=0xffffff
 	mainfcolor=0
+	secondfcolor=0x808080
 end
 contrastColor=user.contrastColor or 0x0094ff
 end
 colorupd()
+
 
 function tools.update(fuser)
 user=fuser
@@ -85,6 +82,25 @@ else
 	fcolor(0)
 end
 set(x+1,y,t)
+color(clr)
+fcolor(fclr)
+end
+
+function tools.button(x,y,t)
+clr=gpu.getBackground()
+fclr=gpu.getForeground()
+fcolor(contrastColor)
+slen=len(t)+2
+set(x,y,"⠰")
+set(x+slen+1,y,"⠆")
+color(contrastColor)
+local _,gg=picture.HEXtoRGB(contrastColor)
+if gg < 160 then
+	fcolor(0xffffff)
+else
+	fcolor(0)
+end
+set(x+1,y," "..t.." ")
 color(clr)
 fcolor(fclr)
 end
@@ -305,7 +321,7 @@ data=nil
 return pos
 end
 
-function tools.error(msg,type,buttons)
+function tools.error(msg,type)
 clr=gpu.getBackground()
 fclr=gpu.getForeground()
 text={}
@@ -367,20 +383,31 @@ else
 		set(w/2-width/2+1,hw+i,text[i])
 	end
 end
+tools.btn(xw,hw+maxh-2,"OK")
 if type == 2 then
 	fcolor(0xff0000)
-	set(w/2-width/2+1,hw+1,"⢠⡶⢿⣿⣿⡿⢶⡄")
-	set(w/2-width/2+1,hw+2,"⣿⣷⣄⠙⠋⣠⣾⣿")
-	set(w/2-width/2+1,hw+3,"⣿⡿⠋⣠⣄⠙⢿⣿")
-	set(w/2-width/2+1,hw+4,"⠘⠷⣾⣿⣿⣷⠾⠃")
+	set(w/2-width/2+1,hw+1,"⢠⣶ ⣿⣿ ⣶⡄")
+	set(w/2-width/2+1,hw+2,"⣿      ⣿")
+	set(w/2-width/2+1,hw+3,"⣿      ⣿")
+	set(w/2-width/2+1,hw+4,"⠘⠿ ⣿⣿ ⠿⠃")
+	color(0xffffff)
+	set(w/2-width/2+3,hw+1,"⢿")
+	set(w/2-width/2+6,hw+1,"⡿")
+	set(w/2-width/2+2,hw+2,"⣷⣄⠙⠋⣠⣾")
+	set(w/2-width/2+2,hw+3,"⡿⠋⣠⣄⠙⢿")
+	set(w/2-width/2+3,hw+4,"⣾")
+	set(w/2-width/2+6,hw+4,"⣷")
 elseif type == 1 then
-	fcolor(0xffd800)
+	fcolor(0xf9d03f)
 	set(w/2-width/2+4,hw+1,"⣼⣧")
-	set(w/2-width/2+3,hw+2,"⣼⡇⢸⣧")
-	set(w/2-width/2+2,hw+3,"⣼⣿⣧⣼⣿⣧")
-	set(w/2-width/2+1,hw+4,"⣼⣿⣿⣧⣼⣿⣿⣧")
+	set(w/2-width/2+3,hw+2,"⣼  ⣧")
+	set(w/2-width/2+2,hw+3,"⣼⣿  ⣿⣧")
+	set(w/2-width/2+1,hw+4,"⣼⣿⣿  ⣿⣿⣧")
+	color(0x3c3c3c)
+	set(w/2-width/2+4,hw+2,"⡇⢸")
+	set(w/2-width/2+4,hw+3,"⣧⣼")
+	set(w/2-width/2+4,hw+4,"⣧⣼")
 end
-tools.btn(xw,hw+maxh-2,"OK")
 fcolor(secondcolor)
 color(temp1)
 set(w/2-width/2,hw,"⣾")
@@ -506,32 +533,46 @@ else
 end
 end
 
-local function reasonDraw(reason)
-fill(1,2,w,h-2," ")
-for i=1,#reason+reasonY do
-	if i+3 == h then
-		break
+local function reasonDraw(reason,a)
+--set(1,1,tostring(1+reasonY))
+--event.pull("touch")
+if a == 1 then
+	gpu.copy(1,3,w,h-5,0,1)
+	fill(1,3,w,1," ")
+	set(1,3,reason[1-reasonY])
+elseif a == -1 then
+	gpu.copy(1,4,w,h-4,0,-1)
+	fill(1,h-2,w,1," ")
+	set(1,h-2,reason[h-4-reasonY])
+else
+	fill(1,2,w,h-2," ")
+	for i=1,#reason+reasonY do
+		if i+3 == h then
+			break
+		end
+		set(1,2+i,reason[i-reasonY])
 	end
-	set(1,2+i,reason[i-reasonY])
 end
 end
 
 function tools.tblprint(o)
+local temp=picture.screenshot(1,1,w,h)
+color(0x404040)
+fcolor(0xffffff)
+fill(1,1,w,1," ")
+fill(1,h,w,1," ")
+set(3,1,"Table contents:")
+set(3,1,"Tap anywhere to continue...")
+color(0x202020)
+fill(1,2,w,h-2," ")
+set(w/2-19,h/2,"Preparing to display table contents...")
 reasonY,hlimit=0,0
 local text=tools.wrap(tables(o),w)
 if #text > h-4 then
 	can=#text-h+4
 	hlimit=-can
 end
-local temp=picture.screenshot(1,1,w,h)
-color(0x404040)
-fcolor(0xffffff)
-fill(1,1,w,1," ")
-fill(1,h,w,1," ")
-set(3,1,"Inside of table:")
-set(3,1,"Tap anywhere to continue...")
-color(0x202020)
-fill(1,2,w,h-2," ")
+fill(w/2-15,h/2,29,1," ")
 reasonDraw(text)
 while true do
 	tip,_,x,y,click=event.pull()
@@ -539,12 +580,12 @@ while true do
 		if click == 1 then
 			if reasonY < 0 then
 				reasonY=reasonY+click
-				reasonDraw(text)
+				reasonDraw(text,click)
 			end
 		else
 			if reasonY > hlimit then
 				reasonY=reasonY+click
-				reasonDraw(text)
+				reasonDraw(text,click)
 			end
 		end
 	elseif tip == "touch" then
@@ -552,6 +593,22 @@ while true do
 	end
 end
 picture.draw(1,1,temp)
+end
+
+function tools.print(a)
+temp=type(a)
+if temp == "table" then
+	error("tools.print() do not output table contents. Use tools.tblprint() instead.")
+end
+if temp == "boolean" then
+	if a then
+		a="true"
+	else
+		a="false"
+	end
+end
+text=tools.wrap("Type: "..temp.."\nContains: "..a,w-2)
+tools.error(text)
 end
 
 return tools

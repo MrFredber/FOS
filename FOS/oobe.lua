@@ -57,22 +57,24 @@ else
 	file:close()
 end
 user.passwordProtection=true
-secondfcolor=0x808080
 if gensett.powerSafe then
 	maincolor=0
-	secondcolor=0x303030
-	thirdcolor=0x404040
+	secondcolor=0x2b2b2b
+	thirdcolor=0x424242
 	mainfcolor=0xffffff
+	secondfcolor=0xd5d5d5
 elseif gensett.darkMode then
 	maincolor=0x202020
-	secondcolor=0x303030
-	thirdcolor=0x404040
+	secondcolor=0x2b2b2b
+	thirdcolor=0x424242
 	mainfcolor=0xffffff
+	secondfcolor=0xaaaaaa
 else
 	maincolor=0xdddddd
 	secondcolor=0xeeeeee
 	thirdcolor=0xffffff
 	mainfcolor=0
+	secondfcolor=0x808080
 end
 contrastColor=gensett.contrastColor or 0x0094ff
 file=io.open("/fos/lang/oobe/"..gensett.lang,"r")
@@ -289,7 +291,6 @@ user.userColor=0x0094ff
 user.darkMode=gensett.darkMode
 user.powerSafe=gensett.powerSafe
 user.timeZone=3
-user.contrastColorHeaders=false
 user.contrastColor=0x0094ff
 user.useXOffset=true
 user.useYOffset=false

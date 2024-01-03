@@ -20,7 +20,7 @@ local set=gpu.set
 local len=unicode.len
 local sub=unicode.sub
 local users,lang,slang,user,nlang,choosebfr={},{},{},{},{},{}
-local time,w,h,file,data,open,timerid,path,slen,ext,tmpext,tmppath,desktopColor
+local time,w,h,file,data,open,timerid,path,slen,ext,tmpext,tmppath,desktopColor,temp,i,timeCorrection,spos,tip,click
 local reasonY,hlimit=0,0
 local incorrect,enter,first=false,false,true
 local full=computer.totalMemory()
@@ -50,28 +50,29 @@ if notLogged ~= true then
 	user.path="/fos/users/"..users[open].name.."/"
 end
 w,h=gpu.getResolution()
-secondfcolor=0x808080
 if user.powerSafe or user.darkMode then
 	maincolor=0x202020
-	secondcolor=0x303030
-	thirdcolor=0x404040
+	secondcolor=0x2b2b2b
+	thirdcolor=0x424242
 	mainfcolor=0xffffff
+	secondfcolor=0xaaaaaa
 else
 	maincolor=0xdddddd
 	secondcolor=0xeeeeee
 	thirdcolor=0xffffff
 	mainfcolor=0
+	secondfcolor=0x808080
 end
 if user.powerSafe then
 	desktopColor=0
 else
-	desktopColor=0x2b2b2b
+	desktopColor=user.desktopColor or 0x1e1e1e
 end
 timeCorrection=user.timeZone*3600
 temp=io.open("/tmp/time","w")
 temp:close()
 temp=fs.lastModified("/tmp/time")
-time=tonumber(sub(temp,1,-4))+timeCorrection
+time=tonumber(sub(temp,1,10))+timeCorrection
 file=io.open("/fos/lang/fos/"..user.lang,"r")
 data={}
 for var in file:lines() do
@@ -93,6 +94,15 @@ for var in file:lines() do
 end
 file:close()
 nlang=finder.unserialize(data)
+if notLogged then
+--yes, don't remove
+else
+	temp={}
+	for k,v in pairs(nlang) do
+		temp[k:gsub("#user#",user.path):lower()]=v
+	end
+	nlang=temp
+end
 data,var=nil,nil
 tools.update(user)
 return w,h,user,lang,slang,nlang
@@ -136,7 +146,7 @@ if fs.exists("/tmp/timerid") ~= true then
 	temp=io.open("/tmp/time","w")
 	temp:close()
 	temp=fs.lastModified("/tmp/time")
-	time=tonumber(sub(temp,1,-4))+timeCorrection
+	time=tonumber(sub(temp,1,10))+timeCorrection
 	timerid=event.timer(1,clock,math.huge)
 	file=io.open("/tmp/timerid","w")
 	file:write(timerid)
@@ -270,6 +280,12 @@ else
 	user=users[1].data
 	user.name=users[1].name
 	user.path="/fos/users/"..users[1].name.."/"
+	if fs.exists("/tmp/timerid") then
+		file=io.open("/tmp/timerid","r")
+		event.cancel(tonumber(file:read("*all")))
+		file:close()
+		fs.remove("/tmp/timerid")
+	end
 	color(desktopColor)
 	fcolor(0xffffff)
 	fill(1,1,w,h," ")
@@ -280,7 +296,7 @@ end
 
 function system.drawMenu()
 data={}
-color(maincolor)
+color(secondcolor)
 i=1
 smax=26
 data=picture.screenshot(1,h-14,smax+1,14)
@@ -289,14 +305,14 @@ fill(1,h-14,smax,14," ")
 local userColor=user.userColor or 0x0094ff
 fcolor(mainfcolor)
 set(11,h-12,sub(user.name,1,15))
-color(secondcolor)
+color(thirdcolor)
 fill(2,h-8,24,8," ")
 set(3,h-8,lang.shell)
 set(3,h-6,lang.sleep)
 set(3,h-4,lang.shutdown)
 set(3,h-2,lang.reboot)
-fcolor(secondcolor)
-color(maincolor)
+fcolor(thirdcolor)
+color(secondcolor)
 set(2,h-9,"⢀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⡀")
 set(2,h-1,"⠈⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠁")
 set(2,h-7,"⢈⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⡁")
@@ -309,12 +325,12 @@ else
 	set(11,h-11,sub(slang.passwordNo,1,15))
 end
 color(clr)
-fcolor(maincolor)
+fcolor(secondcolor)
 set(26,h-14,"⣷")
 fcolor(0x101010)
 set(27,h-14,"⣄")
 fill(27,h-13,1,13,"⣿")
-color(maincolor)
+color(secondcolor)
 icons.user(2,h-13,userColor)
 return smax,data
 end
@@ -349,7 +365,10 @@ end
 
 function system.newFolder()
 temp=inputField(slang.nameFolder)
-if temp == "" then temp=nil end
+if temp == "" then temp=nil
+elseif sub(temp,-1,-1) == "/" then
+	temp=sub(temp,1,-2)
+end
 return temp
 end
 
@@ -359,7 +378,7 @@ if temp == "" then temp=nil end
 return temp
 end
 
-function system.deleteConfirm(obl,page,a)
+function system.deleteConfirm(obl,page,a,isLnk)
 current=obl.pages[page]
 if w/3 > 27 then
 	width=math.floor(w/3)
@@ -371,13 +390,21 @@ _,_,temp1=gpu.get(x,h/2-5)
 _,_,temp2=gpu.get(x+width-1,h/2-5)
 _,_,temp3=gpu.get(x,h/2+6)
 _,_,temp4=gpu.get(x+width-1,h/2+6)
-text=tools.wrap(slang.deleteConfirm,width-16)
+if isLnk then
+	text=tools.wrap(slang.deleteConfirmLnk:format(current.tmppaths[a]),width-16)
+else
+	text=tools.wrap(slang.deleteConfirm,width-16)
+end
 color(thirdcolor)
 fcolor(mainfcolor)
 fill(x,h/2-5,width,12," ")
 set(x+2,h/2-5,slang.deleteHeader)
 set(x+width-5,h/2-5,"  x  ")
-set((x+x+14)/2-(len(current.names[a])/2),h/2+2,current.names[a])
+if isLnk then
+	set((x+x+14)/2-(len(current.names[a])/2),h/2+2,current.names[a])
+else
+	set((x+x+14)/2-(len(current.names[a])/2),h/2+2,current.names[a])
+end
 for i=1,#text do
 	set(x+14,h/2-4+i,text[i])
 end
@@ -387,7 +414,10 @@ fcolor(0x808080)
 set(x+width-6-slen-slen1,h/2+5,slang.yes)
 wi,hi=x+3,h/2-3
 tools.btn(x+width-4-slen,h/2+5,slang.no)
-if obl.appIconCache[current.icons[a]] then
+if isLnk then
+	icons.shortcut(wi,hi)
+else
+	if obl.appIconCache[current.icons[a]] then
 		picture.draw(wi,hi,obl.appIconCache[current.icons[a]])
 	elseif current.icons[a] == "folder" then
 		icons.folder(wi,hi)
@@ -404,10 +434,11 @@ if obl.appIconCache[current.icons[a]] then
 	elseif current.icons[a] == "pic" then
 		icons.pic(wi,hi)
 	elseif current.icons[a] == "error" then
-		icons.error(wi,hi)
+		icons.shortcut(wi,hi)
 	elseif current.icons[a] == "unkFile" then
 		icons.unkFile(wi,hi)
 	end
+end
 fcolor(thirdcolor)
 color(temp1)
 set(x,h/2-5,"⣾")
@@ -479,16 +510,19 @@ for pageI=1,totalPages do
 	data.pages[pageI].x={}
 	data.pages[pageI].y={}
 	data.pages[pageI].paths={}
+	data.pages[pageI].tmppaths={}
 	data.pages[pageI].exts={}
 	data.pages[pageI].tmpexts={}
 	data.pages[pageI].names={}
-	data.pages[pageI].notExists={}
 	data.pages[pageI].fullNames={}
+	data.pages[pageI].tmpnames={}
+	data.pages[pageI].tmpfullNames={}
+	data.pages[pageI].notExists={}
 	data.pages[pageI].icons={}
 	data.pages[pageI].iconsCache={}
 	for i=startPoint,endPoint do
 		dataI=dataI+1
-		notExists=false
+		notExists=nil
 		if wf+9 >= w then
 			wi,wf,hi,hf=x+1,x,hi+7,hf+7
 		end
@@ -505,40 +539,48 @@ for pageI=1,totalPages do
 			table.insert(temp,var)
 			end
 			file:close()
-			if fs.exists(temp[1] or "null") then
+			if temp[1] then
 				tmppath=temp[1]:lower()
-				tmp=fs.name(temp[1])
-				tmpext=finder.ext(tmp)
-			else
+				tmpname=fs.name(temp[1])
+				tmpext=finder.ext(tmpname)
+			end
+			if not fs.exists(temp[1] or "/ /") then
 				notExists=true
 			end
 		end
-		if tmppath ~= nil then
-			data.pages[pageI].paths[dataI]=tmppath
-		else
-			data.pages[pageI].paths[dataI]=path..files[i]
-		end
+		data.pages[pageI].paths[dataI]=path..files[i]
 		if tmpext ~= nil then
 			data.pages[pageI].tmpexts[dataI]=tmpext
 		end
 		if ext ~= nil then
 			data.pages[pageI].exts[dataI]=ext
 		end
-		if nlang[tmppath] ~= nil then
-			tmp=nlang[tmppath]
-		elseif nlang[path..files[i]:lower()] ~= nil then
-			tmp=nlang[path..files[i]:lower()]
+		if tmppath ~= nil then
+			data.pages[pageI].tmppaths[dataI]=tmppath
+			temp=tmppath:lower()
+			if nlang[temp] ~= nil then
+				tmpname=nlang[temp]
+			end
+			data.pages[pageI].tmpfullNames[i]=tmpname
+			slen=len(tmpname)
+			if slen > 10 then
+				tmpname=sub(tmpname,1,9).."…"
+			end
+			data.pages[pageI].tmpnames[dataI]=tmpname
+		end
+		temp=path..files[i]:lower()
+		if nlang[temp] ~= nil then
+			tmp=nlang[temp]
 		end
 		slen=len(tmp)
 		table.insert(data.pages[pageI].fullNames,tmp)
 		if slen > 10 then
-			slen=10
 			tmp=sub(tmp,1,9).."…"
 		end
 		if notExists then
 			data.pages[pageI].icons[dataI]="error"
 		elseif tmppath ~= nil then
-			if tmpext == ".app" and data.appIconCache[data.pages[pageI].paths[dataI]] == nil then
+			if tmpext == ".app" and data.appIconCache[data.pages[pageI].tmppaths[dataI]] == nil then
 				if fs.exists(tmppath.."icon.pic") then
 					icn={}
 					file=io.open(tmppath.."icon.pic")
@@ -546,12 +588,13 @@ for pageI=1,totalPages do
 						table.insert(icn,var)
 					end
 					file:close()
-					data.appIconCache[data.pages[pageI].paths[dataI]]=finder.unserialize(icn)
-					data.pages[pageI].icons[dataI]=data.pages[pageI].paths[dataI]
+					data.appIconCache[data.pages[pageI].tmppaths[dataI]]=finder.unserialize(icn)
+					data.pages[pageI].icons[dataI]=data.pages[pageI].tmppaths[dataI]
 				else
 					data.pages[pageI].icons[dataI]="app"
 				end
 			elseif fs.isDirectory(tmppath) ~= false then
+				data.pages[pageI].tmpexts[dataI]="$dir"
 				data.pages[pageI].icons[dataI]="folder"
 			elseif tmpext == ".lua" then
 				data.pages[pageI].icons[dataI]="lua"
@@ -581,6 +624,7 @@ for pageI=1,totalPages do
 					data.pages[pageI].icons[dataI]="app"
 				end
 			elseif fs.isDirectory(path..files[i]) ~= false then
+				data.pages[pageI].exts[dataI]="$dir"
 				data.pages[pageI].icons[dataI]="folder"
 			elseif ext == ".lua" then
 				data.pages[pageI].icons[dataI]="lua"
@@ -607,8 +651,9 @@ end
 return data
 end
 
-function system.drawPage(user,data,page,backColor)
+function system.drawPage(user,data,page,backColor,frontColor)
 backColor=backColor or desktopColor
+frontColor=frontColor or 0xffffff
 color(backColor)
 if data.totalfiles == 0 then
 	fcolor(0x808080)
@@ -665,7 +710,7 @@ else
 			if current.iconsCache["error"] ~= i then
 				icons.copy(wi,hi,current,current.iconsCache["error"])
 			else
-				icons.error(wi,hi)
+				icons.shortcut(wi,hi)
 			end
 		elseif current.icons[i] == "unkFile" then
 			if current.iconsCache["unkFile"] ~= i then
@@ -679,13 +724,13 @@ else
 			fcolor(0)
 			set(wi+7,hi+3,"<")
 		end
-		slen=len(current.names[i])
+		slen=len(current.tmpnames[i] or current.names[i])
 		if true == false then
-			picture.adaptiveText(current.x[i]+(-slen+10)/2,current.y[i]+5,current.names[i])
+			picture.adaptiveText(current.x[i]+(-slen+10)/2,current.y[i]+5,current.tmpnames[i] or current.names[i])
 		else
 			color(backColor)
-			fcolor(0xffffff)
-			set(current.x[i]+(-slen+10)/2,current.y[i]+5,current.names[i])
+			fcolor(frontColor)
+			set(current.x[i]+(-slen+10)/2,current.y[i]+5,current.tmpnames[i] or current.names[i])
 		end
 	end
 end
@@ -722,7 +767,7 @@ else
 	elseif current.icons[a] == "pic" then
 		icons.pic(wi,hi)
 	elseif current.icons[a] == "error" then
-		icons.error(wi,hi)
+		icons.shortcut(wi,hi)
 	elseif current.icons[a] == "unkFile" then
 		icons.unkFile(wi,hi)
 	end
@@ -738,14 +783,13 @@ else
 	else
 		fcolor(0)
 	end
-	slen=len(current.names[a])
-	if slen > 10 then
-		slen=10
-		tmp=sub(current.names[a],1,9).."…"
+	if current.exts[a] == ".lnk" then
+		slen=len(current.tmpnames[a] or current.names[a]) --основное имя - если битый ярлык
+		set(current.x[a]+((10-slen)/2),current.y[a]+5,current.tmpnames[a] or current.names[a])
 	else
-		tmp=current.names[a]
+		slen=len(current.names[a])
+		set(current.x[a]+((10-slen)/2),current.y[a]+5,current.names[a])
 	end
-	set(current.x[a]+((10-slen)/2),current.y[a]+5,tmp)
 	if true == false then
 		picture.adaptiveText(current.x[a],current.y[a]-1,"⣠⣤⣤⣤⣤⣤⣤⣤⣤⣄",user.contrastColor)
 		picture.adaptiveText(current.x[a],current.y[a]+6,"⠙⠛⠛⠛⠛⠛⠛⠛⠛⠋",user.contrastColor)

@@ -6,31 +6,32 @@ local fs=r("filesystem")
 local tools=r("fos/tools")
 local system=r("fos/system")
 local finder=r("fos/finder")
-local w,h=gpu.getResolution();
 local fill=gpu.fill
 local color=gpu.setBackground
 local fcolor=gpu.setForeground
 local set=gpu.set
 local user,lang,slang,nlang,corrupted={},{},{},{},{}
-local file,maincolor,secondcolor,mainfcolor,secondfcolor,moduleh,name,oldname
+local file,maincolor,secondcolor,mainfcolor,secondfcolor,moduleh,name,oldname,w,h
 local function update()
 w,h,user,_,slang,nlang=system.init()
-secondfcolor=0x808080
 if user.powerSafe then
 	maincolor=0
-	secondcolor=0x303030
-	thirdcolor=0x404040
+	secondcolor=0x2b2b2b
+	thirdcolor=0x424242
 	mainfcolor=0xffffff
+	secondfcolor=0xd5d5d5
 elseif user.darkMode then
 	maincolor=0x202020
-	secondcolor=0x303030
-	thirdcolor=0x404040
+	secondcolor=0x2b2b2b
+	thirdcolor=0x424242
 	mainfcolor=0xffffff
+	secondfcolor=0xaaaaaa
 else
 	maincolor=0xdddddd
 	secondcolor=0xeeeeee
 	thirdcolor=0xffffff
 	mainfcolor=0
+	secondfcolor=0x808080
 end
 lang={}
 file=io.open("/fos/apps/settings.app/lang/"..user.lang,"r")

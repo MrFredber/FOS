@@ -1,5 +1,5 @@
 local raw_loadfile=...
-_G._OSVERSION="FredberOS (OpenOS 1.7.7)"
+_G._OSVERSION="FredberOS (OpenOS 1.8.3)"
 local component=component
 local computer=computer
 local unicode=unicode
@@ -33,7 +33,7 @@ local y=1
 local uptime=computer.uptime
 local pull=computer.pullSignal
 local last_sleep=uptime()
-gpu.set(w/2-7,h-1,"Loading core...")
+gpu.set(w/2-7,h-2,"Loading core...")
 local function dofile(file)
 local program,reason=raw_loadfile(file)
 if program then
@@ -234,7 +234,7 @@ if fs.exists(t) then
 	for v in file:lines() do table.insert(user,v) end
 	user=finder.unserialize(user)
 	tw,th=g.maxResolution()
-	if user.width > tw or user.height > th or user.width < 27 or user.height < 15 then
+	if user.width > tw or user.height > th or user.width < 27 or user.height < 18 then
 		w,h=tw,th
 		user.width,user.height=w,h
 	else
@@ -263,11 +263,11 @@ if startup > 0 then
 		if user.lang == "russian.lang" then
 			t="Запуск скриптов... ("..i.."/"..startup..")"
 			slen=len(t)
-			set(w/2-(slen/2),h-1,t)
+			set(w/2-(slen/2),h-2,t)
 		else
 			t="Starting scripts... ("..i.."/"..startup..")"
 			slen=len(t)
-			set(w/2-(slen/2),h-1,t)
+			set(w/2-(slen/2),h-2,t)
 		end
 		loadIcon()
 		result,text=loadfile(autostart[i])
@@ -306,9 +306,9 @@ if not skipLoad then
 	fcolor(0xffffff)
 	fill(1,1,w,h," ")
 	if user.lang == "russian.lang" then
-		set(w/2-6,h-1,"Запуск FOS...")
+		set(w/2-6,h-2,"Запуск FOS...")
 	else
-		set(w/2-7,h-1,"Starting FOS...")
+		set(w/2-7,h-2,"Starting FOS...")
 	end
 	loadIcon()
 

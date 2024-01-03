@@ -19,22 +19,24 @@ ressuccess=false
 user=usersett
 lang=language
 module.name=lang.SystemName
-secondfcolor=0x808080
 if user.powerSafe then
 	maincolor=0
-	secondcolor=0x303030
-	thirdcolor=0x404040
+	secondcolor=0x2b2b2b
+	thirdcolor=0x424242
 	mainfcolor=0xffffff
+	secondfcolor=0xd5d5d5
 elseif user.darkMode then
 	maincolor=0x202020
-	secondcolor=0x303030
-	thirdcolor=0x404040
+	secondcolor=0x2b2b2b
+	thirdcolor=0x424242
 	mainfcolor=0xffffff
+	secondfcolor=0xaaaaaa
 else
 	maincolor=0xdddddd
 	secondcolor=0xeeeeee
 	thirdcolor=0xffffff
 	mainfcolor=0
+	secondfcolor=0x808080
 end
 contrastColor=tonumber(user.contrastColor) or math.random(16777215)
 screenh=h-4
@@ -50,7 +52,7 @@ end
 
 local function menu()
 fill(x,y-1,w,h-y+1," ")
-menustr={lang.SystemDisplay,"---","---","О системе"}--,"Питание","Память"
+menustr={lang.SystemDisplay,"О системе"}
 for i=1,#menustr do
 	color(secondcolor)
 	fcolor(mainfcolor)
@@ -114,10 +116,6 @@ set(w-1,y+3+maxh+scrollY,"⠟")
 moduleh=y+3+maxh
 end
 
-local function power()
-
-end
-
 local function about()
 color(secondcolor)
 fill(x,y+2+scrollY,w-x,6," ")
@@ -142,7 +140,7 @@ set(x+9,y+6+scrollY,"⡿")
 fcolor(mainfcolor)
 set(x+12,y+4+scrollY,"FredberOS")
 fcolor(secondfcolor)
-set(x+12,y+5+scrollY,"©2019-2022")
+set(x+12,y+5+scrollY,"© Mr.Fredber 2019-2024")
 end
 
 function module.draw(tx,ty)
@@ -157,9 +155,7 @@ if menuopen == 1 then
 	menu()
 elseif open == 1 then
 	display()
-elseif open == 3 then
-	power()
-elseif open == 4 then
+elseif open == 2 then
 	about()
 end
 color(maincolor)
@@ -208,7 +204,7 @@ elseif tip == "touch" then
 			temp=tonumber(temp) or "a"
 			if temp then
 				if temp < 27 then
-					tools.error({lang.resolutionAbove.."27"},1)
+					tools.error({lang.resolutionAbove:format("27")},1)
 				else
 					gensett.width=temp
 				end
@@ -219,8 +215,8 @@ elseif tip == "touch" then
 			temp=tools.input(w-4,y+(maxh/2)+4+scrollY,3,"0",tostring(gensett.height),"1")
 			temp=tonumber(temp) or "a"
 			if temp then
-				if temp < 15 then
-					tools.error({lang.resolutionAbove.."15"},1)
+				if temp < 18 then
+					tools.error({lang.resolutionAbove:format("18")},1)
 				else
 					gensett.height=temp
 				end

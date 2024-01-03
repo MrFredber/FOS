@@ -20,22 +20,24 @@ langsuccess=nil
 user=usersett
 lang=language
 module.name=lang.DateAndLangName
-secondfcolor=0x808080
 if user.powerSafe then
 	maincolor=0
-	secondcolor=0x303030
-	thirdcolor=0x404040
+	secondcolor=0x2b2b2b
+	thirdcolor=0x424242
 	mainfcolor=0xffffff
+	secondfcolor=0xd5d5d5
 elseif user.darkMode then
 	maincolor=0x202020
-	secondcolor=0x303030
-	thirdcolor=0x404040
+	secondcolor=0x2b2b2b
+	thirdcolor=0x424242
 	mainfcolor=0xffffff
+	secondfcolor=0xaaaaaa
 else
 	maincolor=0xdddddd
 	secondcolor=0xeeeeee
 	thirdcolor=0xffffff
 	mainfcolor=0
+	secondfcolor=0x808080
 end
 contrastColor=user.contrastColor or 0x0094ff
 screenh=h-4
@@ -108,7 +110,7 @@ timeCorrection=user.timeZone*3600
 temp=io.open("/tmp/time","w")
 temp:close()
 temp=fs.lastModified("/tmp/time")
-date=tonumber(string.sub(temp,1,-4))+timeCorrection
+date=tonumber(string.sub(temp,1,10))+timeCorrection
 date=os.date(user.dataType,date)
 rightmax=len(date)
 rightmax=rightmax+1

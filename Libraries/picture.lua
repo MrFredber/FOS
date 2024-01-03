@@ -8,47 +8,7 @@ local set=gpu.set
 local color=gpu.setBackground
 local fcolor=gpu.setForeground
 local len=unicode.len
-local file,temp,tmp
-
---function picture.screenshot(x,y,width,height)
---w,h=gpu.getResolution()
---	local data={compressed=true,width=width,height=height,color={},fcolor={},txt={}}
---	local hi=1
---	local ti=1
---	local ci=1
---	while hi ~= height+1 do
---		local i=1
---		temp={txt={},f={},c={},stack={}}
---		while i ~= width+1 do
---			if ci == 1 then
---				temp.stack[ci],tfclr,tclr=gpu.get(x+i-1,y+hi-1)
---			end
---			if x+i < w+1 then
---				temp.stack[ci+1],fclr,clr=gpu.get(x+i,y+hi-1)
---			end
---			if tfclr ~= fclr or tclr ~= clr or i+1 > width then
---				table.remove(temp.stack,ci+1)
---				table.insert(temp.c,ti,ci)
---				table.insert(temp.c,ti+1,tclr)
---				table.insert(temp.f,ti,ci)
---				table.insert(temp.f,ti+1,tfclr)
---				table.insert(temp.txt,table.concat(temp.stack))
---				temp.stack={}
---				ci=0
---				ti=ti+2
---			end
---			ci=ci+1
---			i=i+1
---		end
---		data.color[hi]=temp.c
---		data.fcolor[hi]=temp.f
---		data.txt[hi]=temp.txt
---		hi=hi+1
---		ti=1
---		ci=1
---	end
---return data
---end
+local file,temp,tmp,data
 
 function picture.adaptiveText(x,y,text,fclr)
 data=picture.screenshot(x,y,len(text),1,true)
@@ -62,43 +22,7 @@ picture.draw(x,y,data)
 data=nil
 end
 
---function picture.draw(x,y,data)
---local hi=1
---if data.compressed == true then
---	while hi ~= data.height+1 do
---		local i=1
---		local ti=1
---		local ai=1
---		while i ~= data.width+1 do
---			if data.txt[hi][ti] == nil or data.color[hi][ai+1] == nil or data.fcolor[hi][ai+1] == nil then
---				break
---			else
---				color(data.color[hi][ai+1])
---				fcolor(data.fcolor[hi][ai+1])
---				set(x+i-1,y+hi-1,data.txt[hi][ti])
---			end
---			i=i+data.color[hi][ai]
---			ai=ai+2
---			ti=ti+1
---		end
---		hi=hi+1
---	end
---else
---	while hi ~= data.height+1 do
---		i=1
---		while i ~= data.width+1 do 
---			color(data.color[hi][i])
---			fcolor(data.fcolor[hi][i])
---			set(x+i-1,y+hi-1,data.txt[hi][i])
---			i=i+1
---		end
---		hi=hi+1
---	end
---end
---end
-
 function picture.screenshot(x,y,width,height,raw)
-local data
 if raw then
 	data={width=width,height=height,color={},fcolor={},txt={}}
 	local hi=1
@@ -272,10 +196,10 @@ end
 
 function picture.HEXtoRGB(clr)
 clr=math.ceil(clr)
-local rr=bit32.rshift(clr,16)
-local gg=bit32.rshift(bit32.band(clr,0x00ff00),8)
-local bb=bit32.band(clr,0x0000ff)
-return rr,gg,bb
+local r=bit32.rshift(clr,16)
+local g=bit32.rshift(bit32.band(clr,0x00ff00),8)
+local b=bit32.band(clr,0x0000ff)
+return r,g,b
 end
 
 return picture

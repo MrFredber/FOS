@@ -1,6 +1,40 @@
-----22091700----
+----24010300----
 
--Support for OpenComputers 1.7.7
+NEW:
+
+-OpenComputers 1.8.3 support
+-The system palette has been changed
+-Added a warning about preparation in tools.tblprint()
+-Rid of the stupid display of launching any script/application
+-Added tools.print() to output the contents of a variable (not a table)
+-The data that is placed in the element pages has been changed (technical innovation)
+-The context menu in Explorer and on the desktop has been supplemented with new functionality:
+  Now the menu does not allow you to select options that do not work (for example, edit a folder)
+  Now you can edit the file via the shortcut
+  Now you can view the contents of the application package and edit its main script
+  Now you can edit the shortcut
+  Now you can delete the shortcut and the file/folder separately
+-Now an error appears if the user tries to create a folder/file with a name that is already in use
+  And also if the label points to a non-existent element
+-Added a shortcut icon that is used instead of an error icon if the end path of the shortcut does not exist
+-Now the system adds information from the shortcut to the page always
+-Added new contrasting colors in the personalization settings
+-Minor changes in the Settings app
+
+FIXIES:
+
+-Fixed an error with the time display due to the upgrade to OC 1.7.7
+-Changed the localization in the Settings app
+-Changed the minimum resolution (27x18)
+-Optimized table display in tools.tblprint()
+-Fixed a bug resetting the top panel after editing an element or shortcut in Explorer app
+-Fixed a bug with missing localized folder names in the system and in Explorer app
+-Fixed all problems with deleting items
+-Improved system stability
+-Fixed a bug where the time before the first BSOD was not updated at system startup
+-Functions in libraries have become more stable
+-Fixed the lack of black text color when the light theme is enabled in the Explorer app
+-Fixed a graphical bug showing the selection of an element after editing it
 
 ----22091100----
 

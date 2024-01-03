@@ -14,7 +14,7 @@ local fcolor=gpu.setForeground
 local set=gpu.set
 local sub=unicode.sub
 local cords,lang,slang,nlang,user={},{},{},{},{}
-local ignoreLastChoose,currpage,current,pos,mainfcolor,secondfcolor,maincolor,secondcolor,slen,SkipCon,file,click,data,obl=false,1
+local ignoreLastChoose,currpage,current,pos,mainfcolor,secondfcolor,maincolor,secondcolor,slen,SkipCon,file,click,data,obl,temp=false,1
 local skipCon,open,choose,lastchoose=0,0,0,0
 local w,h=gpu.getResolution()
 local path="/"
@@ -27,33 +27,34 @@ w,h,user,lang,slang,nlang=system.init()
 for k in pairs(nlang) do
 	nlang[k:gsub("#user#",user.path)]=nlang[k]
 end
-secondfcolor=0x808080
 if user.powerSafe then
 	maincolor=0
-	secondcolor=0x303030
-	thirdcolor=0x404040
+	secondcolor=0x2b2b2b
+	thirdcolor=0x424242
 	mainfcolor=0xffffff
+	secondfcolor=0xd5d5d5
 elseif user.darkMode then
 	maincolor=0x202020
-	secondcolor=0x303030
-	thirdcolor=0x404040
+	secondcolor=0x2b2b2b
+	thirdcolor=0x424242
 	mainfcolor=0xffffff
+	secondfcolor=0xaaaaaa
 else
 	maincolor=0xdddddd
 	secondcolor=0xeeeeee
 	thirdcolor=0xffffff
 	mainfcolor=0
+	secondfcolor=0x808080
 end
-tabs={full={[1]=nlang["/"]},slen={[1]=len(nlang["/"])},see={[1]=nlang["/"]},offset=0,last=1}
 tools.update(user)
---if (green < 160) textColor = 'FFFFFF';
---else textColor = '000000';
+--if (green < 160) textColor = 'FFFFFF'
+--else textColor = '000000'
 end
 
 local function dirLoad()
 currPage=1
 files=finder.files(path)
-obl=system.createPages(3,3,w-2,h-4,path,files,user.useXOffset,user.useYOffset)
+obl=system.createPages(3,3,w-2,h-3,path,files,user.useXOffset,user.useYOffset)
 current=obl.pages[currPage]
 end
 
@@ -138,10 +139,147 @@ if #obl.pages > 1 then
 		temp=temp+1
 	end
 end
-system.drawPage(user,obl,currPage,maincolor)
+system.drawPage(user,obl,currPage,maincolor,mainfcolor)
+end
+
+local function editItem(a)
+if fs.exists("/tmp/timerid") then
+	file=io.open("/tmp/timerid","r")
+	event.cancel(tonumber(file:read("*all")))
+	file:close()
+	fs.remove("/tmp/timerid")
+end
+fcolor(mainfcolor)
+color(maincolor)
+os.execute("edit '"..(a or current.paths[choose]).."'")
+open,lastopen,choose,lastchoose=0,0,0,0
+confLoad()
+dirLoad()
+draw()
+end
+
+local function enterDir(b)
+tabs={full={[1]=nlang["/"]},slen={[1]=len(nlang["/"])},see={[1]=nlang["/"]},offset=0,last=1}
+path=b
+temp=fs.segments(path)
+tmp="/"
+for i=1,#temp do
+	tmp=tmp..temp[i].."/"
+	table.insert(tabs.full,nlang[tmp:lower()] or temp[i])
+	table.insert(tabs.slen,len(nlang[tmp:lower()] or temp[i]))
+end
+open,lastopen,choose,lastchoose=0,0,0,0
+system.drawChooseReset()
+dirLoad()
+draw()
+end
+
+local function createItem()
+temp=system.newFile()
+if temp ~= nil then
+	if fs.exists(path..temp) then
+		while true do
+			tools.error({slang.itemExistsErr},1)
+			temp=system.rename(temp)
+			if temp ~= nil then
+				if not fs.exists(path..temp) then
+					break
+				end
+			else
+				break
+			end
+		end
+	end
+end
+if temp ~= nil then --Создание
+	file=io.open(path..temp,"w")
+	file:close()
+	dirLoad()
+end
+system.drawChooseReset()
+ignoreLastChoose=true
+choose=0
+draw()
+end
+
+local function createFolder()
+temp=system.newFolder()
+if fs.exists(path..temp) then
+	while true do
+		tools.error({slang.itemExistsErr},1)
+		if sub(temp,-1,-1) == "/" then
+			temp=sub(temp,1,-2)
+		end
+		temp=system.rename(temp)
+		if temp ~= nil then
+			if not fs.exists(path..temp) then
+				break
+			end
+		else
+			break
+		end
+	end
+end
+if temp ~= nil then
+	fs.makeDirectory(path..temp)
+	dirLoad()
+end
+system.drawChooseReset()
+ignoreLastChoose=true
+choose=0
+draw()
+end
+
+local function renameItem()
+temp=system.rename(current.fullNames[choose])
+if fs.exists(path..temp) then
+	while true do
+		tools.error({slang.itemExistsErr},1)
+		if sub(temp,-1,-1) == "/" then
+			temp=sub(temp,1,-2)
+		end
+		temp=system.rename(temp)
+		if temp ~= nil then
+			if not fs.exists(path..temp) then
+				break
+			end
+		else
+			break
+		end
+	end
+end
+if temp ~= nil then
+	fs.rename(current.paths[choose],path..temp)
+	dirLoad()
+end
+system.drawChooseReset()
+ignoreLastChoose=true
+choose=0
+draw()
+end
+
+local function deleteItem(a,b)
+temp=system.deleteConfirm(obl,currPage,choose,a)
+if temp then
+	if a then
+		fs.remove(current.paths[choose])
+	else
+		if b then --lnk
+			fs.remove(current.tmppaths[choose])
+		else
+			fs.remove(current.paths[choose])
+		end
+	end
+	dirLoad()
+end
+system.drawChooseReset({path..current.fullNames[choose]})
+ignoreLastChoose=true
+choose=0
+draw()
 end
 
 confLoad()
+tabs={full={[1]=nlang["/"]},slen={[1]=len(nlang["/"])},see={[1]=nlang["/"]},offset=0,last=1}
 if type(args[1]) == "string" then
 path=args[1]
 temp=fs.segments(path)
@@ -210,47 +348,65 @@ elseif tip == "touch" then
 
 		if y ~= h and open ~= 0 then
 			if (current.tmpexts[open] or current.exts[open]) == ".app" then
-				if fs.exists(current.paths[open].."main.lua") then
-					local result,reason=loadfile(current.paths[open].."main.lua")
-					if result then
-						result,reason=xpcall(result,debug.traceback,...)
-					    if not result then
-					    	if type(reason) ~= "table" then
-					    		system.bsod(current.fullNames[open],reason)
-					    	end
-					    end
-					else
-						if type(reason) ~= "table" then
-					    	system.bsod(current.fullNames[open],reason)
+				local isCorrupted=false
+				if current.tmppaths[open] ~= nil then
+					temp=current.tmppaths[open].."main.lua"
+					isCorrupted=not fs.exists(current.tmppaths[open] or "/ /")
+					if current.tmppaths[open]=="" then isCorrupted=true end
+				else
+					temp=current.paths[open].."main.lua"
+					isCorrupted=not fs.exists(current.paths[open] or "/ /")
+					if current.paths[open]=="" then isCorrupted=true end
+				end
+				if isCorrupted then
+					tools.error({slang.corruptedLnk:format(current.tmppaths[open] or current.paths[open])},2)
+				else
+					if fs.exists(temp) then
+						local result,reason=loadfile(temp)
+						if result then
+							result,reason=xpcall(result,debug.traceback,...)
+							if not result then
+								if type(reason) ~= "table" then
+									system.bsod(current.fullNames[open],reason)
+								end
+							end
+						else
+							if type(reason) ~= "table" then
+								system.bsod(current.fullNames[open],reason)
+							end
 						end
+						system.drawChooseReset()
+						confLoad()
+						dirLoad()
+						draw()
+						system.taskbarDraw()
+					else
+						tools.error({"The main script of the \""..current.tmpfullNames[open].."\" application does not exist!"},2)
 					end
+				end
+			elseif fs.isDirectory(current.tmppaths[open] or current.paths[open]) then
+				if current.tmppaths[open] ~= nil then
+					enterDir(current.tmppaths[open])
+				else
+					path=current.paths[open]
+					table.insert(tabs.full,nlang[unicode.lower(current.paths[open])] or current.fullNames[open])
+					table.insert(tabs.slen,len(nlang[unicode.lower(current.paths[open])] or current.fullNames[open]))
 					system.drawChooseReset()
-					confLoad()
 					dirLoad()
 					draw()
-					system.taskbarDraw()
-				else
-					tools.error({"The main script of the \""..current.fullNames[open].."\" application does not exist!"},2)
 				end
-			elseif fs.isDirectory(current.paths[open]) then
-				path=current.paths[open]
-				table.insert(tabs.full,current.fullNames[open])
-				table.insert(tabs.slen,len(current.fullNames[open]))
-				system.drawChooseReset()
-				dirLoad()
-				draw()
 			else
-				local result,reason=loadfile(current.paths[open])
+				local result,reason=loadfile(current.tmppaths[open] or current.paths[open])
 				if result then
 					result,reason=xpcall(result,debug.traceback,...)
-				    if not result then
-				    	if type(reason) ~= "table" then
-				    		system.bsod(current.fullNames[open],reason)
-				    	end
-				    end
+					if not result then
+						if type(reason) ~= "table" then
+							system.bsod(current.fullNames[open],reason)
+						end
+					end
 				else
 					if type(reason) ~= "table" then
-				    	system.bsod(current.fullNames[open],reason)
+						system.bsod(current.fullNames[open],reason)
 					end
 				end
 				system.drawChooseReset()
@@ -259,84 +415,237 @@ elseif tip == "touch" then
 				system.taskbarDraw()
 			end
 		elseif y ~= h and click == 1 and skipCon == 1 then
-			pos=tools.conMenu(x,y,{slang.conEdit,"|","<gray>"..slang.conCopy,"<gray>"..slang.conPaste,"<gray>"..slang.conCut,"|",slang.conCreate,slang.conCreateDir,slang.conDelete,slang.conRename,"|","<gray>"..slang.conProp})
-			if pos == 1 then
-				if fs.exists("/tmp/timerid") then
-					file=io.open("/tmp/timerid","r")
-					event.cancel(tonumber(file:read("*all")))
-					file:close()
-					fs.remove("/tmp/timerid")
+			if current.exts[choose] == ".lnk" then
+				if current.tmpexts[choose] == ".app" then --Link to App
+					local isCorrupted=false
+					isCorrupted=not fs.exists(current.tmppaths[choose] or "/ /")
+					if current.tmppaths[choose]=="" then isCorrupted=true end
+					local isMainCorrupted=false
+					isMainCorrupted=not fs.exists(current.tmppaths[choose].."main.lua" or "/ /")
+
+					if isCorrupted then
+						pos=tools.conMenu(x,y,{"<gray>"..slang.conEditApp,"<gray>"..slang.conEnterApp,slang.conEditLnk,"|","<gray>"..slang.conCopy,"<gray>"..slang.conPaste,"<gray>"..slang.conCut,"|",slang.conCreate,slang.conCreateDir,"<gray>"..slang.conCreateLnk,"|",slang.conDelete,"<gray>"..slang.conDeleteLnk,slang.conRename,"|","<gray>"..slang.conProp})
+					elseif isMainCorrupted then
+						pos=tools.conMenu(x,y,{"<gray>"..slang.conEditApp,slang.conEnterApp,slang.conEditLnk,"|","<gray>"..slang.conCopy,"<gray>"..slang.conPaste,"<gray>"..slang.conCut,"|",slang.conCreate,slang.conCreateDir,"<gray>"..slang.conCreateLnk,"|",slang.conDelete,"<gray>"..slang.conDeleteLnk,slang.conRename,"|","<gray>"..slang.conProp})
+					else
+						pos=tools.conMenu(x,y,{slang.conEditApp,slang.conEnterApp,slang.conEditLnk,"|","<gray>"..slang.conCopy,"<gray>"..slang.conPaste,"<gray>"..slang.conCut,"|",slang.conCreate,slang.conCreateDir,"<gray>"..slang.conCreateLnk,"|",slang.conDelete,"<gray>"..slang.conDeleteLnk,slang.conRename,"|","<gray>"..slang.conProp})
+					end
+					if pos == 1 then
+						if isMainCorrupted then
+							if current.tmppaths[choose].."main.lua" ~= nil then
+								temp="\""..current.tmppaths[choose].."main.lua".."\""
+							else
+								temp="Null"
+							end
+							tools.error({slang.corruptedLnk:format(temp)},2)
+						else
+							editItem(current.tmppaths[choose].."main.lua")
+						end
+					elseif pos == 2 then
+						if isCorrupted then
+							if current.tmppaths[choose] ~= nil then
+								temp="\""..current.tmppaths[choose].."\""
+							else
+								temp="Null"
+							end
+							tools.error({slang.corruptedLnk:format(temp)},2)
+						else
+							enterDir(current.tmppaths[choose])
+						end
+					elseif pos == 3 then
+						editItem() --editLnk
+					elseif pos == 9 then
+						createItem()
+					elseif pos == 10 then
+						createFolder()
+					elseif pos == 11 then
+						--createLnk
+					elseif pos == 13 then
+						deleteItem(_,true)
+					elseif pos == 14 then
+						deleteItem(true)
+					elseif pos == 15 then
+						renameItem()
+					elseif pos == 17 then
+						--properties
+					end
+				elseif current.tmpexts[choose] == "$dir" then --Link to Folder
+					pos=tools.conMenu(x,y,{slang.conEditLnk,"|","<gray>"..slang.conCopy,"<gray>"..slang.conPaste,"<gray>"..slang.conCut,"|",slang.conCreate,slang.conCreateDir,"<gray>"..slang.conCreateLnk,"|",slang.conDelete,"<gray>"..slang.conDeleteLnk,slang.conRename,"|","<gray>"..slang.conProp})
+					if pos == 1 then
+						editItem() --editLnk
+					elseif pos == 7 then
+						createItem()
+					elseif pos == 8 then
+						createFolder()
+					elseif pos == 9 then
+						--createLnk
+					elseif pos == 11 then
+						deleteItem(_,true)
+					elseif pos == 12 then
+						deleteItem(true)
+					elseif pos == 13 then
+						renameItem()
+					elseif pos == 15 then
+						--properties
+					end
+				else --Link to File
+					local isCorrupted=not fs.exists(current.tmppaths[choose] or "/ /")
+					if current.tmppaths[choose]=="" then isCorrupted=true end
+					if isCorrupted then
+						pos=tools.conMenu(x,y,{"<gray>"..slang.conEditFile,slang.conEditLnk,"|","<gray>"..slang.conCopy,"<gray>"..slang.conPaste,"<gray>"..slang.conCut,"|",slang.conCreate,slang.conCreateDir,"<gray>"..slang.conCreateLnk,"|",slang.conDelete,"<gray>"..slang.conDeleteLnk,slang.conRename,"|","<gray>"..slang.conProp})
+					else
+						pos=tools.conMenu(x,y,{slang.conEditFile,slang.conEditLnk,"|","<gray>"..slang.conCopy,"<gray>"..slang.conPaste,"<gray>"..slang.conCut,"|",slang.conCreate,slang.conCreateDir,"<gray>"..slang.conCreateLnk,"|",slang.conDelete,"<gray>"..slang.conDeleteLnk,slang.conRename,"|","<gray>"..slang.conProp})
+					end
+					if pos == 1 then
+						if isCorrupted then
+							if current.tmppaths[choose] ~= nil then
+								temp="\""..current.tmppaths[choose].."\""
+							else
+								temp="Null"
+							end
+							tools.error({slang.corruptedLnk:format(temp)},2)
+						else
+							editItem(current.tmppaths[choose])
+						end
+					elseif pos == 2 then
+						editItem() --editLnk
+					elseif pos == 8 then
+						createItem()
+					elseif pos == 9 then
+						createFolder()
+					elseif pos == 10 then
+						--createLnk
+					elseif pos == 12 then
+						deleteItem(_,true)
+					elseif pos == 13 then
+						deleteItem(true)
+					elseif pos == 14 then
+						renameItem()
+					elseif pos == 16 then
+						--properties
+					end
 				end
-				os.execute("edit '"..current.paths[choose].."'")
-				confLoad()
-				dirLoad()
-				draw()
-			elseif pos == 10 then
-				temp=system.rename(current.fullNames[choose])
-				if temp ~= nil then
-					fs.rename(current.paths[choose],path..temp)
-					dirLoad()
+			elseif current.exts[choose] == ".app" then --App
+				pos=tools.conMenu(x,y,{slang.conEditApp,slang.conEnterApp,"|","<gray>"..slang.conCopy,"<gray>"..slang.conPaste,"<gray>"..slang.conCut,"|",slang.conCreate,slang.conCreateDir,"<gray>"..slang.conCreateLnk,"|",slang.conDelete,slang.conRename,"|","<gray>"..slang.conProp})
+				if pos == 1 then
+					editItem(current.paths[choose].."main.lua")
+				elseif pos == 2 then
+					enterDir(current.paths[choose])
+				elseif pos == 8 then
+					createItem()
+				elseif pos == 9 then
+					createFolder()
+				elseif pos == 10 then
+					--createLnk
+				elseif pos == 12 then
+					deleteItem()
+				elseif pos == 13 then
+					renameItem()
+				elseif pos == 15 then
+					--properties
 				end
-				system.drawChooseReset()
-				ignoreLastChoose=true
-				choose=0
-				draw()
-			elseif pos == 7 then
-				temp=system.newFile()
-				if temp ~= nil then
-					file=io.open(path..temp,"w")
-					file:close()
-					dirLoad()
+			elseif current.exts[choose] == "$dir" then --Folder
+				pos=tools.conMenu(x,y,{"<gray>"..slang.conCopy,"<gray>"..slang.conPaste,"<gray>"..slang.conCut,"|",slang.conCreate,slang.conCreateDir,"<gray>"..slang.conCreateLnk,"|",slang.conDelete,slang.conRename,"|","<gray>"..slang.conProp})
+				if pos == 5 then
+					createItem()
+				elseif pos == 6 then
+					createFolder()
+				elseif pos == 7 then
+					--createLnk
+				elseif pos == 9 then
+					deleteItem()
+				elseif pos == 10 then
+					renameItem()
+				elseif pos == 12 then
+					--properties
 				end
-				system.drawChooseReset()
-				ignoreLastChoose=true
-				choose=0
-				draw()
-			elseif pos == 8 then
-				temp=system.newFolder()
-				if temp ~= nil then
-					fs.makeDirectory(path..temp)
-					dirLoad()
+			else --File
+				pos=tools.conMenu(x,y,{slang.conEdit,"|","<gray>"..slang.conCopy,"<gray>"..slang.conPaste,"<gray>"..slang.conCut,"|",slang.conCreate,slang.conCreateDir,"<gray>"..slang.conCreateLnk,"|",slang.conDelete,slang.conRename,"|","<gray>"..slang.conProp})
+				if pos == 1 then
+					editItem()
+				elseif pos == 7 then
+					createItem()
+				elseif pos == 8 then
+					createFolder()
+				elseif pos == 9 then
+					--createLnk
+				elseif pos == 11 then
+					deleteItem()
+				elseif pos == 12 then
+					renameItem()
+				elseif pos == 14 then
+					--properties
 				end
-				system.drawChooseReset()
-				ignoreLastChoose=true
-				choose=0
-				draw()
-			elseif pos == 9 then
-				temp=system.deleteConfirm(obl,currPage,choose)
-				if temp then
-					fs.remove(path..current.fullNames[choose])
-					dirLoad()
-				end
-				system.drawChooseReset()
-				ignoreLastChoose=true
-				choose=0
-				draw()
 			end
+
+
+			--pos=tools.conMenu(x,y,{slang.conEdit,"|","<gray>"..slang.conCopy,"<gray>"..slang.conPaste,"<gray>"..slang.conCut,"|",slang.conCreate,slang.conCreateDir,slang.conDelete,slang.--conRename,"|","<gray>"..slang.conProp})
+			--if pos == 1 then
+			--	if fs.exists("/tmp/timerid") then
+			--		file=io.open("/tmp/timerid","r")
+			--		event.cancel(tonumber(file:read("*all")))
+			--		file:close()
+			--		fs.remove("/tmp/timerid")
+			--	end
+			--	os.execute("edit '"..current.paths[choose].."'")
+			--	confLoad()
+			--	dirLoad()
+			--	draw()
+			--elseif pos == 10 then
+			--	temp=system.rename(current.fullNames[choose])
+			--	if temp ~= nil then
+			--		fs.rename(current.paths[choose],path..temp)
+			--		dirLoad()
+			--	end
+			--	system.drawChooseReset()
+			--	ignoreLastChoose=true
+			--	choose=0
+			--	draw()
+			--elseif pos == 7 then
+			--	temp=system.newFile()
+			--	if temp ~= nil then
+			--		file=io.open(path..temp,"w")
+			--		file:close()
+			--		dirLoad()
+			--	end
+			--	system.drawChooseReset()
+			--	ignoreLastChoose=true
+			--	choose=0
+			--	draw()
+			--elseif pos == 8 then
+			--	temp=system.newFolder()
+			--	if temp ~= nil then
+			--		fs.makeDirectory(path..temp)
+			--		dirLoad()
+			--	end
+			--	system.drawChooseReset()
+			--	ignoreLastChoose=true
+			--	choose=0
+			--	draw()
+			--elseif pos == 9 then
+			--	temp=system.deleteConfirm(obl,currPage,choose)
+			--	if temp then
+			--		fs.remove(path..current.fullNames[choose])
+			--		dirLoad()
+			--	end
+			--	system.drawChooseReset()
+			--	ignoreLastChoose=true
+			--	choose=0
+			--	draw()
+			--end
 		end
 	end
 	if y ~= h and sleep ~= 1 and click == 1 and skipCon == 0 then
-		pos=tools.conMenu(x,y,{"<gray>"..slang.conPaste,"|",slang.conCreate,slang.conCreateDir,"|",slang.conRefresh})
-		if pos == 6 then
+		pos=tools.conMenu(x,y,{"<gray>"..slang.conPaste,"|",slang.conCreate,slang.conCreateDir,"<gray>"..slang.conCreateLnk,"|",slang.conRefresh})
+		if pos == 3 then
+			createItem()
+		elseif pos == 4 then
+			createFolder()
+		elseif pos == 6 then
 			system.drawChooseReset()
 			ignoreLastChoose=true
 			confLoad()
 			dirLoad()
-			draw()
-		elseif pos == 3 then
-			temp=system.newFile()
-			if temp ~= nil then
-				file=io.open(path..temp,"w")
-				file:close()
-				dirLoad()
-			end
-			draw()
-		elseif pos == 4 then
-			temp=system.newFolder()
-			if temp ~= nil then
-				fs.makeDirectory(path..temp)
-				dirLoad()
-			end
 			draw()
 		end
 	elseif x >= 4 and x <= 6 and y == 1 then
@@ -348,7 +657,7 @@ elseif tip == "touch" then
 		temp=fs.segments(path)
 		if #temp > 1 then
 			temp=len(temp[#temp])
-			path=unicode.sub(path,1,-(temp+2))
+			path=sub(path,1,-(temp+2))
 		else
 			path="/"
 		end

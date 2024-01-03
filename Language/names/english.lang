@@ -7,4 +7,5 @@
 ["/fos/system/"]="System",
 ["#user#appdata/"]="Applications Data",
 ["#user#desktop/"]="Desktop",
-["#user#trash/"]="Recycle Bin"}
+["/.trash/"]="Recycle Bin",
+["/fos/"]="FOS"}
