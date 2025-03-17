@@ -15,7 +15,7 @@ local internet=r("internet")
 local fs=r("filesystem")
 local dir=fs.makeDirectory
 local lang={}
-local branch="https://raw.githubusercontent.com/MrFredber/FOS/Dev/"
+local branch="https://raw.githubusercontent.com/MrFredber/FOS/refs/heads/master/"
 dir("/lib/fos")
 print("Downloading necessary libraries... (1/4)")
 os.execute("wget -f -q "..branch.."Libraries/picture.lua /lib/fos/picture.lua")
